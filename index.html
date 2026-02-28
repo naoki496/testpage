@@ -13,7 +13,14 @@
   <div class="bg"></div>
 
   <header class="top">
-    <img class="logo" src="./H.K.LOBBY.png" alt="八東国語LOBBY" />
+    <!-- TOP LOGO (with fallback banner) -->
+    <div class="logoWrap" aria-label="八東国語LOBBY ロゴ">
+      <img class="logo" id="topLogo" src="./H.K.LOBBY.png" alt="八東国語LOBBY" />
+      <div class="logoFallback" id="logoFallback" hidden>
+        <div class="logoFallbackTitle">八東国語LOBBY</div>
+        <div class="logoFallbackSub">H.K. LOBBY</div>
+      </div>
+    </div>
 
     <!-- STATUS -->
     <section class="statusBar" aria-label="STATUS">
@@ -83,17 +90,20 @@
           <div class="archiveTitle">カード図鑑</div>
           <div class="archiveSub">CARD ARCHIVE</div>
         </div>
-        <a class="aBtn ghost" href="https://naoki496.github.io/cards-hub/status.html">OPEN</a>
+        <a class="aBtn ghost" href="https://naoki496.github.io/cards-hub/">OPEN</a>
       </div>
 
       <div class="grid" id="blitzGrid"></div>
     </section>
 
-    <!-- Install (bottom) -->
+    <!-- Install (always visible; state changes) -->
     <footer class="footer">
-      <button class="installBtn" id="btnInstall" type="button" hidden>
+      <button class="installBtn" id="btnInstall" type="button">
         アプリとしてインストール
       </button>
+      <div class="installHint" id="installHint" hidden>
+        この環境ではインストールが利用できません（既にインストール済み／またはブラウザ制限の可能性）。
+      </div>
     </footer>
   </main>
 
@@ -135,7 +145,7 @@
     </div>
   </div>
 
-  <!-- MISSIONBRIEF Modal (top only) -->
+  <!-- MISSIONBRIEF Modal -->
   <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
       <div class="modalHead">
@@ -148,7 +158,7 @@
     </div>
   </div>
 
-  <!-- DETAIL Modal (for “?”) -->
+  <!-- DETAIL Modal -->
   <div class="overlay" id="detailOverlay" style="display:none" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="DETAIL">
       <div class="modalHead">
