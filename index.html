@@ -1,3 +1,4 @@
+<!-- index.html（全文） -->
 <!doctype html>
 <html lang="ja">
 <head>
@@ -40,13 +41,10 @@
           <div class="v"><span id="hkpValue">0</span></div>
         </div>
 
-        <!-- HIGACHA（modeIcon形式） -->
         <div class="statusItem">
           <div class="k"></div>
           <button class="higachaBtn" id="btnHigacha" type="button">
-            <span class="modeIcon" aria-hidden="true">
-              <img src="./higacha_e.png" alt="">
-            </span>
+            <img class="higachaIcon" src="./higacha_e.png" alt="" aria-hidden="true">
             <span>HIGACHA</span>
           </button>
         </div>
@@ -61,7 +59,7 @@
           <span class="briefBadge" id="briefBadge" hidden>UPDATE</span>
         </span>
         <span class="briefChipText" id="briefOneLine">（未読）</span>
-        <span class="briefChipIcon" aria-hidden="true">▼</span>
+        <span class="briefChipIcon" id="briefChevron" aria-hidden="true">▼</span>
       </button>
     </section>
   </header>
@@ -74,7 +72,12 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./flashcard_e.png" alt="">
           </span>
-          <span class="modeLabel modeLabelBreak">FLASH<wbr>CARD</span>
+
+          <!-- ✅ 改行（FLASH / CARD） -->
+          <span class="modeLabel">
+            <span class="modeLine">FLASH</span>
+            <span class="modeLine">CARD</span>
+          </span>
         </span>
       </button>
 
@@ -83,7 +86,12 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./blitzquest_e.png" alt="">
           </span>
-          <span class="modeLabel modeLabelBreak">BLITZ<wbr>QUEST</span>
+
+          <!-- ✅ 改行（BLITZ / QUEST） -->
+          <span class="modeLabel">
+            <span class="modeLine">BLITZ</span>
+            <span class="modeLine">QUEST</span>
+          </span>
         </span>
       </button>
     </nav>
@@ -92,7 +100,8 @@
     <section class="panel" id="panelFlash">
       <div class="grid" id="flashGrid"></div>
 
-      <div class="dailyCard" aria-label="FLASHCARD DAILY 50">
+      <!-- ✅ ゲージ：少し下げる＋視線誘導を強化 -->
+      <div class="dailyCard dailyCard--focus" aria-label="FLASHCARD DAILY 50">
         <div class="dailyTop">
           <div class="dailyTitle">FLASH DAILY 50</div>
           <div class="dailySub"><span id="dailySeen">0</span> / 50（合計）</div>
@@ -123,10 +132,7 @@
     <section class="panel" id="panelBlitz" hidden>
       <div class="archiveCard" aria-label="カード図鑑リンク">
         <div class="archiveLeft">
-          <!-- カード図鑑アイコンも modeIcon 形式に統一 -->
-          <span class="modeIcon" aria-hidden="true">
-            <img src="./zukan_e.png" alt="">
-          </span>
+          <img class="miniIcon" src="./zukan_e.png" alt="" aria-hidden="true">
           <div class="archiveText">
             <div class="archiveTitle">カード図鑑</div>
             <div class="archiveSub">CARD ARCHIVE</div>
@@ -145,12 +151,11 @@
     </footer>
   </main>
 
-  <!-- EXPERT transition FX -->
   <div class="fxOverlay" id="fxOverlay" aria-hidden="true" style="display:none">
     <div class="fxPulse" aria-hidden="true"></div>
   </div>
 
-  <!-- HKP Help Modal（スクロール可能：modalBody overflow:auto をCSS側が担保） -->
+  <!-- HKP Help Modal -->
   <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="HKPの説明">
       <div class="modalHead">
@@ -163,7 +168,7 @@
     </div>
   </div>
 
-  <!-- HIGACHA Modal（既存app.jsが前提とするIDを復帰） -->
+  <!-- HIGACHA Modal -->
   <div class="overlay" id="higachaOverlay" style="display:none" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="HIGACHA">
       <div class="modalHead">
@@ -188,7 +193,7 @@
     </div>
   </div>
 
-  <!-- MISSIONBRIEF Modal（スクロール可能） -->
+  <!-- MISSIONBRIEF Modal -->
   <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
       <div class="modalHead">
