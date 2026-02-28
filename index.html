@@ -44,19 +44,28 @@
         </div>
 
         <!-- DAILY 50 (circular gauge) -->
-        <div class="statusItem statusDaily" aria-label="FLASH DAILY 50">
-          <div class="k">FLASH DAILY 50</div>
+        <div class="statusItem statusDaily">
+  <div class="k">
+    <span>FLASH DAILY 50</span>
+    <button class="helpBtn" id="btnDailyHelp" type="button" aria-label="FLASH DAILY 50の説明">?</button>
+  </div>
 
-          <div class="ringRow">
-            <div class="ringBox" aria-hidden="true">
-              <svg class="ring" viewBox="0 0 64 64" role="img" aria-label="進捗リング">
-                <circle class="ringTrack" cx="32" cy="32" r="22"></circle>
-                <circle class="ringProg" id="dailyRingProg" cx="32" cy="32" r="22"></circle>
-              </svg>
-              <div class="ringCenter">
-                <div class="ringNum" id="dailySeen">0</div>
-                <div class="ringDen">/50</div>
-              </div>
+  <div class="ringRow">
+    <div class="ringBox" aria-hidden="true">
+      <svg class="ring" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
+        <circle class="ringTrack" cx="26" cy="26" r="22"></circle>
+        <circle class="ringProg" id="dailyRingProg" cx="26" cy="26" r="22"></circle>
+      </svg>
+      <div class="ringCenter">
+        <div class="ringNum" id="dailySeen">0</div>
+      </div>
+    </div>
+
+    <div class="ringText">
+      <div class="ringReward">×5 → +2HKP</div>
+    </div>
+  </div>
+</div>
             </div>
 
             <div class="ringText">
@@ -173,6 +182,19 @@
         <div class="leftPad" id="hkpHelpBody"></div>
       </div>
     </div>
+
+<!-- Daily50 Help -->
+<div class="overlay" id="dailyHelpOverlay" style="display:none" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="FLASH DAILY 50の説明">
+    <div class="modalHead">
+      <div class="modalTitle">FLASH DAILY 50</div>
+      <button class="x" id="dailyHelpClose" type="button" aria-label="閉じる">×</button>
+    </div>
+    <div class="modalBody">
+      <div class="leftPad" id="dailyHelpBody"></div>
+    </div>
+  </div>
+</div>
   </div>
 
   <!-- HIGACHA Modal -->

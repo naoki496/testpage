@@ -140,7 +140,9 @@ body{
   background: radial-gradient(220px 80px at 30% 0%, rgba(255,255,255,.08), transparent 60%);
   pointer-events:none;
   opacity:.7;
+  z-index:0;
 }
+
 
 .k{
   display:flex;
@@ -788,3 +790,9 @@ body{
   font-size: 12px;
   padding: 8px 8px;
 }
+.statusItem > *{ position:relative; z-index:1; }
+
+
+.statusDaily .k{ justify-content:space-between; color: rgba(255,255,255,.92); }
+
+.ringCenter{ transform: translateY(1px) !important; }

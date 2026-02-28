@@ -15,7 +15,7 @@
   // Daily 50
   // st = {date, progressed, streak, touched}
   const DAILY_STATE_KEY = "hklobby.v1.flashDaily50";
-  const DAILY_DEBUG = true; // testpage: true / 本番: false 推奨
+  const DAILY_DEBUG = false; // testpage: true / 本番: false 推奨 // testpage: true / 本番: false 推奨
 
   // FLASH apps should store today's seen count here (numbers)
   const FLASH_TODAY_KEYS = [
@@ -308,7 +308,34 @@ HKPを入手できます。
     });
   }
 
+  
   // =========================
+  // Daily50 Help
+  // =========================
+  function initDailyHelp() {
+    const btn = $("btnDailyHelp");
+    const body = $("dailyHelpBody");
+    if (!btn || !body) return;
+
+    const { open } = bindOverlayClose("dailyHelpOverlay", "dailyHelpClose");
+    const text =
+`FLASH DAILY 50 とは？
+
+FLASHCARD（古文単語330 / 助動詞確認 / 文学知識総合）で
+「本日見たカード枚数（合計）」が 50 に到達すると 1回進行します。
+
+進行が 5 回分たまると、自動で +2HKP を付与し、カウントは 0 に戻ります。
+
+※カウントは端末の保存データ（localStorage）に記録されます。
+※実装テスト用のデバッグ機能は、必要なときだけ表示を戻します。`;
+
+    on(btn, "click", () => {
+      body.textContent = text;
+      open();
+    });
+  }
+
+// =========================
   // HIGACHA modal
   // =========================
   function initHigacha() {
@@ -736,6 +763,7 @@ TOTAL ${getHKP()} HKP`;
     disableCardTotal();
 
     initHkpHelp();
+    initDailyHelp();
     initHigacha();
     initBrief();
     initInstall();
