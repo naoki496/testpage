@@ -942,3 +942,66 @@ body{
   border-color: rgba(255,255,255,.14);
   filter: saturate(.96) brightness(.98);
 }
+
+/* =========================
+   STATUS only: Card feel boost
+   ========================= */
+
+.statusBar{
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255,255,255,.22) !important;
+  box-shadow:
+    0 22px 54px rgba(0,0,0,.34),
+    0 0 0 1px rgba(255,255,255,.08) inset,
+    0 0 0 1px rgba(0,0,0,.22),
+    0 0 56px rgba(127,231,255,.08) !important;
+}
+
+/* 角反射 + 内側陰影（STATUS全体） */
+.statusBar::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(240px 140px at 12% 0%, rgba(255,255,255,.10), transparent 55%),
+    radial-gradient(240px 140px at 88% 0%, rgba(255,255,255,.07), transparent 55%),
+    radial-gradient(240px 180px at 50% 115%, rgba(0,0,0,.22), transparent 55%);
+  opacity:.95;
+}
+.statusBar::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 38%),
+    linear-gradient(0deg, rgba(0,0,0,.26), rgba(0,0,0,0) 42%);
+  opacity:.9;
+}
+
+/* STATUS内の各カード（3枚） */
+.statusItem{
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(255,255,255,.16) !important;
+  background:
+    radial-gradient(200px 70px at 25% 0%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16)) !important;
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.22),
+    0 0 0 1px rgba(0,0,0,.22) inset,
+    0 0 0 1px rgba(255,255,255,.05);
+}
+.statusItem::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(140px 70px at 12% 0%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(160px 70px at 92% 0%, rgba(255,255,255,.07), transparent 60%),
+    linear-gradient(0deg, rgba(0,0,0,.22), transparent 45%);
+  opacity:.85;
+}
