@@ -87,13 +87,13 @@
       expertHref: "https://naoki496.github.io/kobun-quiz/expert.html",
       expertEnabled: true,
     },
-    {
-      name: "助動詞マスター",
-      normalHref: "https://naoki496.github.io/hatto-kobun-jodoushi/",
-      expertHref: "",
-      expertEnabled: false,
-    },
-    {
+{
+  {
+  name: "文学知識マスター",
+  normalHref: "https://naoki496.github.io/bungakusi-quiz/",
+  expertHref: "",
+  expertEnabled: false,
+},
       name: "漢字読解マスター",
       normalHref: "https://naoki496.github.io/kanji-y-quiz/",
       expertHref: "",
