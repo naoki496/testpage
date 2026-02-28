@@ -2,7 +2,6 @@
   --bg0:#07040a;
   --text:#ffffff;
   --sub: rgba(255,255,255,0.74);
-  --line: rgba(255,255,255,0.14);
 
   --mint:#7fe7ff;
   --pink:#ff55d6;
@@ -649,48 +648,19 @@ body{
   100%{ transform: scale(18); opacity:0; }
 }
 
-/* =========================
-   Icon sizing / image safety
-   ========================= */
-img{
-  max-width:100%;
-  height:auto;
-  display:block;
-}
+/* image safety + icon sizing */
+img{ max-width:100%; height:auto; display:block; }
 
-.tabIcon{
-  width: 26px;
-  height: 26px;
-  flex: 0 0 26px;
-  object-fit: contain;
-}
+.tabIcon{ width:26px; height:26px; flex:0 0 26px; object-fit:contain; }
+.bigBtnIcon{ width:34px; height:34px; flex:0 0 34px; object-fit:contain; }
+.zukanIcon{ width:28px; height:28px; flex:0 0 28px; object-fit:contain; }
 
-.bigBtnIcon{
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-  object-fit: contain;
-}
-
-.zukanIcon{
-  width: 28px;
-  height: 28px;
-  flex: 0 0 28px;
-  object-fit: contain;
-}
-
-/* =========================
-   Mobile vertical tuning (compact)
-   - BLITZQUEST card typography
-   - STATUS height
-   ========================= */
+/* compact on small screens */
 @media (max-width: 430px){
-  /* STATUS */
-  .statusItem{ padding:8px 10px; border-radius: 14px; }
-  .statusLabel{ font-size:12px; line-height:1.1; }
+  .statusItem{ padding:8px 10px; }
+  .statusLabel{ line-height:1.1; }
   .statusValue{ font-size:16px; line-height:1.1; }
 
-  /* BLITZ cards */
   #panelBlitz .card{ padding:10px; border-radius: 14px; }
   #panelBlitz .cardTitle{ font-size:14px; margin-bottom:8px; line-height:1.15; }
   #panelBlitz .cardActions .aBtn{ font-size:12.5px; padding:10px 10px; line-height:1.1; }
