@@ -663,3 +663,32 @@ body{
   25%{ opacity: 1; }
   100%{ transform: scale(1.10); opacity: 1; }
 }
+
+.modeIcon img,
+.miniIcon{
+  width:32px;
+  height:32px;
+  image-rendering: pixelated;
+  display:block;
+}
+
+.miniIcon{
+  width:28px;
+  height:28px;
+}
+
+.archiveLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* EXPERT 押下演出 */
+.expertBtn:active{
+  animation: expertFlash .3s ease-out;
+}
+@keyframes expertFlash{
+  0%{ filter:brightness(1); }
+  50%{ filter:brightness(1.6); }
+  100%{ filter:brightness(1); }
+}
