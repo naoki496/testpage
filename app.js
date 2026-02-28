@@ -73,33 +73,32 @@
   }
 
   // ===== Contents（名称は変更しない）=====
+  // Trial仕様：FLASHは「タイトル＝ボタン名」だけを出す
   const FLASH_CONTENTS = [
-    { name: "古文単語", href: "https://naoki496.github.io/flashcards/", sub: "読解の土台となる基礎語彙。" },
-    { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/", sub: "意味・用法・活用形の判断。" },
-    { name: "文学知識総合", href: "https://naoki496.github.io/flashcards/", sub: "作者・作品・時代背景を整理。" },
+    { name: "古文単語", href: "https://naoki496.github.io/flashcards/" },
+    { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/" },
+    { name: "文学知識総合", href: "https://naoki496.github.io/flashcards/" },
   ];
 
+  // Trial仕様：BLITZは title の下に NORMAL → EXPERT（スマホ基準で縦）
   const BLITZ_CONTENTS = [
     {
       name: "古文単語330マスター",
       expertHref: "https://naoki496.github.io/kobun-quiz/expert.html",
-      startHref:  "https://naoki496.github.io/kobun-quiz/",
+      normalHref: "https://naoki496.github.io/kobun-quiz/",
       expertEnabled: true,
-      sub: "先ずはここから制覇しよう",
     },
     {
       name: "文学史知識マスター",
       expertHref: "",
-      startHref:  "https://naoki496.github.io/bungakusi-quiz/",
+      normalHref: "https://naoki496.github.io/bungakusi-quiz/",
       expertEnabled: false,
-      sub: "作者・作品・時代の基礎を即断で固める。",
     },
     {
       name: "漢字読解マスター",
       expertHref: "",
-      startHref:  "https://naoki496.github.io/kanji-y-quiz/",
+      normalHref: "https://naoki496.github.io/kanji-y-quiz/",
       expertEnabled: false,
-      sub: "読解で差がつく漢字運用を鍛える。",
     },
   ];
 
@@ -131,12 +130,9 @@
     FLASH_CONTENTS.forEach((c) => {
       const card = document.createElement("div");
       card.className = "card";
-
       card.innerHTML = `
-        <div class="cardTitle">${escapeHtml(c.name)}</div>
-        <div class="cardSub">${escapeHtml(c.sub || "")}</div>
         <div class="cardActions">
-          <a class="aBtn primary" href="${c.href}">START</a>
+          <a class="aBtn primary" href="${c.href}">${escapeHtml(c.name)}</a>
         </div>
       `;
       grid.appendChild(card);
@@ -161,10 +157,9 @@
 
       card.innerHTML = `
         <div class="cardTitle">${escapeHtml(c.name)}</div>
-        <div class="cardSub">${escapeHtml(c.sub || "")}</div>
         <div class="cardActions">
+          <a class="aBtn primary" href="${c.normalHref}">NORMAL</a>
           <a ${expertAttrs} href="${expertHref}">EXPERT</a>
-          <a class="aBtn primary" href="${c.startHref}">START</a>
         </div>
       `;
       grid.appendChild(card);
@@ -479,21 +474,21 @@ TOTAL ${getHKP()} HKP`;
     const hint = $("installHint");
     if (!btn) return;
 
-    // try SW register (helps beforeinstallprompt eligibility)
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").catch(() => {});
     }
 
     let deferredPrompt = null;
 
-    function setAvailable(available) {
-      if (!btn) return;
+    function setAvailable(available, msg) {
       btn.classList.toggle("is-disabled", !available);
       btn.setAttribute("aria-disabled", String(!available));
-      if (hint) hint.hidden = available;
+      if (hint) {
+        hint.hidden = available;
+        if (!available && msg) hint.textContent = msg;
+      }
     }
 
-    // default: not available until we get the event
     setAvailable(false);
 
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -504,23 +499,18 @@ TOTAL ${getHKP()} HKP`;
 
     window.addEventListener("appinstalled", () => {
       deferredPrompt = null;
-      setAvailable(false);
-      if (hint) {
-        hint.hidden = false;
-        hint.textContent = "インストール済みです（ホーム画面から起動できます）。";
-      }
+      setAvailable(false, "インストール済みです（ホーム画面から起動できます）。");
     });
 
     on(btn, "click", async () => {
       if (!deferredPrompt) {
-        // show hint instead of doing nothing
-        setAvailable(false);
+        setAvailable(false, "この環境ではインストールが利用できません（既にインストール済み／またはブラウザ制限の可能性）。");
         return;
       }
       deferredPrompt.prompt();
       try { await deferredPrompt.userChoice; } catch {}
       deferredPrompt = null;
-      setAvailable(false);
+      setAvailable(false, "インストールが完了していない場合は、ブラウザの共有メニューから「ホーム画面に追加」をお試しください。");
     });
   }
 
