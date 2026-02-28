@@ -230,6 +230,14 @@
     setTimeout(() => { location.href = url; }, 380);
   }
 
+  // ✅ BFCache復帰対策：戻った時にFXが残っていたら必ず消す
+  function clearFxOverlay() {
+    const fx = $("fxOverlay");
+    if (!fx) return;
+    fx.style.display = "none";
+    fx.setAttribute("aria-hidden", "true");
+  }
+
   // =========================
   // Render grids
   // =========================
@@ -257,6 +265,8 @@
       card.className = "card";
 
       const expertDisabled = !c.expertEnabled || !c.expertHref;
+      const expertLabel = expertDisabled ? "EXPERT（LOCK）" : "EXPERT";
+
       const expertAttrs = expertDisabled
         ? `class="aBtn danger is-disabled" aria-disabled="true" tabindex="-1"`
         : `class="aBtn danger" data-expert="1" data-expert-url="${escapeHtml(c.expertHref)}"`;
@@ -265,7 +275,7 @@
         <div class="cardTitle">${escapeHtml(c.name)}</div>
         <div class="cardActions">
           <a class="aBtn primary" href="${c.normalHref}">NORMAL</a>
-          <a ${expertAttrs} href="${expertDisabled ? "#" : c.expertHref}">EXPERT</a>
+          <a ${expertAttrs} href="${expertDisabled ? "#" : c.expertHref}">${expertLabel}</a>
         </div>
       `;
       grid.appendChild(card);
@@ -594,24 +604,18 @@ TOTAL ${getHKP()} HKP`;
     if (st.date !== t) {
       const gap = diffDays(st.date, t);
       if (gap >= 1) {
-        // 「前日（st.date）が0枚なら減少」
         let dec = 0;
         if (!st.touched) dec += 1;
-
-        // さらに空いた日（gap-1日）も「触ってない」扱い → 日数分減少
         if (gap > 1) dec += (gap - 1);
-
         st.streak = Math.max(0, st.streak - dec);
       }
 
-      // 今日の状態にリセット
       st.date = t;
       st.progressed = false;
       st.touched = false;
       saveDailyState(st);
     }
 
-    // 表示用に 0..4 に収める（5到達は即リセット運用なので通常ここに残らない）
     st.streak = Math.max(0, Math.min(4, st.streak));
     return st;
   }
@@ -635,12 +639,9 @@ TOTAL ${getHKP()} HKP`;
     if (dbg) dbg.hidden = !DAILY_DEBUG;
   }
 
-  // ✅ 今日の合算50枚到達で「1日1回だけ」streak+1
-  // ✅ streak が 5 に到達した瞬間に +2HKP して streak を 0 に戻す
   function tryProgressDaily(st) {
     const seen = getTodaySeenTotal();
 
-    // touched 判定（0枚のままなら false のまま）
     if (seen > 0 && !st.touched) {
       st.touched = true;
       saveDailyState(st);
@@ -648,18 +649,13 @@ TOTAL ${getHKP()} HKP`;
 
     renderDailyUI(seen, st);
 
-    // 今日すでに加算済み
     if (st.progressed) return;
-
-    // 50未満なら未達
     if (seen < 50) return;
 
-    // 50到達：今日1回だけ進行
     st.progressed = true;
     st.touched = true;
     let next = (Number(st.streak) || 0) + 1;
 
-    // 5到達 → +2HKP & 0へ
     if (next >= 5) {
       addHKP(2);
       next = 0;
@@ -678,7 +674,6 @@ TOTAL ${getHKP()} HKP`;
     const reset = $("dbgResetDaily");
 
     function bumpAll(n) {
-      // テスト用：kobunキーに寄せて足す（合算50の挙動確認用）
       const k = FLASH_TODAY_KEYS[0];
       localStorage.setItem(k, String(readNum(k) + n));
     }
@@ -716,6 +711,7 @@ TOTAL ${getHKP()} HKP`;
   // Sync on return (重要)
   // =========================
   function syncStatus() {
+    clearFxOverlay(); // ✅ 追加：戻る/復帰でFX残留を確実に消す
     renderHKP();
     updateHigachaButtonState();
     const st = ensureDailyState();
@@ -723,18 +719,14 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function initSyncHooks() {
-    // 他ページから戻った瞬間（最重要）
     window.addEventListener("focus", syncStatus);
 
-    // バックグラウンド → 復帰
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) syncStatus();
     });
 
-    // BFCache 復帰（iOS Safari 等）
     window.addEventListener("pageshow", syncStatus);
 
-    // 別タブ等から localStorage が更新された場合（同一オリジン）
     window.addEventListener("storage", (e) => {
       if (!e) return;
       if (
@@ -760,6 +752,7 @@ TOTAL ${getHKP()} HKP`;
   // Boot
   // =========================
   function boot() {
+    clearFxOverlay(); // ✅ 追加：初期表示でも安全側
     initLogoFallback();
 
     renderFlash();
@@ -779,14 +772,11 @@ TOTAL ${getHKP()} HKP`;
     initBrief();
     initInstall();
 
-    // Daily 50
     initDailyDebugControls();
 
-    // ✅ 初期同期
     const st = ensureDailyState();
     tryProgressDaily(st);
 
-    // ✅ 復帰時同期（ここが効く）
     initSyncHooks();
   }
 
