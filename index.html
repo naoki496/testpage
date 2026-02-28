@@ -40,11 +40,13 @@
           <div class="v"><span id="hkpValue">0</span></div>
         </div>
 
-        <!-- ✅ HIGACHA: ラベル削除 / ボタンにHIGACHA表記 / アイコン大 -->
+        <!-- HIGACHA -->
         <div class="statusItem">
           <div class="k"></div>
           <button class="higachaBtn" id="btnHigacha" type="button">
-            <img class="higachaIcon" src="./higacha_e.png" alt="" aria-hidden="true">
+            <span class="modeIcon" aria-hidden="true">
+              <img src="./higacha_e.png" alt="">
+            </span>
             <span>HIGACHA</span>
           </button>
         </div>
@@ -72,10 +74,8 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./flashcard_e.png" alt="">
           </span>
-          <!-- ✅ 改行ポイントだけ付与（名称はそのまま） -->
-          <span class="modeLabel">FLASH<wbr>CARD</span>
+          <span class="modeLabel modeLabelBreak">FLASH<wbr>CARD</span>
         </span>
-        <span class="modeTag">DRILL</span>
       </button>
 
       <button class="modeBtn modeBlitz" id="tabBlitz" type="button">
@@ -83,9 +83,8 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./blitzquest_e.png" alt="">
           </span>
-          <span class="modeLabel">BLITZ<wbr>QUEST</span>
+          <span class="modeLabel modeLabelBreak">BLITZ<wbr>QUEST</span>
         </span>
-        <span class="modeTag">BATTLE</span>
       </button>
     </nav>
 
@@ -93,7 +92,6 @@
     <section class="panel" id="panelFlash">
       <div class="grid" id="flashGrid"></div>
 
-      <!-- ✅ ゲージはボタン群の一番下へ移動 -->
       <div class="dailyCard" aria-label="FLASHCARD DAILY 50">
         <div class="dailyTop">
           <div class="dailyTitle">FLASH DAILY 50</div>
@@ -146,57 +144,6 @@
 
   <div class="fxOverlay" id="fxOverlay" aria-hidden="true" style="display:none">
     <div class="fxPulse" aria-hidden="true"></div>
-  </div>
-
-  <!-- HKP Help Modal -->
-  <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="HKPの説明">
-      <div class="modalHead">
-        <div class="modalTitle">HKP</div>
-        <button class="x" id="hkpHelpClose" type="button" aria-label="閉じる">×</button>
-      </div>
-      <div class="modalBody">
-        <div class="leftPad" id="hkpHelpBody"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HIGACHA Modal -->
-  <div class="overlay" id="higachaOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="HIGACHA">
-      <div class="modalHead">
-        <div class="modalTitle">HIGACHA</div>
-        <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
-      </div>
-
-      <div class="modalBody">
-        <div class="gachaHero">
-          <img class="gachaImg" src="./higacha.png" alt="HIGACHA" />
-        </div>
-
-        <div class="gachaMsg leftPad" id="higachaMsg"></div>
-
-        <div class="modalActions">
-          <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
-          <button class="btnPrimary ghostBtn" id="higachaCancel" type="button">CLOSE</button>
-        </div>
-
-        <div class="note">※HIGACHAは1日1回まで</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MISSIONBRIEF Modal -->
-  <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
-      <div class="modalHead">
-        <div class="modalTitle">MISSIONBRIEF</div>
-        <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>
-      </div>
-      <div class="modalBody">
-        <ul class="briefList" id="briefList"></ul>
-      </div>
-    </div>
   </div>
 
   <script src="./app.js"></script>
