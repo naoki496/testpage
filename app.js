@@ -14,15 +14,10 @@
 
   // Daily 50
   // st = {date, progressed, streak, touched}
-  // - date: "YYYY-MM-DD" (今日)
-  // - progressed: 今日すでに「50枚達成としてゲージ加算」したか
-  // - streak: 0..4（5到達で+2HKP→0へ）
-  // - touched: 今日1枚でも触ったか（0枚ならfalseのまま）
   const DAILY_STATE_KEY = "hklobby.v1.flashDaily50";
   const DAILY_DEBUG = true; // testpage: true / 本番: false 推奨
 
   // FLASH apps should store today's seen count here (numbers)
-  // ✅ 合算で 50 枚 / 日（古典単語・助動詞・文学知識など全て）
   const FLASH_TODAY_KEYS = [
     "hk.flash.kobun.todaySeen",
     "hk.flash.jodoushi.todaySeen",
@@ -133,7 +128,11 @@
     return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
   }
 
-  // ✅ setHKP / addHKP 内で必ず renderHKP を実行（同期漏れ防止）
+  function renderHKP() {
+    const el = $("hkpValue");
+    if (el) el.textContent = String(getHKP());
+  }
+
   function setHKP(n) {
     const v = Math.max(0, Math.trunc(Number(n) || 0));
     localStorage.setItem(HKP_KEY, String(v));
@@ -144,11 +143,6 @@
   function addHKP(delta) {
     const next = getHKP() + (Number(delta) || 0);
     return setHKP(next);
-  }
-
-  function renderHKP() {
-    const el = $("hkpValue");
-    if (el) el.textContent = String(getHKP());
   }
 
   function canHigachaToday() {
@@ -169,9 +163,6 @@
     btn.setAttribute("aria-disabled", String(!ok));
   }
 
-  // =========================
-  // Rank / total placeholders
-  // =========================
   function renderRankPlaceholder() {
     const el = $("rankValue");
     if (el) el.textContent = "-";
@@ -188,7 +179,7 @@
   function bindOverlayClose(overlayId, closeId) {
     const overlay = $(overlayId);
     const closeBtn = $(closeId);
-    if (!overlay || !closeBtn) return { open: () => {}, close: () => {}, overlay: null };
+    if (!overlay || !closeBtn) return { open: () => {}, close: () => {} };
 
     let lastFocus = null;
 
@@ -213,7 +204,7 @@
       if (e.key === "Escape" && overlay.style.display === "flex") close();
     });
 
-    return { open, close, overlay };
+    return { open, close };
   }
 
   // =========================
@@ -330,42 +321,43 @@ HKPを入手できます。
     const msgEl = $("higachaMsg");
     if (!btn || !overlay || !closeBtn || !cancelBtn || !drawBtn || !msgEl) return;
 
-    let lastFocus = null;
+    const { open, close } = (() => {
+      let lastFocus = null;
+      function _open() {
+        lastFocus = document.activeElement;
+        const ok = canHigachaToday();
 
-    function open() {
-      lastFocus = document.activeElement;
-      const ok = canHigachaToday();
-
-      if (ok) {
-        msgEl.textContent =
+        if (ok) {
+          msgEl.textContent =
 `本日のHIGACHAを実行します。
 
 結果により +1 または +2 HKP を獲得します。`;
-        drawBtn.disabled = false;
-        drawBtn.style.opacity = "";
-      } else {
-        msgEl.textContent =
+          drawBtn.disabled = false;
+          drawBtn.style.opacity = "";
+        } else {
+          msgEl.textContent =
 `本日のHIGACHAは使用済みです。
 
 また明日、試せます。`;
-        drawBtn.disabled = true;
-        drawBtn.style.opacity = "0.45";
+          drawBtn.disabled = true;
+          drawBtn.style.opacity = "0.45";
+        }
+
+        overlay.style.display = "flex";
+        overlay.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        closeBtn.focus();
       }
-
-      overlay.style.display = "flex";
-      overlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      closeBtn.focus();
-    }
-
-    function close() {
-      overlay.style.display = "none";
-      overlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      try { lastFocus?.focus?.(); } catch {}
-      renderHKP();
-      updateHigachaButtonState();
-    }
+      function _close() {
+        overlay.style.display = "none";
+        overlay.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        try { lastFocus?.focus?.(); } catch {}
+        renderHKP();
+        updateHigachaButtonState();
+      }
+      return { open:_open, close:_close };
+    })();
 
     on(btn, "click", open);
     on(closeBtn, "click", close);
@@ -522,42 +514,6 @@ TOTAL ${getHKP()} HKP`;
   }
 
   // =========================
-  // Logo fallback
-  // =========================
-  function initLogoFallback() {
-    const img = $("topLogo");
-    const fb = $("logoFallback");
-    if (!img || !fb) return;
-
-    const candidates = [
-      "./H.K.LOBBY.png",
-      "./H.K.LOBBY.PNG",
-      "./H.K.LOBBY.webp",
-      "./H.K.LOBBY.WEBP",
-      "./H.K.LOBBY.jpg",
-      "./H.K.LOBBY.JPG",
-      "./H.K.LOBBY.jpeg",
-      "./H.K.LOBBY.JPEG",
-    ];
-
-    let i = 0;
-    fb.hidden = true;
-    img.hidden = false;
-
-    img.addEventListener("error", () => {
-      i++;
-      if (i >= candidates.length) {
-        img.hidden = true;
-        fb.hidden = false;
-        return;
-      }
-      img.src = candidates[i];
-    });
-
-    img.src = candidates[0];
-  }
-
-  // =========================
   // Daily 50 logic
   // =========================
   function readNum(key) {
@@ -578,14 +534,10 @@ TOTAL ${getHKP()} HKP`;
     try { localStorage.setItem(DAILY_STATE_KEY, JSON.stringify(st)); } catch {}
   }
 
-  // ✅ 3コンテンツ合算の「今日の閲覧枚数」
   function getTodaySeenTotal() {
     return FLASH_TODAY_KEYS.reduce((sum, k) => sum + readNum(k), 0);
   }
 
-  // ✅ 日付更新時：
-  // - 前日が「touched=false（0枚）」なら streak を -1
-  // - 複数日空いたら、空いた日数分 streak を減らす（0未満にならない）
   function ensureDailyState() {
     const t = todayYMD();
     let st = loadDailyState();
@@ -630,10 +582,7 @@ TOTAL ${getHKP()} HKP`;
 
     const steps = [$("step1"), $("step2"), $("step3"), $("step4"), $("step5")];
     const s = (Number(st?.streak) || 0);
-    steps.forEach((el, idx) => {
-      if (!el) return;
-      el.classList.toggle("on", idx < s);
-    });
+    steps.forEach((el, idx) => { if (el) el.classList.toggle("on", idx < s); });
 
     const dbg = $("dailyDbg");
     if (dbg) dbg.hidden = !DAILY_DEBUG;
@@ -672,20 +621,21 @@ TOTAL ${getHKP()} HKP`;
     const add10 = $("dbgAdd10");
     const add50 = $("dbgAdd50");
     const reset = $("dbgResetDaily");
+    if (!add10 || !add50 || !reset) return;
 
-    function bumpAll(n) {
+    function bumpAny(n) {
       const k = FLASH_TODAY_KEYS[0];
       localStorage.setItem(k, String(readNum(k) + n));
     }
 
     on(add10, "click", () => {
-      bumpAll(10);
+      bumpAny(10);
       const st = ensureDailyState();
       tryProgressDaily(st);
     });
 
     on(add50, "click", () => {
-      bumpAll(50);
+      bumpAny(50);
       const st = ensureDailyState();
       tryProgressDaily(st);
     });
@@ -711,7 +661,7 @@ TOTAL ${getHKP()} HKP`;
   // Sync on return (重要)
   // =========================
   function syncStatus() {
-    clearFxOverlay(); // ✅ 追加：戻る/復帰でFX残留を確実に消す
+    clearFxOverlay(); // ✅ 戻る/復帰でFX残留を確実に消す
     renderHKP();
     updateHigachaButtonState();
     const st = ensureDailyState();
@@ -720,11 +670,9 @@ TOTAL ${getHKP()} HKP`;
 
   function initSyncHooks() {
     window.addEventListener("focus", syncStatus);
-
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) syncStatus();
     });
-
     window.addEventListener("pageshow", syncStatus);
 
     window.addEventListener("storage", (e) => {
@@ -740,20 +688,13 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
-  // =========================
-  // Tabs
-  // =========================
   function initTabs() {
     on($("tabFlash"), "click", () => setMode("flash"));
     on($("tabBlitz"), "click", () => setMode("blitz"));
   }
 
-  // =========================
-  // Boot
-  // =========================
   function boot() {
-    clearFxOverlay(); // ✅ 追加：初期表示でも安全側
-    initLogoFallback();
+    clearFxOverlay(); // 初期も安全側
 
     renderFlash();
     renderBlitz();
