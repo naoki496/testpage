@@ -11,7 +11,7 @@
   --mint:#7fe7ff;
   --pink:#ff55d6;
   --lav:#a79bff;
-  --amber:#ffcc66; /* warmth */
+  --amber:#ffcc66;
 
   --radius: 18px;
 }
@@ -25,7 +25,7 @@ body{
   background:
     radial-gradient(900px 700px at 25% 10%, rgba(167,155,255,.18), transparent 60%),
     radial-gradient(900px 700px at 80% 15%, rgba(255,85,214,.14), transparent 62%),
-    radial-gradient(900px 700px at 55% 85%, rgba(255,204,102,.10), transparent 60%),
+    radial-gradient(900px 700px at 55% 85%, rgba(255,204,102,.12), transparent 60%),
     radial-gradient(900px 700px at 10% 85%, rgba(127,231,255,.10), transparent 60%),
     linear-gradient(180deg, var(--bg0), #050207);
   overflow-x:hidden;
@@ -198,27 +198,75 @@ body{
   padding: 10px 14px 18px;
 }
 
-.seg{
-  display:flex;
+/* ===== MODE DOCK (special obvious buttons) ===== */
+.modeDock{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
   gap:10px;
-  margin: 10px 0 12px;
+  margin: 12px 0 12px;
 }
-.segBtn{
-  flex:1;
-  min-height: 44px;
-  padding:12px 10px;
-  border-radius: 16px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.04);
-  color: rgba(255,255,255,.92);
-  font-weight: 950;
-  letter-spacing: .06em;
+.modeBtn{
+  min-height: 56px;
+  padding: 12px 12px;
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.94);
   cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  position:relative;
+  overflow:hidden;
 }
-.segBtn.is-on{
-  border-color: rgba(127,231,255,.34);
-  background: rgba(127,231,255,.09);
-  box-shadow: 0 0 28px rgba(127,231,255,.12);
+.modeBtn::after{
+  content:"";
+  position:absolute;
+  inset:-40% -30%;
+  transform: rotate(12deg);
+  opacity:.35;
+  pointer-events:none;
+}
+.modeLabel{
+  font-weight: 950;
+  letter-spacing:.06em;
+}
+.modeTag{
+  font-size: 12px;
+  font-weight: 950;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.16);
+  color: rgba(255,255,255,.90);
+}
+
+/* FLASH mode style */
+.modeFlash{
+  border-color: rgba(127,231,255,.30);
+  box-shadow: 0 0 24px rgba(127,231,255,.12);
+}
+.modeFlash::after{
+  background: radial-gradient(closest-side, rgba(127,231,255,.30), transparent 70%);
+}
+
+/* BLITZ mode style */
+.modeBlitz{
+  border-color: rgba(255,204,102,.26);
+  box-shadow: 0 0 24px rgba(255,204,102,.10);
+}
+.modeBlitz::after{
+  background: radial-gradient(closest-side, rgba(255,85,214,.22), transparent 70%);
+}
+
+.modeBtn.is-on{
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+.modeBtn.is-on .modeTag{
+  border-color: rgba(255,255,255,.28);
+  background: rgba(255,255,255,.10);
 }
 
 .panel{
@@ -235,11 +283,6 @@ body{
   font-size: 14px;
   font-weight: 950;
   letter-spacing:.06em;
-}
-.panelHint{
-  margin-top:4px;
-  font-size: 12px;
-  color: var(--sub);
 }
 
 .grid{
@@ -263,29 +306,20 @@ body{
 .cardTitle{
   font-weight: 950;
   font-size: 14px;
-  margin: 0 0 6px;
-}
-.cardSub{
-  font-size: 12px;
-  color: var(--sub);
   margin: 0 0 10px;
-  min-height: 16px;
 }
 
-/* Buttons: mobile vertical, PC horizontal */
+/* Buttons: mobile vertical, PC horizontal (but in this trial, we keep vertical always) */
 .cardActions{
   display:flex;
   gap:8px;
   flex-direction: column;
 }
-@media (min-width: 760px){
-  .cardActions{ flex-direction: row; }
-}
 
 .aBtn{
   flex:1;
   width:100%;
-  min-height: 46px;
+  min-height: 48px;
   padding: 12px 12px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
@@ -306,7 +340,7 @@ body{
   pointer-events:none;
 }
 
-/* START */
+/* NORMAL (old START) */
 .aBtn.primary{
   border-color: rgba(127,231,255,.30);
   background: rgba(127,231,255,.10);
@@ -316,21 +350,21 @@ body{
 /* EXPERT: stronger ritual */
 .aBtn.danger{
   position: relative;
-  border-color: rgba(255,85,214,.72);
+  border-color: rgba(255,85,214,.78);
   background:
-    radial-gradient(120px 40px at 20% 30%, rgba(255,255,255,.16), transparent 70%),
-    linear-gradient(180deg, rgba(255,85,214,.28), rgba(255,85,214,.10));
+    radial-gradient(140px 44px at 20% 30%, rgba(255,255,255,.18), transparent 70%),
+    linear-gradient(180deg, rgba(255,85,214,.30), rgba(255,85,214,.10));
   box-shadow:
-    0 0 26px rgba(255,85,214,.30),
-    0 0 70px rgba(255,85,214,.18);
-  animation: breathe 2.4s ease-in-out infinite;
+    0 0 30px rgba(255,85,214,.34),
+    0 0 86px rgba(255,85,214,.20);
+  animation: expertPulse 2.0s ease-in-out infinite;
 }
 .aBtn.danger::after{
   content:"";
   position:absolute;
   inset: 5px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.20);
   pointer-events:none;
 }
 .aBtn.danger::before{
@@ -341,12 +375,12 @@ body{
   transform: translateY(-50%);
   opacity:.95;
   color: rgba(255,255,255,.92);
-  text-shadow: 0 0 22px rgba(255,85,214,.70);
+  text-shadow: 0 0 26px rgba(255,85,214,.78);
 }
-.aBtn.danger:hover{ filter: brightness(1.08); }
-@keyframes breathe{
-  0%,100%{ transform: translateY(0); }
-  50%{ transform: translateY(-1px); }
+.aBtn.danger:hover{ filter: brightness(1.10); }
+@keyframes expertPulse{
+  0%,100%{ transform: translateY(0); filter: brightness(1); }
+  50%{ transform: translateY(-1px); filter: brightness(1.14); }
 }
 
 /* Ghost */
@@ -386,15 +420,8 @@ body{
   cursor:pointer;
   box-shadow: 0 0 28px rgba(255,204,102,.10);
 }
-.installBtn.is-disabled{
-  opacity: .55;
-  cursor: default;
-}
-.installHint{
-  margin-top: 8px;
-  font-size: 12px;
-  color: rgba(255,255,255,.68);
-}
+.installBtn.is-disabled{ opacity: .55; cursor: default; }
+.installHint{ margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.68); }
 
 /* Lists in modals */
 .briefList{ margin:0; padding-left:0; list-style:none; }
