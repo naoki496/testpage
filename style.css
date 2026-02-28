@@ -120,7 +120,7 @@ body{
   gap:10px;
 }
 .statusItem{
-  padding:10px 10px;
+  padding:8px 10px;
   border:1px solid rgba(255,255,255,.10);
   border-radius: 14px;
   background: rgba(0,0,0,.14);
@@ -128,7 +128,7 @@ body{
   overflow:hidden;
 
   /* 高さ固定（4枚同じ縦幅） */
-  
+  height: 92px;
   display:flex;
   flex-direction:column;
   justify-content: space-between;
@@ -161,7 +161,7 @@ body{
   position:relative;
   z-index:1;
 }
-.mini{ margin-top: 6px; font-size: 12px; color: rgba(255,255,255,.74); position:relative; z-index:1; }
+.mini{ margin-top: 4px; font-size: 11px; color: rgba(255,255,255,.74); position:relative; z-index:1; }
 .miniNum{ font-weight: 950; color: rgba(255,255,255,.92); }
 
 .helpBtn{
@@ -187,7 +187,7 @@ body{
   font-weight: 950;
   letter-spacing: .06em;
   display:flex;
-  flex-direction:column;
+  flex-direction: row;
   align-items:center;
   justify-content:center;
   gap:8px;
@@ -425,29 +425,6 @@ body{
   filter: brightness(1.08);
 }
 
-
-
-/* selected marker (mode) */
-.modeBtn{ position: relative; }
-.modeBtn::before{
-  content:"";
-  position:absolute;
-  top: 8px;
-  left: 8px;
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.15);
-  border: 1px solid rgba(255,255,255,.22);
-  box-shadow: 0 0 14px rgba(255,255,255,.12);
-  opacity: .0;
-  transform: scale(.9);
-  transition: opacity .18s ease, transform .18s ease;
-}
-.modeBtn.is-on::before{
-  opacity: 1;
-  transform: scale(1);
-}
 /* Panels */
 .panel{
   border:1px solid var(--line);
@@ -819,3 +796,146 @@ body{
 .statusDaily .k{ justify-content:space-between; color: rgba(255,255,255,.92); }
 
 .ringCenter{ transform: translateY(1px) !important; }
+
+/* =========================
+   STATUS compact fix (CSS only)
+   ========================= */
+
+/* STATUS 全体を詰める */
+.statusBar{
+  padding: 10px !important;
+}
+
+/* STATUS 内グリッドを安定させる */
+.statusGrid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* スマホ時：2×2で固定（HIGACHAが外に出ない） */
+@media (max-width: 420px){
+  .statusGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 各 STATUS カードの縦幅を揃える */
+.statusItem{
+  min-height: 96px;
+  padding: 8px 8px !important;
+}
+
+/* 中の文字を詰める */
+.statusItem .k{
+  font-size: 11px;
+}
+.statusItem .v{
+  font-size: 16px;
+  margin-top: 2px;
+}
+.statusItem .mini{
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+/* HIGACHA ボタンをカード内に収める */
+.statusItem .higachaBtn{
+  margin-top: 4px;
+  min-height: 40px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+/* 黒ずみ対策：STATUS限定で背景を少し明るく */
+.statusItem{
+  background: rgba(255,255,255,.05) !important;
+}
+
+/* STATUS だけカード演出を軽くする */
+.statusBar::before,
+.statusBar::after,
+.statusItem::before,
+.statusItem::after{
+  opacity: .45;
+}
+
+/* =========================
+   STATUS compact (65% target)
+   ========================= */
+.statusBar{
+  padding: 8px !important;
+}
+
+.statusGrid{
+  gap: 7px !important;
+}
+
+.statusItem{
+  min-height: 62px !important;     /* 96px → 約65% */
+  padding: 6px 7px !important;     /* 10→6 */
+}
+
+.statusItem .k{
+  font-size: 10.5px !important;
+  gap: 6px !important;
+}
+
+.statusItem .v{
+  font-size: 15px !important;
+  margin-top: 1px !important;
+  line-height: 1.05 !important;
+}
+
+.statusItem .mini{
+  margin-top: 2px !important;
+  font-size: 10.5px !important;
+  line-height: 1.1 !important;
+}
+
+/* HIGACHAボタンが収まるようにさらに詰める */
+.statusItem .higachaBtn{
+  margin-top: 3px !important;
+  min-height: 34px !important;
+  padding: 6px 8px !important;
+  font-size: 11px !important;
+}
+
+/* まだ黒く沈むなら少しだけ持ち上げる（STATUS内だけ） */
+.statusItem{
+  background: rgba(255,255,255,.055) !important;
+}
+
+/* =========================
+   Mode selected dot restore
+   ========================= */
+.modeBtn{
+  position: relative; /* 念のため */
+}
+
+.modeBtn.is-on::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  top:10px;
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 0 16px rgba(255,255,255,.22);
+  opacity:.75;
+  z-index: 3;
+  pointer-events:none;
+}
+
+
+/* STATUS help buttons in corner */
+.helpBtn.corner{
+  position:absolute;
+  top:10px;
+  right:10px;
+}
+
+
+/* STATUS value sizing */
+#rankValue, #hkpValue{ font-size: 22px; }

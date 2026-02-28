@@ -764,6 +764,7 @@ TOTAL ${getHKP()} HKP`;
 
     initHkpHelp();
     initDailyHelp();
+    initDailyHelp();
     initHigacha();
     initBrief();
     initInstall();
