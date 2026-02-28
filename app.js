@@ -6,12 +6,20 @@
   const HIGACHA_LAST_KEY = "hklobby.v1.higacha.lastDate";
   const MODE_KEY = "testpage.v1.mode";
 
-  // MISSIONBRIEF badge state
+  // Mission brief badge
   const BRIEF_SIG_KEY = "hklobby.v1.missionBrief.signature";
   const BRIEF_SEEN_KEY = "hklobby.v1.missionBrief.seenSignature";
 
-  // FLASH “learning gauge” (proxy) by click count
-  const FLASH_USAGE_KEY = "hklobby.v1.flashUsage"; // JSON {slug: count}
+  // Daily 50 system
+  const DAILY_STATE_KEY = "hklobby.v1.flashDaily50"; // {date, progressed, streak(0-4)}
+  const DAILY_DEBUG = true; // テストpageではtrue、本番ではfalse推奨
+
+  // FLASH apps should store today's seen count here (numbers)
+  const FLASH_TODAY_KEYS = [
+    "hk.flash.kobun.todaySeen",
+    "hk.flash.jodoushi.todaySeen",
+    "hk.flash.bungaku.todaySeen",
+  ];
 
   const $ = (id) => document.getElementById(id);
   const on = (node, ev, fn, opt) => node && node.addEventListener(ev, fn, opt);
@@ -33,10 +41,9 @@
       .replace(/'/g, "&#39;");
   }
 
-  // Simple signature for text (stable enough for badge)
   function signatureOf(text) {
     const s = String(text ?? "").replace(/\r\n/g, "\n").trim();
-    let h = 2166136261; // FNV-1a-ish
+    let h = 2166136261;
     for (let i = 0; i < s.length; i++) {
       h ^= s.charCodeAt(i);
       h = Math.imul(h, 16777619);
@@ -44,14 +51,7 @@
     return (h >>> 0).toString(16);
   }
 
-  function slugify(name) {
-    return String(name ?? "")
-      .toLowerCase()
-      .replace(/[^\w\u3040-\u30ff\u3400-\u9fff]+/g, "-")
-      .replace(/^-+|-+$/g, "") || "item";
-  }
-
-  // ========= Contents (names must NOT change) =========
+  // ========= Contents (names must NOT change on UI text) =========
   const FLASH_CONTENTS = [
     { name: "古文単語", href: "https://naoki496.github.io/flashcards/" },
     { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/" },
@@ -61,20 +61,20 @@
   const BLITZ_CONTENTS = [
     {
       name: "古文単語330マスター",
-      expertHref: "https://naoki496.github.io/kobun-quiz/expert.html",
       normalHref: "https://naoki496.github.io/kobun-quiz/",
+      expertHref: "https://naoki496.github.io/kobun-quiz/expert.html",
       expertEnabled: true,
     },
     {
       name: "文学史知識マスター",
-      expertHref: "",
       normalHref: "https://naoki496.github.io/bungakusi-quiz/",
+      expertHref: "",
       expertEnabled: false,
     },
     {
       name: "漢字読解マスター",
-      expertHref: "",
       normalHref: "https://naoki496.github.io/kanji-y-quiz/",
+      expertHref: "",
       expertEnabled: false,
     },
   ];
@@ -139,7 +139,7 @@
     if (el) el.textContent = "-";
   }
 
-  // ========= Generic overlay close binding =========
+  // ========= Overlay close binding =========
   function bindOverlayClose(overlayId, closeId) {
     const overlay = $(overlayId);
     const closeBtn = $(closeId);
@@ -169,31 +169,6 @@
     return { open, close, overlay };
   }
 
-  // ========= FLASH gauge (proxy by usage) =========
-  function loadFlashUsage() {
-    try {
-      const raw = localStorage.getItem(FLASH_USAGE_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch {
-      return {};
-    }
-  }
-  function saveFlashUsage(obj) {
-    try { localStorage.setItem(FLASH_USAGE_KEY, JSON.stringify(obj || {})); } catch {}
-  }
-  function bumpFlashUsage(slug) {
-    const usage = loadFlashUsage();
-    usage[slug] = (Number(usage[slug]) || 0) + 1;
-    saveFlashUsage(usage);
-    return usage[slug];
-  }
-  function usageToPct(count) {
-    // 0.. ~20 で伸びやすく、その後はゆるやかに（「薄い」ゲージ向け）
-    const c = Math.max(0, Number(count) || 0);
-    const pct = 100 * (1 - Math.exp(-c / 12));
-    return Math.max(0, Math.min(100, pct));
-  }
-
   // ========= EXPERT FX =========
   function playExpertFxThenNavigate(url) {
     const fx = $("fxOverlay");
@@ -203,7 +178,6 @@
     }
     fx.style.display = "flex";
     fx.setAttribute("aria-hidden", "false");
-    // 0.36s + small buffer
     setTimeout(() => { location.href = url; }, 380);
   }
 
@@ -213,36 +187,12 @@
     if (!grid) return;
     grid.innerHTML = "";
 
-    const usage = loadFlashUsage();
-
     FLASH_CONTENTS.forEach((c) => {
-      const slug = slugify(c.name);
-      const count = usage[slug] ?? 0;
-      const pct = usageToPct(count);
-
-      const card = document.createElement("div");
-      card.className = "card";
-
-      card.innerHTML = `
-        <div class="cardActions">
-          <a class="aBtn primary hasGauge" data-flashslug="${escapeHtml(slug)}" href="${c.href}">
-            ${escapeHtml(c.name)}
-            <span class="gauge" aria-hidden="true"><i style="width:${pct.toFixed(1)}%"></i></span>
-          </a>
-        </div>
-      `;
-      grid.appendChild(card);
-    });
-
-    // click hook -> bump usage
-    grid.querySelectorAll('a[data-flashslug]').forEach((a) => {
-      a.addEventListener("click", () => {
-        const slug = a.getAttribute("data-flashslug") || "";
-        const newCount = bumpFlashUsage(slug);
-        const pct = usageToPct(newCount);
-        const bar = a.querySelector(".gauge > i");
-        if (bar) bar.style.width = `${pct.toFixed(1)}%`;
-      }, { passive: true });
+      const a = document.createElement("a");
+      a.className = "aBtn primary hasGauge";
+      a.href = c.href;
+      a.innerHTML = `${escapeHtml(c.name)}<span class="gauge" aria-hidden="true"><i style="width:0%"></i></span>`;
+      grid.appendChild(a);
     });
   }
 
@@ -251,7 +201,7 @@
     if (!grid) return;
     grid.innerHTML = "";
 
-    BLITZ_CONTENTS.forEach((c, idx) => {
+    BLITZ_CONTENTS.forEach((c) => {
       const card = document.createElement("div");
       card.className = "card";
 
@@ -259,19 +209,17 @@
       const expertAttrs = expertDisabled
         ? `class="aBtn danger is-disabled" aria-disabled="true" tabindex="-1"`
         : `class="aBtn danger" data-expert="1" data-expert-url="${escapeHtml(c.expertHref)}"`;
-      const expertHref = expertDisabled ? "#" : c.expertHref;
 
       card.innerHTML = `
         <div class="cardTitle">${escapeHtml(c.name)}</div>
         <div class="cardActions">
           <a class="aBtn primary" href="${c.normalHref}">NORMAL</a>
-          <a ${expertAttrs} href="${expertHref}">EXPERT</a>
+          <a ${expertAttrs} href="${expertDisabled ? "#" : c.expertHref}">EXPERT</a>
         </div>
       `;
       grid.appendChild(card);
     });
 
-    // EXPERT FX hook (enabled only)
     grid.querySelectorAll('a[data-expert="1"]').forEach((a) => {
       a.addEventListener("click", (e) => {
         const url = a.getAttribute("data-expert-url");
@@ -282,7 +230,7 @@
     });
   }
 
-  // ========= HKP Help modal =========
+  // ========= HKP Help =========
   function initHkpHelp() {
     const helpBtn = $("btnHkpHelp");
     const body = $("hkpHelpBody");
@@ -293,7 +241,7 @@
 `★HKPとは？
 Higashi Kokugo Pointの略称。
 
-BLITZ QUESTの通常10問モードを学習時、
+BLITZ QUESTの学習時、
 一定条件でHKPを入手できます。
 また、TOPページの「HIGACHA」を回すことでも
 1HKPを入手できます。
@@ -306,7 +254,7 @@ BLITZ QUESTの通常10問モードを学習時、
     });
   }
 
-  // ========= HIGACHA modal =========
+  // ========= HIGACHA =========
   function initHigacha() {
     const btn = $("btnHigacha");
     const overlay = $("higachaOverlay");
@@ -357,15 +305,9 @@ BLITZ QUESTの通常10問モードを学習時、
     on(closeBtn, "click", close);
     on(cancelBtn, "click", close);
     on(overlay, "click", (e) => { if (e.target === overlay) close(); });
-    on(document, "keydown", (e) => {
-      if (e.key === "Escape" && overlay.style.display === "flex") close();
-    });
 
     on(drawBtn, "click", () => {
-      if (!canHigachaToday()) {
-        updateHigachaButtonState();
-        return;
-      }
+      if (!canHigachaToday()) return;
       const gain = (Math.random() < 0.70) ? 1 : 2;
       addHKP(gain);
       markHigachaDoneToday();
@@ -385,7 +327,7 @@ TOTAL ${getHKP()} HKP`;
   }
 
   // ========= MISSIONBRIEF + badge =========
-  function setBriefBadge(kind /* "NEW"|"UPDATE"|null */) {
+  function setBriefBadge(kind) {
     const badge = $("briefBadge");
     if (!badge) return;
     if (!kind) {
@@ -397,27 +339,23 @@ TOTAL ${getHKP()} HKP`;
     badge.textContent = kind;
     badge.classList.toggle("is-new", kind === "NEW");
   }
-
   function markBriefSeen(sig) {
     try { localStorage.setItem(BRIEF_SEEN_KEY, String(sig || "")); } catch {}
     setBriefBadge(null);
   }
-
   function initBrief() {
     const btn = $("btnBriefOpen");
     const one = $("briefOneLine");
     const list = $("briefList");
     if (!btn || !one || !list) return;
 
-    const { open, close } = bindOverlayClose("briefOverlay", "briefClose");
-
+    const { open } = bindOverlayClose("briefOverlay", "briefClose");
     let currentSig = "";
 
-    function openAndMark() {
+    on(btn, "click", () => {
       open();
       if (currentSig) markBriefSeen(currentSig);
-    }
-    on(btn, "click", openAndMark);
+    });
 
     fetch("./mission-brief.txt", { cache: "no-store" })
       .then((r) => r.ok ? r.text() : "")
@@ -436,31 +374,26 @@ TOTAL ${getHKP()} HKP`;
         currentSig = signatureOf(raw);
         try { localStorage.setItem(BRIEF_SIG_KEY, currentSig); } catch {}
 
-        // decide badge
         const seen = String(localStorage.getItem(BRIEF_SEEN_KEY) || "");
         const head = (lines[0] || "");
         const headUpper = head.toUpperCase();
 
-        // explicit prefix wins
-        if (headUpper.startsWith("NEW:")) {
-          setBriefBadge("NEW");
-        } else if (headUpper.startsWith("UPDATE:")) {
-          setBriefBadge("UPDATE");
-        } else {
-          // content changed since last seen -> UPDATE
+        if (headUpper.startsWith("NEW:")) setBriefBadge("NEW");
+        else if (headUpper.startsWith("UPDATE:")) setBriefBadge("UPDATE");
+        else {
           if (currentSig && seen && currentSig !== seen) setBriefBadge("UPDATE");
-          else if (currentSig && !seen) setBriefBadge("NEW"); // first time -> NEW
+          else if (currentSig && !seen) setBriefBadge("NEW");
           else setBriefBadge(null);
         }
       })
       .catch(() => {
         one.textContent = "（読み込み失敗）";
         list.innerHTML = "";
-        setBriefBadge("UPDATE"); // “何かある”だけ伝える
+        setBriefBadge("UPDATE");
       });
   }
 
-  // ========= Install (always visible) =========
+  // ========= Install =========
   function initInstall() {
     const btn = $("btnInstall");
     const hint = $("installHint");
@@ -516,7 +449,7 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
-  // ========= Logo fallback (show fallback only after all candidates fail) =========
+  // ========= Logo fallback =========
   function initLogoFallback() {
     const img = $("topLogo");
     const fb = $("logoFallback");
@@ -555,6 +488,118 @@ TOTAL ${getHKP()} HKP`;
     on($("tabBlitz"), "click", () => setMode("blitz"));
   }
 
+  // ========= Daily 50 logic =========
+  function readNum(key) {
+    const n = Number(localStorage.getItem(key));
+    return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
+  }
+
+  function loadDailyState() {
+    try {
+      const raw = localStorage.getItem(DAILY_STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function saveDailyState(st) {
+    try { localStorage.setItem(DAILY_STATE_KEY, JSON.stringify(st)); } catch {}
+  }
+
+  function getTodaySeenTotal() {
+    return FLASH_TODAY_KEYS.reduce((sum, k) => sum + readNum(k), 0);
+  }
+
+  function ensureDailyState() {
+    const t = todayYMD();
+    let st = loadDailyState();
+    if (!st || st.date !== t) {
+      st = { date: t, progressed: false, streak: Number(st?.streak) || 0 };
+      // 日付が変わっても streak は保持（5到達まで積み上げ）
+      saveDailyState(st);
+    }
+    st.streak = Math.max(0, Math.min(4, Math.trunc(Number(st.streak) || 0)));
+    st.progressed = !!st.progressed;
+    return st;
+  }
+
+  function renderDailyUI(seen, st) {
+    const seenEl = $("dailySeen");
+    const fillEl = $("dailyBarFill");
+    if (seenEl) seenEl.textContent = String(seen);
+
+    const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
+    if (fillEl) fillEl.style.width = `${pct.toFixed(1)}%`;
+
+    const steps = [$("step1"), $("step2"), $("step3"), $("step4"), $("step5")];
+    const s = (Number(st?.streak) || 0);
+    steps.forEach((el, idx) => {
+      if (!el) return;
+      el.classList.toggle("on", idx < s);
+    });
+
+    const dbg = $("dailyDbg");
+    if (dbg) dbg.hidden = !DAILY_DEBUG;
+  }
+
+  function tryProgressDaily(st) {
+    // 1日1回：seen>=50 のときだけ進行
+    const seen = getTodaySeenTotal();
+    renderDailyUI(seen, st);
+
+    if (st.progressed) return; // 今日すでに進行済み
+    if (seen < 50) return;
+
+    // 進行
+    st.progressed = true;
+    st.streak = Math.min(5, (Number(st.streak) || 0) + 1);
+
+    // 5回到達で +2 HKP / streak reset
+    if (st.streak >= 5) {
+      addHKP(2);
+      st.streak = 0;
+      // “達成演出”は必要なら後で（今は堅牢優先）
+    }
+
+    saveDailyState(st);
+    renderHKP();
+    renderDailyUI(seen, st);
+  }
+
+  function initDailyDebugControls() {
+    if (!DAILY_DEBUG) return;
+    const add10 = $("dbgAdd10");
+    const add50 = $("dbgAdd50");
+    const reset = $("dbgResetDaily");
+
+    function bumpAll(n) {
+      // kobunに寄せて入れる（テスト用）
+      const k = FLASH_TODAY_KEYS[0];
+      localStorage.setItem(k, String(readNum(k) + n));
+    }
+
+    on(add10, "click", () => {
+      bumpAll(10);
+      const st = ensureDailyState();
+      tryProgressDaily(st);
+    });
+    on(add50, "click", () => {
+      bumpAll(50);
+      const st = ensureDailyState();
+      tryProgressDaily(st);
+    });
+    on(reset, "click", () => {
+      // 今日のseenを0、今日の進行フラグをfalse（streakは維持）
+      FLASH_TODAY_KEYS.forEach((k) => localStorage.setItem(k, "0"));
+      const t = todayYMD();
+      const prev = loadDailyState();
+      const st = { date: t, progressed: false, streak: Number(prev?.streak) || 0 };
+      saveDailyState(st);
+      tryProgressDaily(st);
+    });
+  }
+
   function boot() {
     initLogoFallback();
 
@@ -562,7 +607,6 @@ TOTAL ${getHKP()} HKP`;
     renderBlitz();
 
     initTabs();
-
     const saved = localStorage.getItem(MODE_KEY);
     setMode(saved === "blitz" ? "blitz" : "flash");
 
@@ -575,6 +619,11 @@ TOTAL ${getHKP()} HKP`;
     initHigacha();
     initBrief();
     initInstall();
+
+    // Daily 50
+    initDailyDebugControls();
+    const st = ensureDailyState();
+    tryProgressDaily(st);
   }
 
   document.addEventListener("DOMContentLoaded", boot);
