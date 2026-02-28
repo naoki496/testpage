@@ -811,3 +811,134 @@ body{
   25%{ opacity: 1; }
   100%{ transform: scale(1.10); opacity: 1; }
 }
+
+/* =========================
+   Card feel boost (2 levels up)
+   末尾に追記（上書き用）
+   ========================= */
+
+/* 共通：カードっぽい多層ボーダー + 角ハイライト + 内側陰影 */
+:where(.statusBar,.statusItem,.panel,.dailyCard,.card,.archiveCard,.modeBtn){
+  position: relative;
+  overflow: hidden;
+}
+
+/* 外側の縁：多層（光る縁 + 暗い縁） */
+:where(.statusBar,.panel,.dailyCard,.card,.archiveCard,.modeBtn){
+  border-color: rgba(255,255,255,.18) !important;
+  box-shadow:
+    0 18px 46px rgba(0,0,0,.30),
+    0 0 0 1px rgba(0,0,0,.22) inset,
+    0 0 0 1px rgba(255,255,255,.06),
+    0 0 44px rgba(127,231,255,.06);
+}
+
+/* 角の反射（コーナーハイライト） */
+:where(.statusBar,.panel,.dailyCard,.card,.archiveCard,.modeBtn)::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(240px 140px at 12% 0%, rgba(255,255,255,.10), transparent 55%),
+    radial-gradient(240px 140px at 88% 0%, rgba(255,255,255,.07), transparent 55%),
+    radial-gradient(240px 180px at 50% 115%, rgba(0,0,0,.22), transparent 55%);
+  opacity:.95;
+}
+
+/* 面の“芯”：上面ハイライト + 下側沈み（内側陰影） */
+:where(.statusBar,.panel,.dailyCard,.card,.archiveCard,.modeBtn)::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 38%),
+    linear-gradient(0deg, rgba(0,0,0,.26), rgba(0,0,0,0) 42%);
+  opacity:.9;
+}
+
+/* STATUS個別：さらに“カードの積層感”を強める */
+.statusBar{
+  border-color: rgba(255,255,255,.22) !important;
+  box-shadow:
+    0 22px 54px rgba(0,0,0,.34),
+    0 0 0 1px rgba(255,255,255,.08) inset,
+    0 0 0 1px rgba(0,0,0,.22),
+    0 0 56px rgba(127,231,255,.08) !important;
+}
+
+/* STATUS内カード：縁＋面を強化（“カード3枚が並ぶ感じ”） */
+.statusItem{
+  border-color: rgba(255,255,255,.16) !important;
+  background:
+    radial-gradient(200px 70px at 25% 0%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16)) !important;
+  box-shadow:
+    0 10px 26px rgba(0,0,0,.22),
+    0 0 0 1px rgba(0,0,0,.22) inset,
+    0 0 0 1px rgba(255,255,255,.05);
+}
+
+/* STATUS内カードにも角反射を追加 */
+.statusItem::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(140px 70px at 12% 0%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(160px 70px at 92% 0%, rgba(255,255,255,.07), transparent 60%),
+    linear-gradient(0deg, rgba(0,0,0,.22), transparent 45%);
+  opacity:.85;
+}
+
+/* モードボタン：カード感＋“選択ボタン”としての押し出し */
+.modeBtn{
+  border-color: rgba(255,255,255,.22) !important;
+  transform: translateZ(0);
+}
+.modeBtn:hover{
+  filter: brightness(1.06);
+}
+.modeBtn.is-on{
+  box-shadow:
+    0 22px 56px rgba(0,0,0,.34),
+    0 0 0 1px rgba(255,255,255,.10) inset,
+    0 0 54px rgba(127,231,255,.14);
+}
+
+/* Flash/Blitzの色味は既存を尊重しつつ、縁の“芯”だけ強める */
+.modeFlash{ box-shadow: 0 0 38px rgba(127,231,255,.18) !important; }
+.modeBlitz{ box-shadow: 0 0 38px rgba(255,204,102,.14) !important; }
+
+/* DAILY：さらに“目線誘導の主役”に（縁と光沢を強化） */
+.dailyCard--focus{
+  border-color: rgba(127,231,255,.28) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.34),
+    0 0 0 1px rgba(255,255,255,.08) inset,
+    0 0 62px rgba(127,231,255,.12) !important;
+}
+
+/* 光沢の斜めスイープ（カードっぽさ増） */
+.dailyCard--focus::before{
+  opacity: 1;
+}
+.dailyCard--focus::after{
+  opacity: 1;
+}
+
+/* Archiveカードも同じ“カード質感”に揃える */
+.archiveCard{
+  border-color: rgba(255,255,255,.18) !important;
+  background:
+    radial-gradient(240px 90px at 18% 0%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16)) !important;
+}
+
+/* MISSION BRIEF：既読時は落ち着く（カード感は維持） */
+.briefChipBtn.is-seen{
+  border-color: rgba(255,255,255,.14);
+  filter: saturate(.96) brightness(.98);
+}
