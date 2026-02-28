@@ -62,17 +62,22 @@
   </header>
 
   <main class="wrap" id="app">
-    <!-- Tabs -->
-    <nav class="seg" aria-label="mode switch">
-      <button class="segBtn is-on" id="tabFlash" type="button">FLASHCARD</button>
-      <button class="segBtn" id="tabBlitz" type="button">BLITZQUEST</button>
+    <!-- Tabs: make them "special" and obvious -->
+    <nav class="modeDock" aria-label="mode switch">
+      <button class="modeBtn modeFlash is-on" id="tabFlash" type="button">
+        <span class="modeLabel">FLASHCARD</span>
+        <span class="modeTag">DRILL</span>
+      </button>
+      <button class="modeBtn modeBlitz" id="tabBlitz" type="button">
+        <span class="modeLabel">BLITZQUEST</span>
+        <span class="modeTag">BATTLE</span>
+      </button>
     </nav>
 
     <!-- FLASH -->
     <section class="panel" id="panelFlash">
       <header class="panelHead">
         <div class="panelTitle">FLASHCARD</div>
-        <div class="panelHint">反復で土台を固める</div>
       </header>
       <div class="grid" id="flashGrid"></div>
     </section>
@@ -81,7 +86,6 @@
     <section class="panel" id="panelBlitz" hidden>
       <header class="panelHead">
         <div class="panelTitle">BLITZQUEST</div>
-        <div class="panelHint">短時間で即断力を鍛える</div>
       </header>
 
       <!-- Card Archive link (fixed) -->
