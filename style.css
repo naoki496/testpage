@@ -859,3 +859,71 @@ body{
 .statusItem::after{
   opacity: .45;
 }
+
+/* =========================
+   STATUS compact (65% target)
+   ========================= */
+.statusBar{
+  padding: 8px !important;
+}
+
+.statusGrid{
+  gap: 7px !important;
+}
+
+.statusItem{
+  min-height: 62px !important;     /* 96px → 約65% */
+  padding: 6px 7px !important;     /* 10→6 */
+}
+
+.statusItem .k{
+  font-size: 10.5px !important;
+  gap: 6px !important;
+}
+
+.statusItem .v{
+  font-size: 15px !important;
+  margin-top: 1px !important;
+  line-height: 1.05 !important;
+}
+
+.statusItem .mini{
+  margin-top: 2px !important;
+  font-size: 10.5px !important;
+  line-height: 1.1 !important;
+}
+
+/* HIGACHAボタンが収まるようにさらに詰める */
+.statusItem .higachaBtn{
+  margin-top: 3px !important;
+  min-height: 34px !important;
+  padding: 6px 8px !important;
+  font-size: 11px !important;
+}
+
+/* まだ黒く沈むなら少しだけ持ち上げる（STATUS内だけ） */
+.statusItem{
+  background: rgba(255,255,255,.055) !important;
+}
+
+/* =========================
+   Mode selected dot restore
+   ========================= */
+.modeBtn{
+  position: relative; /* 念のため */
+}
+
+.modeBtn.is-on::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  top:10px;
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 0 16px rgba(255,255,255,.22);
+  opacity:.75;
+  z-index: 3;
+  pointer-events:none;
+}
