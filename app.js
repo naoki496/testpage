@@ -628,19 +628,28 @@ TOTAL ${getHKP()} HKP`;
       saveDailyState(st);
     }
 
-    renderDailyUI(seen, st);
+    function renderDailyUI(seen, st) {
+  const seenEl = $("dailySeen");
+  if (seenEl) seenEl.textContent = String(seen);
 
-    if (st.progressed) return;
-    if (seen < 50) return;
+  // 円形リング更新
+  const ring = $("dailyRingProg");
+  const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
+  if (ring) {
+    const r = 22;
+    const circ = 2 * Math.PI * r;
+    ring.style.strokeDasharray = String(circ);
+    ring.style.strokeDashoffset = String(circ * (1 - pct / 100));
+  }
 
-    st.progressed = true;
-    st.touched = true;
-    let next = (Number(st.streak) || 0) + 1;
+  // 5段ゲージ
+  const steps = [$("step1"), $("step2"), $("step3"), $("step4"), $("step5")];
+  const s = (Number(st?.streak) || 0);
+  steps.forEach((el, idx) => { if (el) el.classList.toggle("on", idx < s); });
 
-    if (next >= 5) {
-      addHKP(2);
-      next = 0;
-    }
+  const dbg = $("dailyDbg");
+  if (dbg) dbg.hidden = !DAILY_DEBUG;
+}
 
     st.streak = Math.max(0, Math.min(4, next));
     saveDailyState(st);
