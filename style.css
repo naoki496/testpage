@@ -706,3 +706,114 @@ body{
   25%{ opacity: 1; }
   100%{ transform: scale(1.10); opacity: 1; }
 }
+
+/* =========================================
+   Patch (per Nishihara spec)
+   1) STATUS compact
+   2) STATUS sparkle
+   3) HIGACHA icon like modeIcon
+   4) Tabs: remove drill/battle + force break
+   5) Tabs: more obvious styling
+   6) Flash buttons: no wrap
+   ========================================= */
+
+/* 1) STATUSの縦を詰める（見た目は維持して“背だけ”削る） */
+.statusBar{ padding:10px 12px; }
+.statusTitle{ margin-bottom:6px; }
+.statusGrid{ gap:8px; }
+.statusItem{ padding:8px 10px; }
+.v{ font-size:17px; margin-top:3px; }
+.mini{ margin-top:4px; }
+
+/* 2) STATUSをキラッと光らせる（チカチカしない、通過型） */
+.statusBar{
+  position: relative;
+  overflow: hidden;
+}
+.statusBar::after{
+  content:"";
+  position:absolute;
+  top:-30%;
+  left:-60%;
+  width: 45%;
+  height: 160%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255,255,255,.16),
+    rgba(127,231,255,.18),
+    transparent
+  );
+  transform: rotate(18deg);
+  filter: blur(0.2px);
+  animation: statusSweep 5.6s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes statusSweep{
+  0%{ left:-60%; opacity:0; }
+  12%{ opacity:1; }
+  28%{ left:120%; opacity:0; }
+  100%{ left:120%; opacity:0; }
+}
+
+/* 3) HIGACHAボタンをmodeIcon形式に揃える */
+.higachaBtn{
+  justify-content:flex-start;
+  gap:12px;
+  padding:10px 12px;
+}
+.higachaBtn .modeIcon{
+  width:44px;
+  height:44px;
+  box-shadow: 0 0 18px rgba(255,85,214,.12);
+  border-color: rgba(255,255,255,.18);
+  background: rgba(0,0,0,.18);
+}
+.higachaBtn .modeIcon img{
+  width:36px;
+  height:36px;
+  object-fit:contain;
+}
+
+/* 4) タブの DRILL/BATTLE を消した前提：ラベルを確実に2行化 */
+.modeLabelBreak{
+  white-space: normal;       /* 1行固定を解除 */
+  line-height: 1.05;
+}
+.modeLabelBreak wbr{ display:block; } /* wbrで確実に改行 */
+
+/* 5) FLASHCARD/BLITZQUEST を分かりやすく装飾（押し場の視認性アップ） */
+.modeBtn{
+  background:
+    radial-gradient(240px 120px at 15% 30%, rgba(255,255,255,.07), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.14));
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.10),
+    0 10px 28px rgba(0,0,0,.34);
+}
+.modeBtn::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:.0;
+  background:
+    radial-gradient(220px 110px at 30% 40%, rgba(127,231,255,.16), transparent 70%),
+    radial-gradient(220px 110px at 70% 35%, rgba(255,85,214,.12), transparent 70%);
+  transition: opacity .18s ease;
+  pointer-events:none;
+}
+.modeBtn.is-on::before{ opacity: 1; }
+.modeFlash{ border-color: rgba(127,231,255,.42); }
+.modeBlitz{ border-color: rgba(255,204,102,.38); }
+.modeBtn.is-on{
+  transform: translateY(-2px);
+  filter: brightness(1.10);
+}
+
+/* 6) FLASHCARD内ボタンは改行禁止（文言短いが保険） */
+#panelFlash .aBtn{
+  white-space: nowrap;
+  font-size: 14px;
+}
+@media (max-width: 360px){
+  #panelFlash .aBtn{ font-size: 13px; }
+}
