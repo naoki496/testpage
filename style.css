@@ -75,7 +75,6 @@ body{
   border-radius: var(--radius);
   backdrop-filter: blur(10px);
 
-  /* ✅ カード感（質感） */
   background:
     radial-gradient(260px 120px at 18% 0%, rgba(127,231,255,.12), transparent 60%),
     radial-gradient(260px 120px at 82% 0%, rgba(255,85,214,.10), transparent 60%),
@@ -87,7 +86,7 @@ body{
   overflow:hidden;
 }
 
-/* ✅ キラッと光る（STATUS全体） */
+/* キラッと光る（STATUS全体） */
 .statusBar::after{
   content:"";
   position:absolute;
@@ -117,7 +116,7 @@ body{
 }
 .statusGrid{
   display:grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(4, minmax(0,1fr));
   gap:10px;
 }
 .statusItem{
@@ -127,9 +126,13 @@ body{
   background: rgba(0,0,0,.14);
   position: relative;
   overflow:hidden;
-}
 
-/* ✅ 各カードも薄いハイライト */
+  /* 高さ固定（4枚同じ縦幅） */
+  height: 132px;
+  display:flex;
+  flex-direction:column;
+  justify-content: space-between;
+}
 .statusItem::before{
   content:"";
   position:absolute;
@@ -146,6 +149,7 @@ body{
   font-size: 12px;
   color: var(--sub);
   position:relative;
+  z-index:1;
 }
 .v{
   margin-top:4px;
@@ -153,8 +157,9 @@ body{
   font-weight: 950;
   color: rgba(255,255,255,.94);
   position:relative;
+  z-index:1;
 }
-.mini{ margin-top: 6px; font-size: 12px; color: rgba(255,255,255,.74); position:relative; }
+.mini{ margin-top: 6px; font-size: 12px; color: rgba(255,255,255,.74); position:relative; z-index:1; }
 .miniNum{ font-weight: 950; color: rgba(255,255,255,.92); }
 
 .helpBtn{
@@ -167,41 +172,60 @@ body{
   cursor:pointer;
 }
 
-/* ✅ HIGACHA：見た目を「大きめアイコン＋テキスト」 */
+/* HIGACHA button (icon on top center + button fills entire block) */
 .higachaBtn{
-  margin-top:6px;
   width:100%;
-  min-height: 46px;
-  padding:10px 10px;
+  height: 100%;
   border-radius: 14px;
   border:1px solid rgba(255,85,214,.28);
   background:
-    radial-gradient(180px 70px at 18% 30%, rgba(255,85,214,.14), transparent 70%),
+    radial-gradient(180px 70px at 50% 20%, rgba(255,85,214,.16), transparent 70%),
     linear-gradient(180deg, rgba(255,85,214,.10), rgba(0,0,0,.14));
   color: rgba(255,255,255,.92);
   font-weight: 950;
   letter-spacing: .06em;
   display:flex;
-  justify-content:center;
+  flex-direction:column;
   align-items:center;
-  gap:10px;
+  justify-content:center;
+  gap:8px;
   cursor:pointer;
   box-shadow: 0 0 26px rgba(255,85,214,.12);
+  padding: 10px 10px;
 }
 .higachaBtn.is-disabled{ opacity:.5; cursor:not-allowed; }
+.higachaTop{ display:flex; align-items:center; justify-content:center; }
+.higachaLabel{ font-weight: 950; letter-spacing: .10em; }
+
+/* icon container (shared) */
+.modeIcon{
+  width:56px; height:56px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.18);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  overflow:hidden;
+  box-shadow: 0 0 18px rgba(255,255,255,.08);
+}
+.modeIcon img{
+  width:48px; height:48px;
+  image-rendering: pixelated;
+  display:block;
+}
 
 .higachaIcon{
-  width:34px;
-  height:34px;
+  width:48px;
+  height:48px;
   display:block;
   image-rendering: pixelated;
   filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
 }
 
-/* ✅ STATUS高さは維持しつつ、スマホで詰めすぎない */
-@media (max-width: 420px){
+@media (max-width: 520px){
   .statusGrid{ grid-template-columns: 1fr 1fr; }
-  /* 4つを素直に2x2で並べる（ゲージがHIGACHA左隣になる） */
 }
 
 /* MISSIONBRIEF */
@@ -307,7 +331,7 @@ body{
 }
 
 .modeBtn{
-  min-height: 86px; /* ✅ 視認性UP */
+  min-height: 86px;
   padding: 14px 14px;
   border-radius: 22px;
   border:1px solid rgba(255,255,255,.18);
@@ -322,13 +346,43 @@ body{
   background: rgba(255,255,255,.05);
 }
 
+/* Diagonal stripe overlay */
 .modeBtn::after{
   content:"";
   position:absolute;
-  inset:-2px;
-  background: radial-gradient(260px 90px at 22% 0%, rgba(255,255,255,.10), transparent 60%);
+  inset:-40px;
   pointer-events:none;
-  opacity:.8;
+  opacity:.42;
+  transform: rotate(-12deg);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,.00) 0px,
+      rgba(255,255,255,.00) 10px,
+      rgba(255,255,255,.07) 10px,
+      rgba(255,255,255,.07) 16px
+    );
+  mix-blend-mode: screen;
+}
+.modeFlash::after{
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(127,231,255,.00) 0px,
+      rgba(127,231,255,.00) 10px,
+      rgba(127,231,255,.10) 10px,
+      rgba(127,231,255,.10) 16px
+    );
+}
+.modeBlitz::after{
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,204,102,.00) 0px,
+      rgba(255,204,102,.00) 10px,
+      rgba(255,204,102,.10) 10px,
+      rgba(255,204,102,.10) 16px
+    );
 }
 
 .modeLeft{
@@ -337,6 +391,7 @@ body{
   gap:12px;
   min-width:0;
   position:relative;
+  z-index:1;
 }
 
 .modeLabel{
@@ -346,32 +401,8 @@ body{
   font-weight: 950;
   letter-spacing:.10em;
 }
-.modeLine{
-  display:block;
-  white-space: nowrap;
-}
+.modeLine{ display:block; white-space: nowrap; }
 
-.modeIcon{
-  width:58px; height:58px;
-  border-radius: 999px;
-  border:1px solid rgba(255,255,255,.18);
-  background: rgba(0,0,0,.18);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 auto;
-  overflow:hidden;
-  box-shadow: 0 0 18px rgba(255,255,255,.08);
-  position:relative;
-  z-index:1;
-}
-.modeIcon img{
-  width:50px; height:50px;
-  image-rendering: pixelated;
-  display:block;
-}
-
-/* ✅ FLASH / BLITZ を「一目で分かる」装飾に */
 .modeFlash{
   border-color: rgba(127,231,255,.38);
   background:
@@ -390,16 +421,6 @@ body{
 .modeBtn.is-on{
   transform: translateY(-2px);
   filter: brightness(1.08);
-}
-.modeBtn.is-on::before{
-  content:"";
-  position:absolute;
-  left:10px; top:10px;
-  width:10px; height:10px;
-  border-radius:999px;
-  background: rgba(255,255,255,.86);
-  box-shadow: 0 0 18px rgba(255,255,255,.20);
-  opacity:.7;
 }
 
 /* Panels */
@@ -421,117 +442,6 @@ body{
 }
 @media (max-width: 340px){
   .grid{ grid-template-columns: 1fr; }
-}
-
-/* DAILY card */
-.dailyCard{
-  border:1px solid rgba(255,255,255,.14);
-  border-radius: 16px;
-  background: rgba(0,0,0,.14);
-  padding: 12px;
-  margin-top: 14px; /* ✅ ボタン群から離す */
-}
-.dailyCard--focus{
-  border-color: rgba(127,231,255,.22);
-  background:
-    radial-gradient(260px 90px at 22% 0%, rgba(127,231,255,.10), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16));
-  box-shadow:
-    0 0 34px rgba(127,231,255,.10),
-    0 18px 40px rgba(0,0,0,.22);
-  position: relative;
-  overflow:hidden;
-}
-.dailyCard--focus::after{
-  content:"";
-  position:absolute;
-  top:-30%;
-  left:-70%;
-  width:60%;
-  height:180%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
-  transform: skewX(-16deg);
-  animation: dailyShine 7.6s ease-in-out infinite;
-  opacity:.55;
-  pointer-events:none;
-}
-@keyframes dailyShine{
-  0%{ left:-70%; opacity:0; }
-  14%{ opacity:.55; }
-  34%{ left:120%; opacity:0; }
-  100%{ left:120%; opacity:0; }
-}
-
-.dailyTop{
-  display:flex;
-  align-items:baseline;
-  justify-content:space-between;
-  gap:10px;
-  position:relative;
-}
-.dailyTitle{
-  font-weight: 950;
-  letter-spacing: .06em;
-  color: rgba(127,231,255,.95);
-}
-.dailySub{
-  font-size: 12px;
-  color: rgba(255,255,255,.76);
-}
-.dailyBar{
-  margin-top: 10px;
-  height: 6px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.10);
-  overflow:hidden;
-  position:relative;
-}
-.dailyBar > i{
-  display:block;
-  height:100%;
-  width:0%;
-  border-radius: 999px;
-  background: rgba(127,231,255,.34);
-  box-shadow: 0 0 18px rgba(127,231,255,.14);
-}
-.dailySteps{
-  margin-top: 10px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  position:relative;
-}
-.step{
-  width:18px; height:10px;
-  border-radius: 999px;
-  border:1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.06);
-}
-.step.on{
-  background: rgba(255,204,102,.22);
-  border-color: rgba(255,204,102,.28);
-  box-shadow: 0 0 16px rgba(255,204,102,.10);
-}
-.dailyReward{
-  margin-left:auto;
-  font-size: 12px;
-  color: rgba(255,255,255,.78);
-}
-
-.dailyDbg{
-  margin-top:10px;
-  display:flex;
-  gap:8px;
-}
-.dbgBtn{
-  flex:1;
-  min-height: 38px;
-  border-radius: 12px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
-  font-weight: 900;
 }
 
 /* Cards */
@@ -583,25 +493,6 @@ body{
   background: rgba(127,231,255,.10);
   box-shadow: 0 0 20px rgba(127,231,255,.12);
 }
-.aBtn.hasGauge{ padding-bottom: 16px; }
-.aBtn .gauge{
-  position:absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 7px;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.10);
-  overflow:hidden;
-}
-.aBtn .gauge > i{
-  display:block;
-  height:100%;
-  width:0%;
-  border-radius: 999px;
-  background: rgba(127,231,255,.35);
-  box-shadow: 0 0 16px rgba(127,231,255,.16);
-}
 
 /* EXPERT */
 .aBtn.danger{
@@ -617,11 +508,6 @@ body{
 @keyframes expertPulse{
   0%,100%{ transform: translateY(0); filter: brightness(1); }
   50%{ transform: translateY(-1px); filter: brightness(1.14); }
-}
-.aBtn.ghost{
-  border-color: rgba(255,255,255,.14);
-  background: rgba(255,255,255,.04);
-  box-shadow:none;
 }
 
 /* Card archive row */
@@ -813,296 +699,42 @@ body{
 }
 
 /* =========================
-   Card feel boost (2 levels up)
-   末尾に追記（上書き用）
+   Daily ring UI (STATUS内)
    ========================= */
-
-/* 共通：カードっぽい多層ボーダー + 角ハイライト + 内側陰影 */
-:where(.statusBar,.statusItem,.panel,.dailyCard,.card,.archiveCard,.modeBtn){
-  position: relative;
-  overflow: hidden;
-}
-
-/* 外側の縁：多層（光る縁 + 暗い縁） */
-:where(.statusBar,.panel,.dailyCard,.card,.archiveCard,.modeBtn){
-  border-color: rgba(255,255,255,.18) !important;
-  box-shadow:
-    0 18px 46px rgba(0,0,0,.30),
-    0 0 0 1px rgba(0,0,0,.22) inset,
-    0 0 0 1px rgba(255,255,255,.06),
-    0 0 44px rgba(127,231,255,.06);
-}
-
-/* 角の反射（コーナーハイライト） */
-:where(.statusBar,.panel,.dailyCard,.card,.archiveCard,.modeBtn)::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(240px 140px at 12% 0%, rgba(255,255,255,.10), transparent 55%),
-    radial-gradient(240px 140px at 88% 0%, rgba(255,255,255,.07), transparent 55%),
-    radial-gradient(240px 180px at 50% 115%, rgba(0,0,0,.22), transparent 55%);
-  opacity:.95;
-}
-
-/* 面の“芯”：上面ハイライト + 下側沈み（内側陰影） */
-:where(.statusBar,.panel,.dailyCard,.card,.archiveCard,.modeBtn)::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 38%),
-    linear-gradient(0deg, rgba(0,0,0,.26), rgba(0,0,0,0) 42%);
-  opacity:.9;
-}
-
-/* STATUS個別：さらに“カードの積層感”を強める */
-.statusBar{
-  border-color: rgba(255,255,255,.22) !important;
-  box-shadow:
-    0 22px 54px rgba(0,0,0,.34),
-    0 0 0 1px rgba(255,255,255,.08) inset,
-    0 0 0 1px rgba(0,0,0,.22),
-    0 0 56px rgba(127,231,255,.08) !important;
-}
-
-/* STATUS内カード：縁＋面を強化（“カード3枚が並ぶ感じ”） */
-.statusItem{
-  border-color: rgba(255,255,255,.16) !important;
-  background:
-    radial-gradient(200px 70px at 25% 0%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16)) !important;
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.22),
-    0 0 0 1px rgba(0,0,0,.22) inset,
-    0 0 0 1px rgba(255,255,255,.05);
-}
-
-/* STATUS内カードにも角反射を追加 */
-.statusItem::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(140px 70px at 12% 0%, rgba(255,255,255,.10), transparent 60%),
-    radial-gradient(160px 70px at 92% 0%, rgba(255,255,255,.07), transparent 60%),
-    linear-gradient(0deg, rgba(0,0,0,.22), transparent 45%);
-  opacity:.85;
-}
-
-/* モードボタン：カード感＋“選択ボタン”としての押し出し */
-.modeBtn{
-  border-color: rgba(255,255,255,.22) !important;
-  transform: translateZ(0);
-}
-.modeBtn:hover{
-  filter: brightness(1.06);
-}
-.modeBtn.is-on{
-  box-shadow:
-    0 22px 56px rgba(0,0,0,.34),
-    0 0 0 1px rgba(255,255,255,.10) inset,
-    0 0 54px rgba(127,231,255,.14);
-}
-
-/* Flash/Blitzの色味は既存を尊重しつつ、縁の“芯”だけ強める */
-.modeFlash{ box-shadow: 0 0 38px rgba(127,231,255,.18) !important; }
-.modeBlitz{ box-shadow: 0 0 38px rgba(255,204,102,.14) !important; }
-
-/* DAILY：さらに“目線誘導の主役”に（縁と光沢を強化） */
-.dailyCard--focus{
-  border-color: rgba(127,231,255,.28) !important;
-  box-shadow:
-    0 24px 60px rgba(0,0,0,.34),
-    0 0 0 1px rgba(255,255,255,.08) inset,
-    0 0 62px rgba(127,231,255,.12) !important;
-}
-
-/* 光沢の斜めスイープ（カードっぽさ増） */
-.dailyCard--focus::before{
-  opacity: 1;
-}
-.dailyCard--focus::after{
-  opacity: 1;
-}
-
-/* Archiveカードも同じ“カード質感”に揃える */
-.archiveCard{
-  border-color: rgba(255,255,255,.18) !important;
-  background:
-    radial-gradient(240px 90px at 18% 0%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16)) !important;
-}
-
-/* MISSION BRIEF：既読時は落ち着く（カード感は維持） */
-.briefChipBtn.is-seen{
-  border-color: rgba(255,255,255,.14);
-  filter: saturate(.96) brightness(.98);
-}
-
-/* =========================
-   STATUS only: Card feel boost
-   ========================= */
-
-.statusBar{
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(255,255,255,.22) !important;
-  box-shadow:
-    0 22px 54px rgba(0,0,0,.34),
-    0 0 0 1px rgba(255,255,255,.08) inset,
-    0 0 0 1px rgba(0,0,0,.22),
-    0 0 56px rgba(127,231,255,.08) !important;
-}
-
-/* 角反射 + 内側陰影（STATUS全体） */
-.statusBar::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(240px 140px at 12% 0%, rgba(255,255,255,.10), transparent 55%),
-    radial-gradient(240px 140px at 88% 0%, rgba(255,255,255,.07), transparent 55%),
-    radial-gradient(240px 180px at 50% 115%, rgba(0,0,0,.22), transparent 55%);
-  opacity:.95;
-}
-.statusBar::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 38%),
-    linear-gradient(0deg, rgba(0,0,0,.26), rgba(0,0,0,0) 42%);
-  opacity:.9;
-}
-
-/* STATUS内の各カード（3枚） */
-.statusItem{
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(255,255,255,.16) !important;
-  background:
-    radial-gradient(200px 70px at 25% 0%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16)) !important;
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.22),
-    0 0 0 1px rgba(0,0,0,.22) inset,
-    0 0 0 1px rgba(255,255,255,.05);
-}
-.statusItem::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:
-    radial-gradient(140px 70px at 12% 0%, rgba(255,255,255,.10), transparent 60%),
-    radial-gradient(160px 70px at 92% 0%, rgba(255,255,255,.07), transparent 60%),
-    linear-gradient(0deg, rgba(0,0,0,.22), transparent 45%);
-  opacity:.85;
-}
-
-/* HIGACHA button: use same icon system as tabs, but slightly compact */
-.higachaBtn .modeIcon{
-  width:44px; height:44px;
-}
-.higachaBtn .modeIcon img{
-  width:38px; height:38px;
-}
-
-
-/* =========================
-   Mode buttons: diagonal stripe
-   ========================= */
-.modeBtn{
-  position: relative;
-  overflow: hidden;
-}
-.modeBtn::after{
-  content:"";
-  position:absolute;
-  inset:-40px;
-  pointer-events:none;
-  opacity:.42;
-  transform: rotate(-12deg);
-  background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,255,255,.00) 0px,
-      rgba(255,255,255,.00) 10px,
-      rgba(255,255,255,.07) 10px,
-      rgba(255,255,255,.07) 16px
-    );
-  mix-blend-mode: screen;
-}
-
-/* 個別色味（FLASHはミント寄り／BLITZはアンバー寄り） */
-.modeFlash::after{
-  background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(127,231,255,.00) 0px,
-      rgba(127,231,255,.00) 10px,
-      rgba(127,231,255,.10) 10px,
-      rgba(127,231,255,.10) 16px
-    );
-}
-.modeBlitz::after{
-  background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,204,102,.00) 0px,
-      rgba(255,204,102,.00) 10px,
-      rgba(255,204,102,.10) 10px,
-      rgba(255,204,102,.10) 16px
-    );
-}
-/* =========================
-   STATUS: circular daily gauge
-   ========================= */
-.statusDaily .k{ justify-content:space-between; }
-
 .ringRow{
   display:flex;
   align-items:center;
   gap:10px;
-  margin-top:8px;
+  margin-top:4px;
+  position:relative;
+  z-index:1;
 }
-
 .ringBox{
-  width:68px;
-  height:68px;
+  width:64px;
+  height:64px;
   position:relative;
   flex:0 0 auto;
 }
-
 .ring{
-  width:68px;
-  height:68px;
+  width:64px;
+  height:64px;
   display:block;
   transform: rotate(-90deg);
 }
-
 .ringTrack{
   fill:none;
   stroke: rgba(255,255,255,.12);
   stroke-width: 7;
 }
-
 .ringProg{
   fill:none;
   stroke: rgba(127,231,255,.55);
   stroke-width: 7;
   stroke-linecap: round;
-  stroke-dasharray: 138.23; /* JSで上書きしてもOK */
+  stroke-dasharray: 138.23;
   stroke-dashoffset: 138.23;
   filter: drop-shadow(0 0 10px rgba(127,231,255,.18));
 }
-
 .ringCenter{
   position:absolute;
   inset:0;
@@ -1112,7 +744,6 @@ body{
   flex-direction:column;
   transform: translateY(1px);
 }
-
 .ringNum{
   font-weight: 950;
   font-size: 16px;
@@ -1123,10 +754,6 @@ body{
   font-size: 11px;
   color: rgba(255,255,255,.70);
   letter-spacing:.04em;
-}
-
-.ringText{
-  min-width:0;
 }
 .ringHint{
   font-size: 11px;
@@ -1139,15 +766,25 @@ body{
   color: rgba(255,255,255,.88);
 }
 
-.statusSteps{
-  margin-top:8px;
+/* Debug buttons inside STATUS item */
+.statusDbg{
+  margin-top: 6px;
+  display:flex;
   gap:6px;
+  position:relative;
+  z-index:1;
 }
-.statusSteps .step{
-  width:16px;
-  height:9px;
+.dbgBtn{
+  flex:1;
+  min-height: 38px;
+  border-radius: 12px;
+  border:1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
+  font-weight: 900;
 }
-
-/* HIGACHAボタン内の丸アイコンは少しだけコンパクトに */
-.higachaBtn .modeIcon{ width:44px; height:44px; }
-.higachaBtn .modeIcon img{ width:38px; height:38px; }
+.dbgMini{
+  min-height: 30px;
+  font-size: 12px;
+  padding: 8px 8px;
+}

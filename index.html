@@ -25,17 +25,16 @@
     <section class="statusBar" aria-label="STATUS">
       <div class="statusTitle">STATUS</div>
 
-      <!-- 2x2（スマホ） / 4列（PC） -->
-      <div class="statusGrid statusGrid4">
+      <div class="statusGrid">
         <!-- Rank -->
-        <div class="statusItem statusItem--simple" aria-label="ランク">
+        <div class="statusItem">
           <div class="k">ランク</div>
           <div class="v" id="rankValue">-</div>
           <div class="mini">カード総数 <span class="miniNum" id="cardTotalValue">-</span></div>
         </div>
 
         <!-- HKP -->
-        <div class="statusItem statusItem--simple" aria-label="HKP">
+        <div class="statusItem">
           <div class="k">
             HKP
             <button class="helpBtn" id="btnHkpHelp" type="button" aria-label="HKPの説明">?</button>
@@ -44,54 +43,43 @@
           <div class="mini">Higashi Kokugo Point</div>
         </div>
 
-        <!-- Daily50（HIGACHAの左隣） -->
+        <!-- DAILY 50 (circular gauge) -->
         <div class="statusItem statusDaily" aria-label="FLASH DAILY 50">
-          <div class="dailyHead">
-            <div class="dailyTitle">FLASH DAILY 50</div>
-            <div class="dailySub">合計（1日1回カウント）</div>
-          </div>
+          <div class="k">FLASH DAILY 50</div>
 
-          <div class="dailyRow">
-            <!-- Ring -->
-            <div class="ring" aria-label="進捗リング">
-              <svg class="ringSvg" viewBox="0 0 44 44" aria-hidden="true">
-                <circle class="ringBg" cx="22" cy="22" r="18"></circle>
-                <circle class="ringProg" id="dailyRingProg" cx="22" cy="22" r="18"></circle>
+          <div class="ringRow">
+            <div class="ringBox" aria-hidden="true">
+              <svg class="ring" viewBox="0 0 64 64" role="img" aria-label="進捗リング">
+                <circle class="ringTrack" cx="32" cy="32" r="22"></circle>
+                <circle class="ringProg" id="dailyRingProg" cx="32" cy="32" r="22"></circle>
               </svg>
-              <div class="ringTxt">
+              <div class="ringCenter">
                 <div class="ringNum" id="dailySeen">0</div>
                 <div class="ringDen">/50</div>
               </div>
             </div>
 
-            <!-- Right -->
-            <div class="dailyRight">
-              <div class="dailyRewardLine">×5 → <b>+2HKP</b></div>
-
-              <!-- 5段階：丸ドット（横） -->
-              <div class="dailyDots" aria-label="5回で+2HKP（ドット）">
-                <span class="dot" id="step1"></span>
-                <span class="dot" id="step2"></span>
-                <span class="dot" id="step3"></span>
-                <span class="dot" id="step4"></span>
-                <span class="dot" id="step5"></span>
-              </div>
+            <div class="ringText">
+              <div class="ringHint">合計（1日1回カウント）</div>
+              <div class="ringReward">×5 → +2HKP</div>
             </div>
           </div>
 
-          <!-- Debug（表示維持、動作させる） -->
-          <div class="dailyDbg" id="dailyDbg">
-            <button class="dbgBtn" id="dbgAdd10" type="button">+10</button>
-            <button class="dbgBtn" id="dbgAdd50" type="button">+50</button>
-            <button class="dbgBtn" id="dbgResetDaily" type="button">RESET</button>
+          <!-- Debug (keep visible in testpage) -->
+          <div class="dailyDbg statusDbg" id="dailyDbg">
+            <button class="dbgBtn dbgMini" id="dbgAdd10" type="button">+10</button>
+            <button class="dbgBtn dbgMini" id="dbgAdd50" type="button">+50</button>
+            <button class="dbgBtn dbgMini" id="dbgResetDaily" type="button">RESET</button>
           </div>
         </div>
 
         <!-- HIGACHA -->
-        <div class="statusItem" aria-label="HIGACHA">
-          <button class="higachaBtn higachaBtn--tall" id="btnHigacha" type="button">
-            <span class="modeIcon modeIcon--status" aria-hidden="true">
-              <img src="./higacha_e.png" alt="" />
+        <div class="statusItem statusHigacha">
+          <button class="higachaBtn higachaBig" id="btnHigacha" type="button">
+            <span class="higachaTop">
+              <span class="modeIcon" aria-hidden="true">
+                <img class="higachaIcon" src="./higacha_e.png" alt="">
+              </span>
             </span>
             <span class="higachaLabel">HIGACHA</span>
           </button>
@@ -100,14 +88,14 @@
     </section>
 
     <!-- MISSIONBRIEF -->
-    <section class="briefChip" aria-label="MISSION BRIEF【お知らせ】">
-      <button class="briefChipBtn" id="btnBriefOpen" type="button" aria-haspopup="dialog" aria-expanded="false">
+    <section class="briefChip" aria-label="MISSIONBRIEF">
+      <button class="briefChipBtn" id="btnBriefOpen" type="button" aria-haspopup="dialog">
         <span class="briefChipLeft">
           <span class="briefChipTitle">MISSION BRIEF【お知らせ】</span>
           <span class="briefBadge" id="briefBadge" hidden>UPDATE</span>
         </span>
         <span class="briefChipText" id="briefOneLine">（未読）</span>
-        <span class="briefChipIcon" id="briefChevron" aria-hidden="true">▼</span>
+        <span class="briefChipIcon" aria-hidden="true">▼</span>
       </button>
     </section>
   </header>
@@ -120,7 +108,10 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./flashcard_e.png" alt="">
           </span>
-          <span class="modeLabel modeLabel--twoLine">FLASH<br>CARD</span>
+          <span class="modeLabel">
+            <span class="modeLine">FLASH</span>
+            <span class="modeLine">CARD</span>
+          </span>
         </span>
       </button>
 
@@ -129,7 +120,10 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./blitzquest_e.png" alt="">
           </span>
-          <span class="modeLabel modeLabel--twoLine">BLITZ<br>QUEST</span>
+          <span class="modeLabel">
+            <span class="modeLine">BLITZ</span>
+            <span class="modeLine">QUEST</span>
+          </span>
         </span>
       </button>
     </nav>
@@ -143,14 +137,15 @@
     <section class="panel" id="panelBlitz" hidden>
       <div class="archiveCard" aria-label="カード図鑑リンク">
         <div class="archiveLeft">
-          <span class="modeIcon modeIcon--small" aria-hidden="true">
-            <img src="./zukan_e.png" alt="">
+          <span class="modeIcon" aria-hidden="true">
+            <img class="miniIcon" src="./zukan_e.png" alt="">
           </span>
           <div class="archiveText">
             <div class="archiveTitle">カード図鑑</div>
             <div class="archiveSub">CARD ARCHIVE</div>
           </div>
         </div>
+
         <a class="archiveOpen" href="https://naoki496.github.io/cards-hub/">OPEN</a>
       </div>
 
@@ -207,7 +202,7 @@
 
   <!-- MISSIONBRIEF Modal -->
   <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSION BRIEF【お知らせ】">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
       <div class="modalHead">
         <div class="modalTitle">MISSION BRIEF【お知らせ】</div>
         <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>

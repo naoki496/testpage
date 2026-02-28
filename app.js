@@ -1,4 +1,3 @@
-// app.js（全文）
 (() => {
   "use strict";
 
@@ -222,7 +221,6 @@
     setTimeout(() => { location.href = url; }, 380);
   }
 
-  // ✅ BFCache復帰対策：戻った時にFXが残っていたら必ず消す
   function clearFxOverlay() {
     const fx = $("fxOverlay");
     if (!fx) return;
@@ -242,7 +240,7 @@
       const a = document.createElement("a");
       a.className = "aBtn primary";
       a.href = c.href;
-      a.textContent = c.name; // ✅ 改行なし（CSSのnowrap維持）
+      a.textContent = c.name;
       grid.appendChild(a);
     });
   }
@@ -415,7 +413,6 @@ TOTAL ${getHKP()} HKP`;
     const { open, close } = bindOverlayClose("briefOverlay", "briefClose");
     let currentSig = "";
 
-    // ✅ 開閉で▼回転 / 既読カード感
     function openBrief() {
       btn.classList.add("is-open");
       open();
@@ -430,7 +427,6 @@ TOTAL ${getHKP()} HKP`;
     }
 
     on(btn, "click", openBrief);
-    // bindOverlayClose側のcloseに加えて、ボタン見た目も戻す
     on($("briefClose"), "click", closeBrief);
     on($("briefOverlay"), "click", (e) => { if (e.target === $("briefOverlay")) closeBrief(); });
     on(document, "keydown", (e) => {
@@ -447,7 +443,6 @@ TOTAL ${getHKP()} HKP`;
           .map((s) => s.trim())
           .filter(Boolean);
 
-        // ✅ 一行目は「ヘッドライン」扱い（NEW/UPDATE接頭辞は表示から除外）
         const head = (lines[0] || "（未読）");
         const headUpper = head.toUpperCase();
         const headClean = headUpper.startsWith("NEW:") ? head.replace(/^NEW:\s*/i, "") :
@@ -477,7 +472,6 @@ TOTAL ${getHKP()} HKP`;
           else setBriefBadge(null);
         }
 
-        // ✅ 既読なら見た目を落ち着かせる
         if (currentSig && seen && currentSig === seen) btn.classList.add("is-seen");
       })
       .catch(() => {
@@ -604,17 +598,18 @@ TOTAL ${getHKP()} HKP`;
     return st;
   }
 
-  function renderDailyUI(seen, st) {
+  function renderDailyUI(seen) {
     const seenEl = $("dailySeen");
-    const fillEl = $("dailyBarFill");
     if (seenEl) seenEl.textContent = String(seen);
 
+    const ring = $("dailyRingProg");
     const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
-    if (fillEl) fillEl.style.width = `${pct.toFixed(1)}%`;
-
-    const steps = [$("step1"), $("step2"), $("step3"), $("step4"), $("step5")];
-    const s = (Number(st?.streak) || 0);
-    steps.forEach((el, idx) => { if (el) el.classList.toggle("on", idx < s); });
+    if (ring) {
+      const r = 22;
+      const circ = 2 * Math.PI * r;
+      ring.style.strokeDasharray = String(circ);
+      ring.style.strokeDashoffset = String(circ * (1 - pct / 100));
+    }
 
     const dbg = $("dailyDbg");
     if (dbg) dbg.hidden = !DAILY_DEBUG;
@@ -628,32 +623,23 @@ TOTAL ${getHKP()} HKP`;
       saveDailyState(st);
     }
 
-    function renderDailyUI(seen, st) {
-  const seenEl = $("dailySeen");
-  if (seenEl) seenEl.textContent = String(seen);
+    renderDailyUI(seen);
 
-  // 円形リング更新
-  const ring = $("dailyRingProg");
-  const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
-  if (ring) {
-    const r = 22;
-    const circ = 2 * Math.PI * r;
-    ring.style.strokeDasharray = String(circ);
-    ring.style.strokeDashoffset = String(circ * (1 - pct / 100));
-  }
+    if (st.progressed) return;
+    if (seen < 50) return;
 
-  // 5段ゲージ
-  const steps = [$("step1"), $("step2"), $("step3"), $("step4"), $("step5")];
-  const s = (Number(st?.streak) || 0);
-  steps.forEach((el, idx) => { if (el) el.classList.toggle("on", idx < s); });
+    st.progressed = true;
+    st.touched = true;
 
-  const dbg = $("dailyDbg");
-  if (dbg) dbg.hidden = !DAILY_DEBUG;
-}
-
+    let next = (Number(st.streak) || 0) + 1;
+    if (next >= 5) {
+      addHKP(2);
+      next = 0;
+    }
     st.streak = Math.max(0, Math.min(4, next));
     saveDailyState(st);
-    renderDailyUI(seen, st);
+
+    renderDailyUI(seen);
   }
 
   function initDailyDebugControls() {
@@ -702,7 +688,7 @@ TOTAL ${getHKP()} HKP`;
   // Sync on return (重要)
   // =========================
   function syncStatus() {
-    clearFxOverlay(); // ✅ 戻る/復帰でFX残留を確実に消す
+    clearFxOverlay();
     renderHKP();
     updateHigachaButtonState();
     const st = ensureDailyState();
@@ -735,7 +721,7 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function boot() {
-    clearFxOverlay(); // 初期も安全側
+    clearFxOverlay();
 
     renderFlash();
     renderBlitz();
