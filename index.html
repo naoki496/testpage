@@ -40,7 +40,7 @@
           <div class="v"><span id="hkpValue">0</span></div>
         </div>
 
-        <!-- HIGACHA -->
+        <!-- HIGACHA（modeIcon形式） -->
         <div class="statusItem">
           <div class="k"></div>
           <button class="higachaBtn" id="btnHigacha" type="button">
@@ -57,11 +57,11 @@
     <section class="briefChip" aria-label="MISSIONBRIEF">
       <button class="briefChipBtn" id="btnBriefOpen" type="button" aria-haspopup="dialog">
         <span class="briefChipLeft">
-          <span class="briefChipTitle">MISSIONBRIEF</span>
+          <span class="briefChipTitle">MISSION BRIEF【お知らせ】</span>
           <span class="briefBadge" id="briefBadge" hidden>UPDATE</span>
         </span>
         <span class="briefChipText" id="briefOneLine">（未読）</span>
-        <span class="briefChipIcon" aria-hidden="true">▸</span>
+        <span class="briefChipIcon" aria-hidden="true">▼</span>
       </button>
     </section>
   </header>
@@ -123,7 +123,10 @@
     <section class="panel" id="panelBlitz" hidden>
       <div class="archiveCard" aria-label="カード図鑑リンク">
         <div class="archiveLeft">
-          <img class="miniIcon" src="./zukan_e.png" alt="" aria-hidden="true">
+          <!-- カード図鑑アイコンも modeIcon 形式に統一 -->
+          <span class="modeIcon" aria-hidden="true">
+            <img src="./zukan_e.png" alt="">
+          </span>
           <div class="archiveText">
             <div class="archiveTitle">カード図鑑</div>
             <div class="archiveSub">CARD ARCHIVE</div>
@@ -142,8 +145,60 @@
     </footer>
   </main>
 
+  <!-- EXPERT transition FX -->
   <div class="fxOverlay" id="fxOverlay" aria-hidden="true" style="display:none">
     <div class="fxPulse" aria-hidden="true"></div>
+  </div>
+
+  <!-- HKP Help Modal（スクロール可能：modalBody overflow:auto をCSS側が担保） -->
+  <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="HKPの説明">
+      <div class="modalHead">
+        <div class="modalTitle">HKP</div>
+        <button class="x" id="hkpHelpClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="leftPad" id="hkpHelpBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIGACHA Modal（既存app.jsが前提とするIDを復帰） -->
+  <div class="overlay" id="higachaOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="HIGACHA">
+      <div class="modalHead">
+        <div class="modalTitle">HIGACHA</div>
+        <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="gachaHero">
+          <img class="gachaImg" src="./higacha.png" alt="HIGACHA" />
+        </div>
+
+        <div class="gachaMsg leftPad" id="higachaMsg"></div>
+
+        <div class="modalActions">
+          <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
+          <button class="btnPrimary ghostBtn" id="higachaCancel" type="button">CLOSE</button>
+        </div>
+
+        <div class="note">※HIGACHAは1日1回まで</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSIONBRIEF Modal（スクロール可能） -->
+  <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
+      <div class="modalHead">
+        <div class="modalTitle">MISSION BRIEF【お知らせ】</div>
+        <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="modalBody">
+        <ul class="briefList" id="briefList"></ul>
+      </div>
+    </div>
   </div>
 
   <script src="./app.js"></script>
