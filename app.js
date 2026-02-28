@@ -1,18 +1,20 @@
 (() => {
   "use strict";
 
-  // ========= Keys =========
+  // =========================
+  // Keys
+  // =========================
   const HKP_KEY = "hklobby.v1.hkp";
   const HIGACHA_LAST_KEY = "hklobby.v1.higacha.lastDate";
   const MODE_KEY = "testpage.v1.mode";
 
   // Mission brief badge
-  const BRIEF_SIG_KEY = "hklobby.v1.missionBrief.signature";
+  const BRIEF_SIG_KEY  = "hklobby.v1.missionBrief.signature";
   const BRIEF_SEEN_KEY = "hklobby.v1.missionBrief.seenSignature";
 
-  // Daily 50 system
-  const DAILY_STATE_KEY = "hklobby.v1.flashDaily50"; // {date, progressed, streak(0-4)}
-  const DAILY_DEBUG = true; // テストpageではtrue、本番ではfalse推奨
+  // Daily 50
+  const DAILY_STATE_KEY = "hklobby.v1.flashDaily50"; // {date, progressed, streak}
+  const DAILY_DEBUG = true; // testpage: true / 本番: false 推奨
 
   // FLASH apps should store today's seen count here (numbers)
   const FLASH_TODAY_KEYS = [
@@ -21,6 +23,9 @@
     "hk.flash.bungaku.todaySeen",
   ];
 
+  // =========================
+  // DOM helpers
+  // =========================
   const $ = (id) => document.getElementById(id);
   const on = (node, ev, fn, opt) => node && node.addEventListener(ev, fn, opt);
 
@@ -51,13 +56,16 @@
     return (h >>> 0).toString(16);
   }
 
-  // ========= Contents (names must NOT change on UI text) =========
+  // =========================
+  // Contents
+  // =========================
   const FLASH_CONTENTS = [
     { name: "古文単語", href: "https://naoki496.github.io/flashcards/" },
     { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/" },
     { name: "文学知識総合", href: "https://naoki496.github.io/bungaku/" },
   ];
 
+  // ✅ BLITZ: 助動詞と漢字読解を確実に復旧（3本）
   const BLITZ_CONTENTS = [
     {
       name: "古文単語330マスター",
@@ -66,8 +74,8 @@
       expertEnabled: true,
     },
     {
-      name: "文学史知識マスター",
-      normalHref: "https://naoki496.github.io/bungakusi-quiz/",
+      name: "助動詞マスター",
+      normalHref: "https://naoki496.github.io/hatto-kobun-jodoushi/",
       expertHref: "",
       expertEnabled: false,
     },
@@ -79,7 +87,9 @@
     },
   ];
 
-  // ========= Mode tabs =========
+  // =========================
+  // Mode tabs
+  // =========================
   function setMode(mode) {
     const flash = $("panelFlash");
     const blitz = $("panelBlitz");
@@ -96,30 +106,41 @@
     localStorage.setItem(MODE_KEY, mode);
   }
 
-  // ========= HKP / HIGACHA =========
+  // =========================
+  // HKP / HIGACHA
+  // =========================
   function getHKP() {
     const n = Number(localStorage.getItem(HKP_KEY));
     return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
   }
+
+  // ✅ setHKP / addHKP 内で必ず renderHKP を実行（同期漏れ防止）
   function setHKP(n) {
     const v = Math.max(0, Math.trunc(Number(n) || 0));
     localStorage.setItem(HKP_KEY, String(v));
+    renderHKP();
     return v;
   }
+
   function addHKP(delta) {
-    return setHKP(getHKP() + (Number(delta) || 0));
+    const next = getHKP() + (Number(delta) || 0);
+    return setHKP(next);
   }
+
   function renderHKP() {
     const el = $("hkpValue");
     if (el) el.textContent = String(getHKP());
   }
+
   function canHigachaToday() {
     const last = String(localStorage.getItem(HIGACHA_LAST_KEY) || "");
     return last !== todayYMD();
   }
+
   function markHigachaDoneToday() {
     localStorage.setItem(HIGACHA_LAST_KEY, todayYMD());
   }
+
   function updateHigachaButtonState() {
     const btn = $("btnHigacha");
     if (!btn) return;
@@ -129,23 +150,29 @@
     btn.setAttribute("aria-disabled", String(!ok));
   }
 
-  // ========= Rank / total placeholders =========
+  // =========================
+  // Rank / total placeholders
+  // =========================
   function renderRankPlaceholder() {
     const el = $("rankValue");
     if (el) el.textContent = "-";
   }
+
   function disableCardTotal() {
     const el = $("cardTotalValue");
     if (el) el.textContent = "-";
   }
 
-  // ========= Overlay close binding =========
+  // =========================
+  // Overlay close binding
+  // =========================
   function bindOverlayClose(overlayId, closeId) {
     const overlay = $(overlayId);
     const closeBtn = $(closeId);
     if (!overlay || !closeBtn) return { open: () => {}, close: () => {}, overlay: null };
 
     let lastFocus = null;
+
     function open() {
       lastFocus = document.activeElement;
       overlay.style.display = "flex";
@@ -153,6 +180,7 @@
       document.body.style.overflow = "hidden";
       closeBtn.focus();
     }
+
     function close() {
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
@@ -169,7 +197,9 @@
     return { open, close, overlay };
   }
 
-  // ========= EXPERT FX =========
+  // =========================
+  // EXPERT FX (dark +集中発光)
+  // =========================
   function playExpertFxThenNavigate(url) {
     const fx = $("fxOverlay");
     if (!fx) {
@@ -181,7 +211,9 @@
     setTimeout(() => { location.href = url; }, 380);
   }
 
-  // ========= Render grids =========
+  // =========================
+  // Render grids
+  // =========================
   function renderFlash() {
     const grid = $("flashGrid");
     if (!grid) return;
@@ -189,9 +221,9 @@
 
     FLASH_CONTENTS.forEach((c) => {
       const a = document.createElement("a");
-      a.className = "aBtn primary hasGauge";
+      a.className = "aBtn primary";
       a.href = c.href;
-      a.innerHTML = `${escapeHtml(c.name)}<span class="gauge" aria-hidden="true"><i style="width:0%"></i></span>`;
+      a.textContent = c.name;
       grid.appendChild(a);
     });
   }
@@ -230,7 +262,9 @@
     });
   }
 
-  // ========= HKP Help =========
+  // =========================
+  // HKP Help
+  // =========================
   function initHkpHelp() {
     const helpBtn = $("btnHkpHelp");
     const body = $("hkpHelpBody");
@@ -239,14 +273,15 @@
     const { open } = bindOverlayClose("hkpHelpOverlay", "hkpHelpClose");
     const text =
 `★HKPとは？
-Higashi Kokugo Pointの略称。
+Higashi Kokugo Point の略称。
 
-BLITZ QUESTの学習時、
+BLITZQUESTの学習時、
 一定条件でHKPを入手できます。
 また、TOPページの「HIGACHA」を回すことでも
-1HKPを入手できます。
-時々2HKP入手できることも…？
-※HIGACHAは1日1回まで回せます`;
+HKPを入手できます。
+時々+2になることも…？
+
+※HIGACHAは1日1回まで`;
 
     on(helpBtn, "click", () => {
       body.textContent = text;
@@ -254,7 +289,9 @@ BLITZ QUESTの学習時、
     });
   }
 
-  // ========= HIGACHA =========
+  // =========================
+  // HIGACHA modal
+  // =========================
   function initHigacha() {
     const btn = $("btnHigacha");
     const overlay = $("higachaOverlay");
@@ -321,15 +358,17 @@ TOTAL ${getHKP()} HKP`;
 
       drawBtn.disabled = true;
       drawBtn.style.opacity = "0.45";
-      renderHKP();
       updateHigachaButtonState();
     });
   }
 
-  // ========= MISSIONBRIEF + badge =========
+  // =========================
+  // Mission brief + badge
+  // =========================
   function setBriefBadge(kind) {
     const badge = $("briefBadge");
     if (!badge) return;
+
     if (!kind) {
       badge.hidden = true;
       badge.classList.remove("is-new");
@@ -339,10 +378,12 @@ TOTAL ${getHKP()} HKP`;
     badge.textContent = kind;
     badge.classList.toggle("is-new", kind === "NEW");
   }
+
   function markBriefSeen(sig) {
     try { localStorage.setItem(BRIEF_SEEN_KEY, String(sig || "")); } catch {}
     setBriefBadge(null);
   }
+
   function initBrief() {
     const btn = $("btnBriefOpen");
     const one = $("briefOneLine");
@@ -358,7 +399,7 @@ TOTAL ${getHKP()} HKP`;
     });
 
     fetch("./mission-brief.txt", { cache: "no-store" })
-      .then((r) => r.ok ? r.text() : "")
+      .then((r) => (r.ok ? r.text() : ""))
       .then((txt) => {
         const raw = String(txt || "");
         const lines = raw
@@ -393,7 +434,9 @@ TOTAL ${getHKP()} HKP`;
       });
   }
 
-  // ========= Install =========
+  // =========================
+  // Install
+  // =========================
   function initInstall() {
     const btn = $("btnInstall");
     const hint = $("installHint");
@@ -449,7 +492,9 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
-  // ========= Logo fallback =========
+  // =========================
+  // Logo fallback
+  // =========================
   function initLogoFallback() {
     const img = $("topLogo");
     const fb = $("logoFallback");
@@ -483,12 +528,9 @@ TOTAL ${getHKP()} HKP`;
     img.src = candidates[0];
   }
 
-  function initTabs() {
-    on($("tabFlash"), "click", () => setMode("flash"));
-    on($("tabBlitz"), "click", () => setMode("blitz"));
-  }
-
-  // ========= Daily 50 logic =========
+  // =========================
+  // Daily 50 logic
+  // =========================
   function readNum(key) {
     const n = Number(localStorage.getItem(key));
     return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
@@ -514,11 +556,13 @@ TOTAL ${getHKP()} HKP`;
   function ensureDailyState() {
     const t = todayYMD();
     let st = loadDailyState();
+
+    // 日付が変わったら progressed だけリセット（streakは維持）
     if (!st || st.date !== t) {
       st = { date: t, progressed: false, streak: Number(st?.streak) || 0 };
-      // 日付が変わっても streak は保持（5到達まで積み上げ）
       saveDailyState(st);
     }
+
     st.streak = Math.max(0, Math.min(4, Math.trunc(Number(st.streak) || 0)));
     st.progressed = !!st.progressed;
     return st;
@@ -544,37 +588,38 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function tryProgressDaily(st) {
-    // 1日1回：seen>=50 のときだけ進行
     const seen = getTodaySeenTotal();
     renderDailyUI(seen, st);
 
-    if (st.progressed) return; // 今日すでに進行済み
+    // 今日すでに進行済み → 表示だけ
+    if (st.progressed) return;
+
+    // 50未満 → 進行なし
     if (seen < 50) return;
 
     // 進行
     st.progressed = true;
     st.streak = Math.min(5, (Number(st.streak) || 0) + 1);
 
-    // 5回到達で +2 HKP / streak reset
+    // 5回到達 → +2HKP & リセット
     if (st.streak >= 5) {
-      addHKP(2);
+      addHKP(2); // ✅ ここでSTATUSも確実に更新される
       st.streak = 0;
-      // “達成演出”は必要なら後で（今は堅牢優先）
     }
 
     saveDailyState(st);
-    renderHKP();
     renderDailyUI(seen, st);
   }
 
   function initDailyDebugControls() {
     if (!DAILY_DEBUG) return;
+
     const add10 = $("dbgAdd10");
     const add50 = $("dbgAdd50");
     const reset = $("dbgResetDaily");
 
     function bumpAll(n) {
-      // kobunに寄せて入れる（テスト用）
+      // テスト用：kobunキーに寄せて足す
       const k = FLASH_TODAY_KEYS[0];
       localStorage.setItem(k, String(readNum(k) + n));
     }
@@ -584,22 +629,36 @@ TOTAL ${getHKP()} HKP`;
       const st = ensureDailyState();
       tryProgressDaily(st);
     });
+
     on(add50, "click", () => {
       bumpAll(50);
       const st = ensureDailyState();
       tryProgressDaily(st);
     });
+
     on(reset, "click", () => {
-      // 今日のseenを0、今日の進行フラグをfalse（streakは維持）
       FLASH_TODAY_KEYS.forEach((k) => localStorage.setItem(k, "0"));
       const t = todayYMD();
       const prev = loadDailyState();
       const st = { date: t, progressed: false, streak: Number(prev?.streak) || 0 };
       saveDailyState(st);
-      tryProgressDaily(st);
+      const now = ensureDailyState();
+      tryProgressDaily(now);
+      renderHKP();
     });
   }
 
+  // =========================
+  // Tabs
+  // =========================
+  function initTabs() {
+    on($("tabFlash"), "click", () => setMode("flash"));
+    on($("tabBlitz"), "click", () => setMode("blitz"));
+  }
+
+  // =========================
+  // Boot
+  // =========================
   function boot() {
     initLogoFallback();
 
