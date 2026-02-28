@@ -27,6 +27,7 @@
         <div class="statusItem">
           <div class="k">ランク</div>
           <div class="v" id="rankValue">-</div>
+          <div class="mini">カード総数 <span id="cardTotalValue">-</span></div>
         </div>
 
         <div class="statusItem">
@@ -45,6 +46,15 @@
           </button>
         </div>
       </div>
+    </section>
+
+    <!-- ===== MISSIONBRIEF chip (always visible) ===== -->
+    <section class="briefChip" aria-label="MISSIONBRIEF">
+      <button class="briefChipBtn" id="btnBriefToggle2" type="button" aria-expanded="false">
+        <span class="briefChipTitle">MISSIONBRIEF</span>
+        <span class="briefChipText" id="briefOneLine">（未読）</span>
+        <span class="briefChipIcon">▾</span>
+      </button>
     </section>
   </header>
 
@@ -78,7 +88,7 @@
       <div class="grid" id="blitzGrid"></div>
     </section>
 
-    <!-- ===== MISSIONBRIEF ===== -->
+    <!-- ===== MISSIONBRIEF (full) ===== -->
     <section class="brief" aria-label="MISSIONBRIEF">
       <div class="briefHead">
         <div class="briefTitle">MISSIONBRIEF</div>
