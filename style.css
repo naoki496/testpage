@@ -280,8 +280,20 @@ body{
   overflow:hidden;
   background: rgba(255,255,255,.05);
 }
-.modeBtn .modeLabel{ position:relative; z-index:2; font-weight: 950; letter-spacing:.06em; }
-.modeBtn .modeTag{ position:relative; z-index:2; }
+
+/* ★修正：labelを縮めても崩れないようにする */
+.modeBtn .modeLabel{
+  position:relative;
+  z-index:2;
+  font-weight: 950;
+  letter-spacing:.06em;
+  min-width: 0;
+  overflow:hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.modeBtn .modeTag{ position:relative; z-index:2; flex: 0 0 auto; }
+
 .modeBtn::before{
   content:"";
   position:absolute;
@@ -298,6 +310,7 @@ body{
   opacity:.50;
   pointer-events:none;
 }
+
 .modeTag{
   font-size: 12px;
   font-weight: 950;
@@ -308,6 +321,15 @@ body{
   color: rgba(255,255,255,.92);
   letter-spacing: .06em;
 }
+
+/* ★修正：狭い画面ではtagを少し縮める */
+@media (max-width: 420px){
+  .modeTag{
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
 .modeFlash{
   border-color: rgba(127,231,255,.34);
   box-shadow: 0 0 32px rgba(127,231,255,.14);
@@ -547,8 +569,14 @@ body{
   padding: 16px;
   z-index: 50;
 }
+
+/* ★修正：modalをviewport内に収める（確実にスクロールさせる） */
 .modal{
   width: min(560px, 100%);
+  max-height: min(86vh, 720px);
+  display:flex;
+  flex-direction: column;
+
   border-radius: 18px;
   border:1px solid rgba(255,255,255,.16);
   background: rgba(12,9,18,.90);
@@ -556,6 +584,7 @@ body{
   overflow:hidden;
 }
 .modalHead{
+  flex: 0 0 auto;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -572,7 +601,15 @@ body{
   font-size: 18px;
   cursor:pointer;
 }
-.modalBody{ padding: 14px; color: rgba(255,255,255,.92); }
+
+/* ★修正：ここがスクロール領域 */
+.modalBody{
+  flex: 1 1 auto;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 14px;
+  color: rgba(255,255,255,.92);
+}
 
 .leftPad{
   text-align:left;
