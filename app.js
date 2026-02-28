@@ -2,20 +2,16 @@
   "use strict";
 
   // =========================================================
-  // 図鑑「カード総数」(＝全cards.csvの総行数) の正規運用スイッチ
-  // - テスト: null のままでOK（"-"表示）
-  // - kokugo-dojo本番: 下のURLを有効化するだけで動きます
+  // 図鑑「カード総数」：現段階では表示しない（常に "-"）
+  // - 将来 kokugo-dojo 本番で必要になったら URL を入れて fetchCardTotal() を復帰可能
   // =========================================================
   const CARD_TOTAL_MANIFEST_URL = null;
-  // kokugo-dojo本番で有効化するならこれ：
-  // const CARD_TOTAL_MANIFEST_URL =
-  //   "https://raw.githubusercontent.com/naoki496/cards-hub/refs/heads/main/cards-manifest.json";
 
   // ===== Keys (kokugo-dojo home.js compatible) =====
   const HKP_KEY = "hklobby.v1.hkp";
   const HIGACHA_LAST_KEY = "hklobby.v1.higacha.lastDate";
 
-  // cache for total cards (optional)
+  // cache for total cards (kept for future)
   const CARD_TOTAL_CACHE_KEY = "hklobby.v1.cardTotal.cache";
   const CARD_TOTAL_CACHE_TS_KEY = "hklobby.v1.cardTotal.cacheTs";
   const CARD_TOTAL_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
@@ -71,17 +67,6 @@
 
   function normalize(s) {
     return String(s ?? "").trim().toLowerCase();
-  }
-
-  async function fetchWithTimeout(url, ms) {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), ms);
-    try {
-      const r = await fetch(url, { cache: "no-store", signal: ctrl.signal });
-      return r;
-    } finally {
-      clearTimeout(t);
-    }
   }
 
   // -------------------------
@@ -255,96 +240,11 @@
   }
 
   // -------------------------
-  // Card total (図鑑枚数)
-  // - cards-hub/cards-manifest.json を読み、sources[].cardsCsv を合算
+  // Card total (now disabled)
   // -------------------------
-  function setCardTotalText(s) {
+  function disableCardTotal() {
     const el = $("cardTotalValue");
-    if (!el) return;
-    el.textContent = String(s ?? "-");
-  }
-
-  function getCachedCardTotal() {
-    const v = Number(localStorage.getItem(CARD_TOTAL_CACHE_KEY));
-    const ts = Number(localStorage.getItem(CARD_TOTAL_CACHE_TS_KEY));
-    if (!Number.isFinite(v) || !Number.isFinite(ts)) return null;
-    if ((Date.now() - ts) > CARD_TOTAL_CACHE_MAX_AGE_MS) return null;
-    return v;
-  }
-
-  function setCachedCardTotal(v) {
-    const n = Number(v);
-    if (!Number.isFinite(n)) return;
-    localStorage.setItem(CARD_TOTAL_CACHE_KEY, String(Math.max(0, Math.trunc(n))));
-    localStorage.setItem(CARD_TOTAL_CACHE_TS_KEY, String(Date.now()));
-  }
-
-  function countCardsFromCsvText(text) {
-    const lines = String(text ?? "")
-      .replace(/\r\n/g, "\n")
-      .replace(/\r/g, "\n")
-      .split("\n")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    if (!lines.length) return 0;
-
-    const header = lines[0];
-    const headerLike =
-      header.includes(",") && /(^|,)\s*id\s*(,|$)/i.test(header);
-
-    return headerLike ? Math.max(0, lines.length - 1) : lines.length;
-  }
-
-  async function fetchCardTotalFromCardsHubManifest(manifestUrl) {
-    const res = await fetchWithTimeout(manifestUrl, 6000);
-    if (!res.ok) throw new Error(`manifest load failed: ${res.status}`);
-
-    const man = await res.json();
-    const sources = Array.isArray(man?.sources) ? man.sources : [];
-
-    let total = 0;
-
-    // 順にCSVを読む（失敗はスキップせず、例外にせずに継続）
-    for (const s of sources) {
-      const csvUrl = String(s?.cardsCsv ?? "").trim();
-      if (!csvUrl) continue;
-
-      try {
-        const r = await fetchWithTimeout(csvUrl, 6000);
-        if (!r.ok) continue;
-        const txt = await r.text();
-        total += countCardsFromCsvText(txt);
-      } catch {
-        // ignore and continue
-      }
-    }
-
-    return total;
-  }
-
-  async function fetchCardTotal() {
-    const cached = getCachedCardTotal();
-    if (cached !== null) setCardTotalText(cached);
-
-    if (!CARD_TOTAL_MANIFEST_URL) {
-      if (cached === null) setCardTotalText("-");
-      return;
-    }
-
-    try {
-      const total = await fetchCardTotalFromCardsHubManifest(CARD_TOTAL_MANIFEST_URL);
-      if (Number.isFinite(total)) {
-        const n = Math.max(0, Math.trunc(total));
-        setCardTotalText(n);
-        setCachedCardTotal(n);
-        return;
-      }
-    } catch {
-      // fallthrough
-    }
-
-    if (cached === null) setCardTotalText("-");
+    if (el) el.textContent = "-";
   }
 
   // -------------------------
@@ -702,8 +602,14 @@ TOTAL ${getHKP()} HKP`;
 
     applyCompactLabels();
 
-    // 図鑑枚数（CARD_TOTAL_MANIFEST_URL が null なら "-" のまま）
-    fetchCardTotal();
+    // 総数は現段階では出さない
+    disableCardTotal();
+
+    // 将来復帰する場合のフック（いまは何もしない）
+    void CARD_TOTAL_MANIFEST_URL;
+    void CARD_TOTAL_CACHE_KEY;
+    void CARD_TOTAL_CACHE_TS_KEY;
+    void CARD_TOTAL_CACHE_MAX_AGE_MS;
   }
 
   document.addEventListener("DOMContentLoaded", boot);
