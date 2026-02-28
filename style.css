@@ -1,14 +1,16 @@
 :root{
-  --bg0:#050307;
-  --bg1:#0b0610;
+  /* friendly cyber: softer & warmer */
+  --bg0:#07040a;
+  --bg1:#0d0714;
+
   --text:#ffffff;
-  --sub: rgba(255,255,255,0.68);
+  --sub: rgba(255,255,255,0.72);
   --line: rgba(255,255,255,0.14);
 
-  --acc0:#7fe7ff;
-
-  --flashGlow: rgba(120,140,255,.35);
-  --blitzGlow: rgba(255,60,200,.45);
+  /* accents: mint + soft pink */
+  --mint:#7fe7ff;
+  --pink:#ff55d6;
+  --lav:#a79bff;
 
   --radius: 18px;
 }
@@ -20,17 +22,18 @@ body{
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
   color:var(--text);
   background:
-    radial-gradient(1200px 900px at 30% 10%, rgba(140,120,255,.16), transparent 60%),
-    radial-gradient(900px 700px at 70% 20%, rgba(255,60,200,.10), transparent 60%),
-    linear-gradient(180deg, #050307, #040208);
+    radial-gradient(900px 700px at 25% 10%, rgba(167,155,255,.18), transparent 60%),
+    radial-gradient(900px 700px at 80% 15%, rgba(255,85,214,.14), transparent 62%),
+    radial-gradient(900px 700px at 60% 85%, rgba(127,231,255,.10), transparent 60%),
+    linear-gradient(180deg, var(--bg0), #050207);
   overflow-x:hidden;
 }
 .bg{
   position:fixed; inset:0;
   background:
-    radial-gradient(800px 500px at 50% 0%, rgba(127,231,255,.08), transparent 60%),
-    radial-gradient(700px 500px at 0% 60%, rgba(107,111,255,.09), transparent 60%),
-    radial-gradient(700px 500px at 100% 60%, rgba(255,61,207,.08), transparent 60%);
+    radial-gradient(600px 420px at 50% 0%, rgba(127,231,255,.08), transparent 62%),
+    radial-gradient(680px 520px at 0% 60%, rgba(167,155,255,.10), transparent 60%),
+    radial-gradient(680px 520px at 100% 60%, rgba(255,85,214,.08), transparent 60%);
   pointer-events:none;
 }
 
@@ -45,7 +48,7 @@ body{
   display:block;
   margin: 10px auto 10px;
   border-radius: 14px;
-  opacity: .95;
+  opacity: .96;
 }
 
 /* ===== STATUS ===== */
@@ -53,15 +56,15 @@ body{
   margin: 10px 0 6px;
   padding: 12px 12px;
   border:1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
   border-radius: var(--radius);
   backdrop-filter: blur(10px);
 }
 .statusTitle{
-  font-weight: 800;
+  font-weight: 900;
   letter-spacing: .08em;
   font-size: 12px;
-  color: rgba(255,255,255,.85);
+  color: rgba(255,255,255,.88);
   margin-bottom: 8px;
 }
 .statusGrid{
@@ -73,7 +76,7 @@ body{
   padding:10px 10px;
   border:1px solid rgba(255,255,255,.10);
   border-radius: 14px;
-  background: rgba(0,0,0,.18);
+  background: rgba(0,0,0,.16);
 }
 .k{
   display:flex;
@@ -85,33 +88,35 @@ body{
 .v{
   margin-top:4px;
   font-size: 18px;
-  font-weight: 900;
-  color: rgba(255,255,255,.92);
+  font-weight: 950;
+  color: rgba(255,255,255,.94);
 }
 .mini{
   margin-top: 6px;
   font-size: 12px;
-  color: rgba(255,255,255,.70);
+  color: rgba(255,255,255,.72);
 }
+.miniNum{ font-weight: 900; color: rgba(255,255,255,.90); }
+
 .helpBtn{
   border:none;
   width:18px; height:18px;
   border-radius: 10px;
-  background: rgba(127,231,255,.14);
+  background: rgba(127,231,255,.16);
   color: rgba(255,255,255,.95);
-  font-weight:900;
+  font-weight:950;
   cursor:pointer;
 }
 .higachaBtn{
   margin-top:6px;
   width:100%;
-  min-height: 44px; /* タップ領域 */
+  min-height: 44px;
   padding:10px 10px;
   border-radius: 14px;
-  border:1px solid rgba(127,231,255,.22);
-  background: rgba(127,231,255,.08);
+  border:1px solid rgba(255,85,214,.26);
+  background: rgba(255,85,214,.08);
   color: rgba(255,255,255,.92);
-  font-weight: 900;
+  font-weight: 950;
   letter-spacing: .06em;
   display:flex;
   justify-content:center;
@@ -121,8 +126,8 @@ body{
 }
 .higachaBtn .dot{
   width:8px;height:8px;border-radius:8px;
-  background: var(--acc0);
-  box-shadow: 0 0 16px rgba(127,231,255,.6);
+  background: var(--pink);
+  box-shadow: 0 0 16px rgba(255,85,214,.55);
 }
 .higachaBtn.is-disabled{
   opacity:.5;
@@ -130,16 +135,13 @@ body{
   box-shadow:none;
 }
 
-/* STATUSを超小型で詰め過ぎない（必要なら2段に落とす） */
 @media (max-width: 420px){
   .statusGrid{ grid-template-columns: 1fr 1fr; }
-  .statusItem:nth-child(3){ grid-column: 1 / -1; } /* HIGACHAを横いっぱい */
+  .statusItem:nth-child(3){ grid-column: 1 / -1; }
 }
 
-/* ===== MISSIONBRIEF chip (always visible) ===== */
-.briefChip{
-  margin: 10px 0 0;
-}
+/* ===== MISSIONBRIEF chip ===== */
+.briefChip{ margin: 10px 0 0; }
 .briefChipBtn{
   width:100%;
   display:flex;
@@ -150,19 +152,19 @@ body{
   border-radius: 16px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.88);
+  color: rgba(255,255,255,.90);
   cursor:pointer;
 }
 .briefChipTitle{
-  font-weight: 900;
+  font-weight: 950;
   letter-spacing:.06em;
-  color: rgba(127,231,255,.95);
+  color: rgba(127,231,255,.96);
   white-space: nowrap;
 }
 .briefChipText{
   flex:1;
   text-align:left;
-  color: rgba(255,255,255,.78);
+  color: rgba(255,255,255,.80);
   overflow:hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -173,59 +175,30 @@ body{
 .wrap{
   max-width: 980px;
   margin: 0 auto;
-  padding: 10px 14px 24px;
+  padding: 10px 14px 18px;
 }
 
 .seg{
   display:flex;
   gap:10px;
-  margin: 8px 0 10px;
+  margin: 10px 0 12px;
 }
 .segBtn{
   flex:1;
-  min-height: 44px; /* タップ領域 */
+  min-height: 44px;
   padding:12px 10px;
   border-radius: 16px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.04);
-  color: rgba(255,255,255,.88);
-  font-weight: 900;
+  color: rgba(255,255,255,.90);
+  font-weight: 950;
   letter-spacing: .06em;
   cursor:pointer;
 }
 .segBtn.is-on{
-  border-color: rgba(127,231,255,.32);
+  border-color: rgba(127,231,255,.34);
   background: rgba(127,231,255,.08);
-  box-shadow: 0 0 24px rgba(127,231,255,.10);
-}
-
-.toolbar{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin: 0 0 12px;
-}
-.search{
-  flex:1;
-  min-height: 44px;
-  padding:12px 12px;
-  border-radius: 14px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.22);
-  color: rgba(255,255,255,.92);
-  outline:none;
-}
-.search::placeholder{ color: rgba(255,255,255,.45); }
-
-.btnGhost{
-  min-height: 44px;
-  padding:12px 12px;
-  border-radius: 14px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.88);
-  font-weight: 800;
-  cursor:pointer;
+  box-shadow: 0 0 26px rgba(127,231,255,.10);
 }
 
 .panel{
@@ -240,7 +213,7 @@ body{
 .panelHead{ margin-bottom: 10px; }
 .panelTitle{
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 950;
   letter-spacing:.06em;
 }
 .panelHint{
@@ -258,17 +231,17 @@ body{
   .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
 }
 @media (max-width: 340px){
-  .grid{ grid-template-columns: 1fr; } /* 超小型は1列に落として確実に押せる */
+  .grid{ grid-template-columns: 1fr; }
 }
 
 .card{
   border-radius: 16px;
   border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.18);
+  background: rgba(0,0,0,.16);
   padding: 12px;
 }
 .cardTitle{
-  font-weight: 900;
+  font-weight: 950;
   font-size: 14px;
   margin: 0 0 6px;
 }
@@ -279,28 +252,33 @@ body{
   min-height: 16px;
 }
 
-/* ここが肝：狭いときに“必ず収まる” */
+/* Buttons: always same size. Mobile -> vertical stack */
 .cardActions{
   display:flex;
   gap:8px;
+  flex-direction: column; /* default: mobile-friendly vertical */
 }
+@media (min-width: 760px){
+  .cardActions{ flex-direction: row; } /* PC: side by side */
+}
+
 .aBtn{
   flex:1;
-  min-height: 44px; /* タップ領域 */
-  padding: 10px 10px;
+  width:100%;
+  min-height: 46px;
+  padding: 12px 12px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.9);
-  font-weight: 900;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
+  font-weight: 950;
   cursor:pointer;
   text-align:center;
   text-decoration:none;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-
-  white-space: nowrap; /* 文字の折返しはしない（はみ出しはレイアウト側で吸収） */
+  white-space: nowrap;
 }
 .aBtn[aria-disabled="true"], .aBtn.is-disabled{
   opacity:.45;
@@ -308,33 +286,24 @@ body{
   pointer-events:none;
 }
 
-/* FLASH tone */
-body[data-mode="flash"] .segBtn.is-on{ box-shadow: 0 0 26px var(--flashGlow); }
-body[data-mode="flash"] .aBtn.primary{
-  border-color: rgba(107,111,255,.35);
-  background: rgba(107,111,255,.10);
-  box-shadow: 0 0 22px rgba(107,111,255,.18);
+/* START */
+.aBtn.primary{
+  border-color: rgba(127,231,255,.28);
+  background: rgba(127,231,255,.10);
+  box-shadow: 0 0 18px rgba(127,231,255,.10);
 }
 
-/* BLITZ tone */
-body[data-mode="blitz"] .segBtn.is-on{ box-shadow: 0 0 26px var(--blitzGlow); }
-body[data-mode="blitz"] .aBtn.primary{
-  border-color: rgba(255,61,207,.35);
-  background: rgba(255,61,207,.10);
-  box-shadow: 0 0 22px rgba(255,61,207,.18);
-}
-
-/* EXPERT special (ritual button) */
-body[data-mode="blitz"] .aBtn.danger{
+/* EXPERT special */
+.aBtn.danger{
   position: relative;
-  border-color: rgba(255,61,207,.55);
-  background: linear-gradient(180deg, rgba(255,61,207,.22), rgba(255,61,207,.10));
+  border-color: rgba(255,85,214,.55);
+  background: linear-gradient(180deg, rgba(255,85,214,.22), rgba(255,85,214,.10));
   box-shadow:
-    0 0 22px rgba(255,61,207,.22),
-    0 0 46px rgba(255,61,207,.14);
-  animation: breathe 2.6s ease-in-out infinite;
+    0 0 18px rgba(255,85,214,.22),
+    0 0 44px rgba(255,85,214,.12);
+  animation: breathe 2.7s ease-in-out infinite;
 }
-body[data-mode="blitz"] .aBtn.danger::after{
+.aBtn.danger::after{
   content:"";
   position:absolute;
   inset: 5px;
@@ -342,41 +311,70 @@ body[data-mode="blitz"] .aBtn.danger::after{
   border: 1px solid rgba(255,255,255,.14);
   pointer-events:none;
 }
+.aBtn.danger::before{
+  content:"★";
+  position:absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity:.9;
+  color: rgba(255,255,255,.88);
+  text-shadow: 0 0 16px rgba(255,85,214,.55);
+}
 @keyframes breathe{
   0%,100%{ transform: translateY(0); filter: brightness(1); }
-  50%{ transform: translateY(-1px); filter: brightness(1.08); }
+  50%{ transform: translateY(-1px); filter: brightness(1.10); }
 }
 
-/* 狭い端末：まず文字だけ少し縮める */
-@media (max-width: 420px){
-  .aBtn{ font-size: 13px; }
-}
-
-/* それでも厳しい超小型：ボタンを縦積みにして絶対に収める */
-@media (max-width: 360px){
-  .cardActions{ flex-direction: column; }
-  .aBtn{ width: 100%; }
-}
-
-/* ===== MISSIONBRIEF (full) ===== */
-.brief{
-  margin-top: 12px;
-  border:1px solid var(--line);
+/* Ghost / secondary */
+.aBtn.ghost, .ghostBtn{
+  border-color: rgba(255,255,255,.14);
   background: rgba(255,255,255,.04);
-  border-radius: var(--radius);
-  padding: 12px;
+  box-shadow:none;
 }
-.briefHead{
+
+/* ===== Card Archive card ===== */
+.archiveCard{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
   gap:10px;
+  padding: 12px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
+  margin-bottom: 10px;
 }
-.briefTitle{
-  font-weight: 900;
-  letter-spacing:.06em;
+.archiveTitle{
+  font-weight: 950;
+  letter-spacing: .06em;
 }
-.briefBody{ margin-top: 10px; }
+.archiveSub{
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
+
+/* ===== Footer / Install ===== */
+.footer{
+  margin-top: 14px;
+  padding-bottom: 10px;
+}
+.installBtn{
+  width:100%;
+  min-height: 48px;
+  padding: 12px 12px;
+  border-radius: 16px;
+  border:1px solid rgba(167,155,255,.28);
+  background: rgba(167,155,255,.12);
+  color: rgba(255,255,255,.92);
+  font-weight: 950;
+  letter-spacing: .04em;
+  cursor:pointer;
+  box-shadow: 0 0 22px rgba(167,155,255,.10);
+}
+
+/* ===== List (MISSIONBRIEF modal) ===== */
 .briefList{
   margin:0;
   padding-left: 0;
@@ -389,12 +387,12 @@ body[data-mode="blitz"] .aBtn.danger::after{
   padding:10px 10px;
   border:1px solid rgba(255,255,255,.10);
   border-radius: 14px;
-  background: rgba(0,0,0,.16);
+  background: rgba(0,0,0,.14);
   margin: 8px 0;
 }
 .briefText{
   flex:1;
-  color: rgba(255,255,255,.86);
+  color: rgba(255,255,255,.88);
   line-height: 1.5;
   word-break: break-word;
 }
@@ -404,12 +402,12 @@ body[data-mode="blitz"] .aBtn.danger::after{
   align-items:center;
 }
 .briefQ{
-  width:44px;height:44px; /* タップ領域に合わせる */
+  width:44px;height:44px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.06);
   color: rgba(255,255,255,.92);
-  font-weight: 900;
+  font-weight: 950;
   cursor:pointer;
 }
 .briefLinks a{
@@ -429,10 +427,10 @@ body[data-mode="blitz"] .aBtn.danger::after{
   z-index: 50;
 }
 .modal{
-  width: min(520px, 100%);
+  width: min(560px, 100%);
   border-radius: 18px;
   border:1px solid rgba(255,255,255,.16);
-  background: rgba(10,8,14,.88);
+  background: rgba(12,9,18,.90);
   backdrop-filter: blur(12px);
   overflow:hidden;
 }
@@ -443,9 +441,9 @@ body[data-mode="blitz"] .aBtn.danger::after{
   padding: 12px 14px;
   border-bottom:1px solid rgba(255,255,255,.10);
 }
-.modalTitle{ font-weight: 900; letter-spacing:.06em; }
+.modalTitle{ font-weight: 950; letter-spacing:.06em; }
 .x{
-  width:44px;height:44px; /* タップ領域 */
+  width:44px;height:44px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.06);
@@ -453,14 +451,14 @@ body[data-mode="blitz"] .aBtn.danger::after{
   font-size: 18px;
   cursor:pointer;
 }
-.modalBody{ padding: 14px; color: rgba(255,255,255,.90); }
+.modalBody{ padding: 14px; color: rgba(255,255,255,.92); }
 
 .leftPad{
   text-align:left;
-  padding: 10px 12px; /* 最左ベタ付きを回避 */
+  padding: 10px 12px;
   border:1px solid rgba(255,255,255,.12);
   border-radius: 14px;
-  background: rgba(0,0,0,.20);
+  background: rgba(0,0,0,.18);
   white-space: pre-line;
 }
 
@@ -486,10 +484,10 @@ body[data-mode="blitz"] .aBtn.danger::after{
   min-height: 44px;
   padding: 12px 12px;
   border-radius: 14px;
-  border:1px solid rgba(127,231,255,.28);
+  border:1px solid rgba(127,231,255,.24);
   background: rgba(127,231,255,.10);
   color: rgba(255,255,255,.92);
-  font-weight: 900;
+  font-weight: 950;
   cursor:pointer;
 }
 .note{
@@ -501,8 +499,8 @@ body[data-mode="blitz"] .aBtn.danger::after{
 .detailLinksWrap{ margin-top: 12px; }
 .detailLinksTitle{
   font-size: 12px;
-  color: rgba(255,255,255,.70);
-  font-weight: 800;
+  color: rgba(255,255,255,.72);
+  font-weight: 900;
   letter-spacing: .06em;
   margin: 0 0 6px 2px;
 }
