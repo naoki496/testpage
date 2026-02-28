@@ -549,3 +549,64 @@ body{
   .cardActions{ grid-template-columns: 1fr; }
   .aBtn.is-disabled::after{ top: 10px; transform:none; }
 }
+
+/* =========================
+   Mobile vertical tuning
+   (BLITZ + STATUS compact)
+   ========================= */
+
+/* STATUS：縦に間延びするのを抑える */
+.statusRow, .statusBar, .statusWrap{
+  /* 既存クラス名がどれかに当たる想定。
+     もし当たらない場合、実DOMのクラス名を教えてください。 */
+}
+
+.statusItem{
+  padding: 8px 10px;         /* ←縦を詰める */
+  min-height: unset;
+}
+
+.statusLabel{
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+.statusValue{
+  font-size: 16px;           /* ←数字がデカすぎる場合ここを下げる */
+  line-height: 1.1;
+}
+
+/* BLITZカード全体：スマホ縦の時に文字量を圧縮 */
+#panelBlitz .card{
+  padding: 10px;
+  border-radius: 14px;
+}
+
+#panelBlitz .cardTitle{
+  font-size: 14px;
+  line-height: 1.15;
+  margin-bottom: 8px;
+}
+
+#panelBlitz .cardActions .aBtn{
+  font-size: 13px;
+  padding: 10px 10px;        /* ボタン高さは確保しつつ文字を小さく */
+  line-height: 1.1;
+}
+
+/* LOCKED バッジも邪魔なら小さく */
+#panelBlitz .aBtn.is-disabled::after{
+  font-size: 10px;
+  padding: 5px 8px;
+}
+
+/* さらに狭い端末向け（例：iPhone SE / 360px以下） */
+@media (max-width: 380px){
+  #panelBlitz .cardTitle{ font-size: 13px; }
+  #panelBlitz .cardActions .aBtn{ font-size: 12px; padding: 10px 9px; }
+}
+
+/* 極小幅では2列が詰むので縦並びへ */
+@media (max-width: 340px){
+  #panelBlitz .cardActions{ grid-template-columns: 1fr; }
+}
