@@ -3,23 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#07060a" />
-  <title>八東国語LOBBY | testpage</title>
+  <meta name="theme-color" content="#140817" />
+  <title>八東国語LOBBY</title>
+  <link rel="manifest" href="./manifest.json" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 
-<body data-mode="flash">
+<body>
   <div class="bg"></div>
 
   <header class="top">
-    <img
-      class="logo"
-      src="https://raw.githubusercontent.com/naoki496/kokugo-dojo/refs/heads/main/H.K.LOBBY.png"
-      alt="八東国語LOBBY"
-      loading="eager"
-    />
+    <img class="logo" src="./H.K.LOBBY.png" alt="八東国語LOBBY" />
 
-    <!-- ===== STATUS / HKP / HIGACHA ===== -->
+    <!-- STATUS -->
     <section class="statusBar" aria-label="STATUS">
       <div class="statusTitle">STATUS</div>
 
@@ -27,7 +23,7 @@
         <div class="statusItem">
           <div class="k">ランク</div>
           <div class="v" id="rankValue">-</div>
-          <div class="mini">カード総数 <span id="cardTotalValue">-</span></div>
+          <div class="mini">カード総数 <span class="miniNum" id="cardTotalValue">-</span></div>
         </div>
 
         <div class="statusItem">
@@ -42,78 +38,81 @@
           <div class="k">HIGACHA</div>
           <button class="higachaBtn" id="btnHigacha" type="button">
             <span class="dot" aria-hidden="true"></span>
-            <span class="t">OPEN</span>
+            <span>OPEN</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- ===== MISSIONBRIEF chip (always visible) ===== -->
+    <!-- MISSIONBRIEF (top only) -->
     <section class="briefChip" aria-label="MISSIONBRIEF">
-      <button class="briefChipBtn" id="btnBriefToggle2" type="button" aria-expanded="false">
+      <button class="briefChipBtn" id="btnBriefOpen" type="button" aria-haspopup="dialog">
         <span class="briefChipTitle">MISSIONBRIEF</span>
         <span class="briefChipText" id="briefOneLine">（未読）</span>
-        <span class="briefChipIcon">▾</span>
+        <span class="briefChipIcon" aria-hidden="true">▸</span>
       </button>
     </section>
   </header>
 
   <main class="wrap" id="app">
-    <!-- ===== Segmented control ===== -->
+    <!-- Tabs -->
     <nav class="seg" aria-label="mode switch">
       <button class="segBtn is-on" id="tabFlash" type="button">FLASHCARD</button>
       <button class="segBtn" id="tabBlitz" type="button">BLITZQUEST</button>
     </nav>
 
-    <!-- ===== Search (filter) ===== -->
-    <section class="toolbar">
-      <input id="q" class="search" type="search" inputmode="search" placeholder="検索" />
-      <button id="btnClear" class="btnGhost" type="button">クリア</button>
-    </section>
-
-    <!-- ===== Lists ===== -->
-    <section class="panel" id="panelFlash" aria-label="FLASHCARD">
-      <div class="panelHead">
+    <!-- FLASH -->
+    <section class="panel" id="panelFlash">
+      <header class="panelHead">
         <div class="panelTitle">FLASHCARD</div>
-        <div class="panelHint">同格コンテンツ（増えてもここに追加）</div>
-      </div>
+        <div class="panelHint">反復で土台を固める</div>
+      </header>
       <div class="grid" id="flashGrid"></div>
     </section>
 
-    <section class="panel" id="panelBlitz" aria-label="BLITZQUEST" hidden>
-      <div class="panelHead">
+    <!-- BLITZ -->
+    <section class="panel" id="panelBlitz" hidden>
+      <header class="panelHead">
         <div class="panelTitle">BLITZQUEST</div>
-        <div class="panelHint">各コンテンツ：EXPERT / START を分離（導線は維持）</div>
+        <div class="panelHint">短時間で即断力を鍛える</div>
+      </header>
+
+      <!-- Card Archive link (fixed) -->
+      <div class="archiveCard" aria-label="カード図鑑リンク">
+        <div class="archiveLeft">
+          <div class="archiveTitle">カード図鑑</div>
+          <div class="archiveSub">CARD ARCHIVE</div>
+        </div>
+        <a class="aBtn ghost" href="https://naoki496.github.io/cards-hub/status.html">OPEN</a>
       </div>
+
       <div class="grid" id="blitzGrid"></div>
     </section>
 
-    <!-- ===== MISSIONBRIEF (full) ===== -->
-    <section class="brief" aria-label="MISSIONBRIEF">
-      <div class="briefHead">
-        <div class="briefTitle">MISSIONBRIEF</div>
-        <button class="btnGhost" id="btnBriefToggle" type="button" aria-expanded="false">OPEN</button>
-      </div>
-      <div class="briefBody" id="briefBody" hidden>
-        <ul class="briefList" id="briefList"></ul>
-      </div>
-    </section>
+    <!-- Install (bottom) -->
+    <footer class="footer">
+      <button class="installBtn" id="btnInstall" type="button" hidden>
+        アプリとしてインストール
+      </button>
+    </footer>
   </main>
 
-  <!-- ===== HKP Help Modal ===== -->
-  <div class="overlay" id="hkpHelpOverlay" aria-hidden="true" style="display:none;">
-    <div class="modal">
+  <!-- HKP Help Modal -->
+  <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="HKPの説明">
       <div class="modalHead">
         <div class="modalTitle">HKP</div>
         <button class="x" id="hkpHelpClose" type="button" aria-label="閉じる">×</button>
       </div>
-      <div class="modalBody leftPad" id="hkpHelpBody"></div>
+      <div class="modalBody">
+        <div class="leftPad" id="hkpHelpBody"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ===== HIGACHA Modal ===== -->
-  <div class="overlay" id="higachaOverlay" aria-hidden="true" style="display:none;">
-    <div class="modal">
+  <!-- HIGACHA Modal -->
+  <div class="overlay" id="higachaOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="HIGACHA">
       <div class="modalHead">
         <div class="modalTitle">HIGACHA</div>
         <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
@@ -121,40 +120,47 @@
 
       <div class="modalBody">
         <div class="gachaHero">
-          <img
-            class="gachaImg"
-            src="https://raw.githubusercontent.com/naoki496/kokugo-dojo/refs/heads/main/higacha.png"
-            alt="HIGACHA"
-            loading="lazy"
-          />
+          <img class="gachaImg" src="./higacha.png" alt="HIGACHA" />
         </div>
 
         <div class="gachaMsg leftPad" id="higachaMsg"></div>
 
         <div class="modalActions">
-          <button class="btnGhost" id="higachaCancel" type="button">CLOSE</button>
           <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
+          <button class="btnPrimary ghostBtn" id="higachaCancel" type="button">CLOSE</button>
         </div>
 
-        <div class="note">※ 1日1回まで。結果はHKPに加算されます。</div>
+        <div class="note">※HIGACHAは1日1回まで</div>
       </div>
     </div>
   </div>
 
-  <!-- ===== DETAIL Modal (MISSIONBRIEF “?”) ===== -->
-  <div class="overlay" id="detailOverlay" aria-hidden="true" style="display:none;">
-    <div class="modal">
+  <!-- MISSIONBRIEF Modal (top only) -->
+  <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
+      <div class="modalHead">
+        <div class="modalTitle">MISSIONBRIEF</div>
+        <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="modalBody">
+        <ul class="briefList" id="briefList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- DETAIL Modal (for “?”) -->
+  <div class="overlay" id="detailOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="DETAIL">
       <div class="modalHead">
         <div class="modalTitle" id="detailTitle">DETAIL</div>
         <button class="x" id="detailClose" type="button" aria-label="閉じる">×</button>
       </div>
-
       <div class="modalBody">
-        <div class="detailBody leftPad" id="detailBody"></div>
+        <div class="leftPad" id="detailBody"></div>
 
-        <div class="detailLinksWrap" id="detailLinksWrap" style="display:none;">
-          <div class="detailLinksTitle">LINK</div>
-          <div class="detailLinks leftPad" id="detailLinks"></div>
+        <div class="detailLinksWrap" id="detailLinksWrap" style="display:none">
+          <div class="detailLinksTitle">LINKS</div>
+          <div class="detailLinks" id="detailLinks"></div>
         </div>
       </div>
     </div>
