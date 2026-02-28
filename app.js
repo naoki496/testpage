@@ -1,9 +1,27 @@
 (() => {
   "use strict";
 
+  // =========================================================
+  // CONFIG
+  // - カード総数（図鑑枚数）は、将来ここに “正しいソースURL” を入れるだけで運用できます。
+  // - テストページでは空のままでOK（"-"表示）。
+  // =========================================================
+  const CARD_TOTAL_SOURCES = [
+    // 例：cards-hub の manifest が用意できたら、下のどれかに差し替え
+    // "https://naoki496.github.io/cards-hub/cards-manifest.json",
+    // "https://raw.githubusercontent.com/naoki496/cards-hub/refs/heads/main/cards-manifest.json",
+  ];
+
   // ===== Keys (kokugo-dojo home.js compatible) =====
   const HKP_KEY = "hklobby.v1.hkp";
   const HIGACHA_LAST_KEY = "hklobby.v1.higacha.lastDate";
+
+  // cache for total cards (optional)
+  const CARD_TOTAL_CACHE_KEY = "hklobby.v1.cardTotal.cache";
+  const CARD_TOTAL_CACHE_TS_KEY = "hklobby.v1.cardTotal.cacheTs";
+  const CARD_TOTAL_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
+
+  const MODE_KEY = "testpage.v1.mode";
 
   const $ = (id) => document.getElementById(id);
   const on = (node, ev, fn, opt) => node && node.addEventListener(ev, fn, opt);
@@ -18,6 +36,7 @@
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
   }
+
   function escapeHtml(str) {
     return String(str ?? "")
       .replace(/&/g, "&amp;")
@@ -26,9 +45,11 @@
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#39;");
   }
+
   function hostnameOf(url) {
     try { return new URL(url).hostname; } catch { return ""; }
   }
+
   function extractUrlsKeepText(line) {
     const s = String(line ?? "");
     const urlRe = /(https?:\/\/[^\s]+)/g;
@@ -38,6 +59,7 @@
     const textOnly = s.replace(urlRe, "").replace(/\s{2,}/g, " ").trim();
     return { textOnly, urls };
   }
+
   // "表示||詳細"
   function splitDetail(line) {
     const s = String(line ?? "");
@@ -46,6 +68,21 @@
     const main = parts[0].trim();
     const detail = parts.slice(1).join("||").trim();
     return { main, detail: detail.length ? detail : null };
+  }
+
+  function normalize(s) {
+    return String(s ?? "").trim().toLowerCase();
+  }
+
+  async function fetchWithTimeout(url, ms) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    try {
+      const r = await fetch(url, { cache: "no-store", signal: ctrl.signal });
+      return r;
+    } finally {
+      clearTimeout(t);
+    }
   }
 
   // -------------------------
@@ -72,7 +109,8 @@
   }
 
   // -------------------------
-  // Content registry (Names MUST remain exactly as-is)
+  // Content registry
+  // NOTE: Names MUST remain exactly as-is.
   // -------------------------
   const FLASH_CONTENTS = [
     { name: "古文単語", href: "https://naoki496.github.io/flashcards/", sub: "読解の土台となる基礎語彙。" },
@@ -107,7 +145,6 @@
   // -------------------------
   // Mode (C案 tabs)
   // -------------------------
-  const MODE_KEY = "testpage.v1.mode";
   function setMode(mode) {
     document.body.dataset.mode = mode;
     const flash = $("panelFlash");
@@ -124,14 +161,12 @@
 
     localStorage.setItem(MODE_KEY, mode);
     applyFilter();
+    applyCompactLabels();
   }
 
   // -------------------------
   // Search filter
   // -------------------------
-  function normalize(s) {
-    return String(s ?? "").trim().toLowerCase();
-  }
   function applyFilter() {
     const q = normalize($("q")?.value);
     const isFlash = (document.body.dataset.mode || "flash") === "flash";
@@ -204,6 +239,7 @@
     const el = $("hkpValue");
     if (el) el.textContent = String(getHKP());
   }
+
   function updateHigachaButtonState() {
     const btn = $("btnHigacha");
     if (!btn) return;
@@ -213,10 +249,137 @@
     btn.classList.toggle("is-disabled", !ok);
     btn.setAttribute("aria-disabled", String(!ok));
   }
+
   function renderRankPlaceholder() {
     const el = $("rankValue");
     if (el) el.textContent = "-";
   }
+
+  // -------------------------
+  // Card total (図鑑枚数) hook
+  // - テスト段階: "-" のままでもOK
+  // - 正規運用: CARD_TOTAL_SOURCES に “真のデータソースURL” を追加すれば反映されます。
+  // -------------------------
+  function setCardTotalText(s) {
+    const el = $("cardTotalValue");
+    if (!el) return;
+    el.textContent = String(s ?? "-");
+  }
+
+  function getCachedCardTotal() {
+    const v = Number(localStorage.getItem(CARD_TOTAL_CACHE_KEY));
+    const ts = Number(localStorage.getItem(CARD_TOTAL_CACHE_TS_KEY));
+    if (!Number.isFinite(v) || !Number.isFinite(ts)) return null;
+    if ((Date.now() - ts) > CARD_TOTAL_CACHE_MAX_AGE_MS) return null;
+    return v;
+  }
+
+  function setCachedCardTotal(v) {
+    const n = Number(v);
+    if (!Number.isFinite(n)) return;
+    localStorage.setItem(CARD_TOTAL_CACHE_KEY, String(Math.max(0, Math.trunc(n))));
+    localStorage.setItem(CARD_TOTAL_CACHE_TS_KEY, String(Date.now()));
+  }
+
+  function inferCardTotalFromManifestJson(obj) {
+    // できるだけ汎用に：よくあるパターンを吸収
+    // - { cards: [...] }
+    // - { items: [...] }
+    // - [ ... ]
+    // - { total: 123 }
+    if (!obj) return null;
+
+    if (Array.isArray(obj)) return obj.length;
+
+    if (Number.isFinite(obj.total)) return obj.total;
+
+    if (Array.isArray(obj.cards)) return obj.cards.length;
+    if (Array.isArray(obj.items)) return obj.items.length;
+
+    // cardsManifest の形が { byRepo: {kobun:[...], ...} } みたいな場合も合算
+    if (obj.byRepo && typeof obj.byRepo === "object") {
+      let sum = 0;
+      for (const k of Object.keys(obj.byRepo)) {
+        const a = obj.byRepo[k];
+        if (Array.isArray(a)) sum += a.length;
+      }
+      return sum || null;
+    }
+
+    return null;
+  }
+
+  async function fetchCardTotal() {
+    // まずキャッシュがあれば即表示（体感を軽く）
+    const cached = getCachedCardTotal();
+    if (cached !== null) setCardTotalText(cached);
+
+    if (!CARD_TOTAL_SOURCES.length) {
+      // テスト段階：ソース未指定ならここで終了
+      if (cached === null) setCardTotalText("-");
+      return;
+    }
+
+    for (const url of CARD_TOTAL_SOURCES) {
+      try {
+        const r = await fetchWithTimeout(url, 6000);
+        if (!r.ok) continue;
+
+        const ct = (r.headers.get("content-type") || "").toLowerCase();
+        let total = null;
+
+        if (ct.includes("application/json") || url.endsWith(".json")) {
+          const obj = await r.json();
+          total = inferCardTotalFromManifestJson(obj);
+        } else {
+          // CSV等：行数カウント（ヘッダ1行がある場合は自動で除外）
+          const txt = await r.text();
+          const lines = txt.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+          if (lines.length) {
+            const headerLike = lines[0].includes(",") && /id|rarity|name|img/i.test(lines[0]);
+            total = headerLike ? Math.max(0, lines.length - 1) : lines.length;
+          }
+        }
+
+        if (Number.isFinite(total)) {
+          const n = Math.max(0, Math.trunc(total));
+          setCardTotalText(n);
+          setCachedCardTotal(n);
+          return;
+        }
+      } catch {
+        // 次のソースへ
+      }
+    }
+
+    // 全失敗
+    if (cached === null) setCardTotalText("-");
+  }
+
+  // -------------------------
+  // Compact labels (EXPERT/START -> EX/GO on narrow screens)
+  // - 表示だけ短縮。導線や概念は変えません。
+  // -------------------------
+  function applyCompactLabels() {
+    const isCompact = window.matchMedia("(max-width: 380px)").matches;
+
+    const rewrite = (node) => {
+      const t = node.textContent.trim();
+      if (!node.dataset.long) node.dataset.long = t;
+
+      if (!isCompact) {
+        node.textContent = node.dataset.long;
+        return;
+      }
+      if (t === "EXPERT" || node.dataset.long === "EXPERT") node.textContent = "EX";
+      else if (t === "START" || node.dataset.long === "START") node.textContent = "GO";
+    };
+
+    document.querySelectorAll("#blitzGrid .aBtn").forEach(rewrite);
+    document.querySelectorAll("#flashGrid .aBtn").forEach(rewrite);
+  }
+  window.addEventListener("resize", applyCompactLabels);
+  window.addEventListener("orientationchange", applyCompactLabels);
 
   // -------------------------
   // HKP help modal
@@ -252,7 +415,7 @@ HKPを消費することで「EXPERT MODE」への挑戦や、
       document.body.style.overflow = "hidden";
     }
     function close() {
-      try { (lastFocus && lastFocus.focus) ? lastFocus.focus() : helpBtn.focus(); } catch {}
+      try { (lastFocus && typeof lastFocus.focus === "function") ? lastFocus.focus() : helpBtn.focus(); } catch {}
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
@@ -367,10 +530,8 @@ TOTAL ${getHKP()} HKP`;
 
       titleEl.textContent = titleText || "DETAIL";
 
-      // "\n" を改行として扱う
       const raw = String(detailText ?? "").replaceAll("\\n", "\n");
 
-      // URL抽出（本文はURL除去、リンク領域はURLがある時だけ表示）
       const urlRe = /(https?:\/\/[^\s]+)/g;
       const urls = raw.match(urlRe) ?? [];
       const bodyText = raw.replace(urlRe, "").replace(/[ \t]{2,}/g, " ").trim();
@@ -417,21 +578,30 @@ TOTAL ${getHKP()} HKP`;
 
   // -------------------------
   // MISSIONBRIEF (表示||詳細 + “?” button)
+  // - 上のチップ（btnBriefToggle2）と下の OPEN（btnBriefToggle）を同期
   // -------------------------
   function initBrief(detailApi) {
-    const btn = $("btnBriefToggle");
+    const btn = $("btnBriefToggle");      // 下段
+    const btn2 = $("btnBriefToggle2");    // 上段チップ
+    const one = $("briefOneLine");        // 上段1行要約
     const body = $("briefBody");
     const list = $("briefList");
-    if (!btn || !body || !list) return;
+    if (!body || !list) return;
 
     function setOpen(open) {
       body.hidden = !open;
-      btn.setAttribute("aria-expanded", String(open));
-      btn.textContent = open ? "CLOSE" : "OPEN";
+      btn?.setAttribute("aria-expanded", String(open));
+      btn2?.setAttribute("aria-expanded", String(open));
+      if (btn) btn.textContent = open ? "CLOSE" : "OPEN";
+      if (btn2) {
+        const icon = btn2.querySelector(".briefChipIcon");
+        if (icon) icon.textContent = open ? "▴" : "▾";
+      }
     }
 
     let open = false;
     on(btn, "click", () => { open = !open; setOpen(open); });
+    on(btn2, "click", () => { open = !open; setOpen(open); });
 
     function renderLines(lines) {
       list.innerHTML = "";
@@ -488,9 +658,17 @@ TOTAL ${getHKP()} HKP`;
           .split(/\r?\n/)
           .map((s) => s.trim())
           .filter(Boolean);
+
+        if (one) {
+          const first = lines[0] ? splitDetail(lines[0]).main : "";
+          one.textContent = first || "（未読）";
+        }
+
         renderLines(lines.slice(0, 60));
       })
-      .catch(() => {});
+      .catch(() => {
+        if (one) one.textContent = "（読み込み失敗）";
+      });
   }
 
   function initTabs() {
@@ -509,6 +687,9 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
+  // -------------------------
+  // boot
+  // -------------------------
   function boot() {
     renderFlash();
     renderBlitz();
@@ -527,6 +708,12 @@ TOTAL ${getHKP()} HKP`;
 
     const detailApi = initDetailModal();
     initBrief(detailApi);
+
+    // 表示短縮（狭い画面用）
+    applyCompactLabels();
+
+    // 図鑑枚数（ソース未設定なら "-" のまま）
+    fetchCardTotal();
   }
 
   document.addEventListener("DOMContentLoaded", boot);
