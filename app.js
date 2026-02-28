@@ -1,3 +1,4 @@
+// app.js（全文）
 (() => {
   "use strict";
 
@@ -74,15 +75,12 @@
   // =========================
   // Contents
   // =========================
-  // ✅ 指示通り：表記を変更（改行しない前提）
   const FLASH_CONTENTS = [
     { name: "古文単語330", href: "https://naoki496.github.io/flashcards/" },
     { name: "助動詞確認", href: "https://naoki496.github.io/hatto-kobun-jodoushi/" },
     { name: "文学知識総合", href: "https://naoki496.github.io/bungaku/" },
   ];
 
-  // ✅ ここが壊れていた（{ { が混入）ので完全修正
-  // ✅ 2枠目は「文学知識マスター」+ 指定リンク
   const BLITZ_CONTENTS = [
     {
       name: "古文単語330マスター",
@@ -224,7 +222,7 @@
     setTimeout(() => { location.href = url; }, 380);
   }
 
-  // ✅ 戻った時にFXが残っていたら必ず消す
+  // ✅ BFCache復帰対策：戻った時にFXが残っていたら必ず消す
   function clearFxOverlay() {
     const fx = $("fxOverlay");
     if (!fx) return;
@@ -244,7 +242,7 @@
       const a = document.createElement("a");
       a.className = "aBtn primary";
       a.href = c.href;
-      a.textContent = c.name;
+      a.textContent = c.name; // ✅ 改行なし（CSSのnowrap維持）
       grid.appendChild(a);
     });
   }
@@ -414,12 +412,30 @@ TOTAL ${getHKP()} HKP`;
     const list = $("briefList");
     if (!btn || !one || !list) return;
 
-    const { open } = bindOverlayClose("briefOverlay", "briefClose");
+    const { open, close } = bindOverlayClose("briefOverlay", "briefClose");
     let currentSig = "";
 
-    on(btn, "click", () => {
+    // ✅ 開閉で▼回転 / 既読カード感
+    function openBrief() {
+      btn.classList.add("is-open");
       open();
-      if (currentSig) markBriefSeen(currentSig);
+      if (currentSig) {
+        markBriefSeen(currentSig);
+        btn.classList.add("is-seen");
+      }
+    }
+    function closeBrief() {
+      btn.classList.remove("is-open");
+      close();
+    }
+
+    on(btn, "click", openBrief);
+    // bindOverlayClose側のcloseに加えて、ボタン見た目も戻す
+    on($("briefClose"), "click", closeBrief);
+    on($("briefOverlay"), "click", (e) => { if (e.target === $("briefOverlay")) closeBrief(); });
+    on(document, "keydown", (e) => {
+      const ov = $("briefOverlay");
+      if (e.key === "Escape" && ov && ov.style.display === "flex") closeBrief();
     });
 
     fetch("./mission-brief.txt", { cache: "no-store" })
@@ -431,17 +447,27 @@ TOTAL ${getHKP()} HKP`;
           .map((s) => s.trim())
           .filter(Boolean);
 
-        one.textContent = lines[0] || "（未読）";
+        // ✅ 一行目は「ヘッドライン」扱い（NEW/UPDATE接頭辞は表示から除外）
+        const head = (lines[0] || "（未読）");
+        const headUpper = head.toUpperCase();
+        const headClean = headUpper.startsWith("NEW:") ? head.replace(/^NEW:\s*/i, "") :
+                          headUpper.startsWith("UPDATE:") ? head.replace(/^UPDATE:\s*/i, "") :
+                          head;
+
+        one.textContent = headClean || "（未読）";
+
         list.innerHTML = lines.slice(0, 80).map((line) => {
-          return `<li class="briefItem"><div class="briefText">${escapeHtml(line)}</div></li>`;
+          const up = line.toUpperCase();
+          const clean = up.startsWith("NEW:") ? line.replace(/^NEW:\s*/i, "") :
+                        up.startsWith("UPDATE:") ? line.replace(/^UPDATE:\s*/i, "") :
+                        line;
+          return `<li class="briefItem"><div class="briefText">${escapeHtml(clean)}</div></li>`;
         }).join("");
 
         currentSig = signatureOf(raw);
         try { localStorage.setItem(BRIEF_SIG_KEY, currentSig); } catch {}
 
         const seen = String(localStorage.getItem(BRIEF_SEEN_KEY) || "");
-        const head = (lines[0] || "");
-        const headUpper = head.toUpperCase();
 
         if (headUpper.startsWith("NEW:")) setBriefBadge("NEW");
         else if (headUpper.startsWith("UPDATE:")) setBriefBadge("UPDATE");
@@ -450,6 +476,9 @@ TOTAL ${getHKP()} HKP`;
           else if (currentSig && !seen) setBriefBadge("NEW");
           else setBriefBadge(null);
         }
+
+        // ✅ 既読なら見た目を落ち着かせる
+        if (currentSig && seen && currentSig === seen) btn.classList.add("is-seen");
       })
       .catch(() => {
         one.textContent = "（読み込み失敗）";
@@ -664,7 +693,7 @@ TOTAL ${getHKP()} HKP`;
   // Sync on return (重要)
   // =========================
   function syncStatus() {
-    clearFxOverlay();
+    clearFxOverlay(); // ✅ 戻る/復帰でFX残留を確実に消す
     renderHKP();
     updateHigachaButtonState();
     const st = ensureDailyState();
@@ -697,7 +726,7 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function boot() {
-    clearFxOverlay();
+    clearFxOverlay(); // 初期も安全側
 
     renderFlash();
     renderBlitz();
