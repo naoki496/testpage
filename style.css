@@ -105,6 +105,7 @@ body{
 .higachaBtn{
   margin-top:6px;
   width:100%;
+  min-height: 44px; /* タップ領域 */
   padding:10px 10px;
   border-radius: 14px;
   border:1px solid rgba(127,231,255,.22);
@@ -127,6 +128,12 @@ body{
   opacity:.5;
   cursor:not-allowed;
   box-shadow:none;
+}
+
+/* STATUSを超小型で詰め過ぎない（必要なら2段に落とす） */
+@media (max-width: 420px){
+  .statusGrid{ grid-template-columns: 1fr 1fr; }
+  .statusItem:nth-child(3){ grid-column: 1 / -1; } /* HIGACHAを横いっぱい */
 }
 
 /* ===== MISSIONBRIEF chip (always visible) ===== */
@@ -176,6 +183,7 @@ body{
 }
 .segBtn{
   flex:1;
+  min-height: 44px; /* タップ領域 */
   padding:12px 10px;
   border-radius: 16px;
   border:1px solid rgba(255,255,255,.14);
@@ -199,6 +207,7 @@ body{
 }
 .search{
   flex:1;
+  min-height: 44px;
   padding:12px 12px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
@@ -209,6 +218,7 @@ body{
 .search::placeholder{ color: rgba(255,255,255,.45); }
 
 .btnGhost{
+  min-height: 44px;
   padding:12px 12px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
@@ -247,6 +257,9 @@ body{
 @media (min-width: 760px){
   .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
 }
+@media (max-width: 340px){
+  .grid{ grid-template-columns: 1fr; } /* 超小型は1列に落として確実に押せる */
+}
 
 .card{
   border-radius: 16px;
@@ -265,12 +278,15 @@ body{
   margin: 0 0 10px;
   min-height: 16px;
 }
+
+/* ここが肝：狭いときに“必ず収まる” */
 .cardActions{
   display:flex;
   gap:8px;
 }
 .aBtn{
   flex:1;
+  min-height: 44px; /* タップ領域 */
   padding: 10px 10px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
@@ -283,6 +299,8 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
+
+  white-space: nowrap; /* 文字の折返しはしない（はみ出しはレイアウト側で吸収） */
 }
 .aBtn[aria-disabled="true"], .aBtn.is-disabled{
   opacity:.45;
@@ -327,6 +345,17 @@ body[data-mode="blitz"] .aBtn.danger::after{
 @keyframes breathe{
   0%,100%{ transform: translateY(0); filter: brightness(1); }
   50%{ transform: translateY(-1px); filter: brightness(1.08); }
+}
+
+/* 狭い端末：まず文字だけ少し縮める */
+@media (max-width: 420px){
+  .aBtn{ font-size: 13px; }
+}
+
+/* それでも厳しい超小型：ボタンを縦積みにして絶対に収める */
+@media (max-width: 360px){
+  .cardActions{ flex-direction: column; }
+  .aBtn{ width: 100%; }
 }
 
 /* ===== MISSIONBRIEF (full) ===== */
@@ -375,7 +404,7 @@ body[data-mode="blitz"] .aBtn.danger::after{
   align-items:center;
 }
 .briefQ{
-  width:34px;height:34px;
+  width:44px;height:44px; /* タップ領域に合わせる */
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.06);
@@ -416,7 +445,7 @@ body[data-mode="blitz"] .aBtn.danger::after{
 }
 .modalTitle{ font-weight: 900; letter-spacing:.06em; }
 .x{
-  width:36px;height:36px;
+  width:44px;height:44px; /* タップ領域 */
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.06);
@@ -454,6 +483,7 @@ body[data-mode="blitz"] .aBtn.danger::after{
 }
 .btnPrimary{
   flex:1;
+  min-height: 44px;
   padding: 12px 12px;
   border-radius: 14px;
   border:1px solid rgba(127,231,255,.28);
@@ -482,9 +512,4 @@ body[data-mode="blitz"] .aBtn.danger::after{
   color: rgba(255,255,255,.92);
   text-decoration:none;
   border-bottom:1px solid rgba(255,255,255,.24);
-}
-
-/* ===== Compact labels (narrow screens) ===== */
-@media (max-width: 380px){
-  .aBtn{ padding: 10px 8px; font-size: 13px; }
 }
