@@ -77,7 +77,7 @@ body{
 
 /* ===== STATUS ===== */
 .statusBar{
-  margin: 10px 0 6px;
+  margin: 10px 0 10px;
   padding: 12px 12px;
   border:1px solid var(--line);
   background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
@@ -160,36 +160,84 @@ body{
   .statusItem:nth-child(3){ grid-column: 1 / -1; }
 }
 
-/* ===== MISSIONBRIEF chip ===== */
-.briefChip{ margin: 10px 0 0; }
+/* ===== MISSIONBRIEF : "見に行かせる" 告知パネル化 ===== */
+.briefChip{ margin: 12px 0 0; }
 .briefChipBtn{
   width:100%;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
-  padding: 12px 12px;
-  border-radius: 16px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.92);
+
+  /* 厚みUP */
+  padding: 14px 14px;
+  min-height: 60px;
+
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.18);
+
+  /* 目立つ背景 */
+  background:
+    radial-gradient(220px 80px at 18% 40%, rgba(127,231,255,.14), transparent 70%),
+    radial-gradient(240px 90px at 78% 30%, rgba(255,204,102,.12), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.14));
+
+  color: rgba(255,255,255,.94);
   cursor:pointer;
+  position: relative;
+  overflow:hidden;
+  box-shadow: 0 0 26px rgba(127,231,255,.08);
 }
+
+/* 左のアクセントバー */
+.briefChipBtn::before{
+  content:"";
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width: 6px;
+  background: linear-gradient(180deg, rgba(127,231,255,.95), rgba(255,85,214,.55));
+  opacity:.65;
+}
+
+/* うっすら流れる光（チカチカしない） */
+.briefChipBtn::after{
+  content:"";
+  position:absolute;
+  inset:-40% -30%;
+  transform: rotate(12deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+  opacity:.32;
+  animation: briefShimmer 3.6s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes briefShimmer{
+  0%,100%{ transform: translateX(-18%) rotate(12deg); }
+  50%{ transform: translateX(18%) rotate(12deg); }
+}
+
 .briefChipTitle{
   font-weight: 950;
-  letter-spacing:.06em;
-  color: rgba(127,231,255,.96);
+  letter-spacing:.08em;
+  color: rgba(127,231,255,.98);
   white-space: nowrap;
 }
 .briefChipText{
   flex:1;
   text-align:left;
-  color: rgba(255,255,255,.82);
+  color: rgba(255,255,255,.90);
   overflow:hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.briefChipIcon{ opacity:.75; }
+.briefChipIcon{
+  opacity:.9;
+  font-weight:950;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(0,0,0,.14);
+}
+.briefChipBtn:hover{ filter: brightness(1.06); }
 
 /* ===== main ===== */
 .wrap{
@@ -198,77 +246,109 @@ body{
   padding: 10px 14px 18px;
 }
 
-/* ===== MODE DOCK (special obvious buttons) ===== */
+/* ===== MODE DOCK : “押す場所”を強制的に可視化 ===== */
 .modeDock{
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap:10px;
-  margin: 12px 0 12px;
+  gap:12px;
+  margin: 14px 0 14px;
 }
+@media (max-width: 380px){
+  .modeDock{ grid-template-columns: 1fr; }
+}
+
+/* ベース（縦に厚い） */
 .modeBtn{
-  min-height: 56px;
-  padding: 12px 12px;
-  border-radius: 18px;
-  border:1px solid rgba(255,255,255,.16);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.94);
+  min-height: 72px;          /* ← 縦の厚みUP */
+  padding: 14px 14px;
+  border-radius: 20px;
+  border:1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.96);
   cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
+  gap:12px;
   position:relative;
   overflow:hidden;
+  background: rgba(255,255,255,.05);
+}
+
+/* 中の装飾（回路っぽい線） */
+.modeBtn .modeLabel{ position:relative; z-index:2; }
+.modeBtn .modeTag{ position:relative; z-index:2; }
+
+.modeBtn::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,.08);
+  pointer-events:none;
 }
 .modeBtn::after{
   content:"";
   position:absolute;
   inset:-40% -30%;
   transform: rotate(12deg);
-  opacity:.35;
+  opacity:.50;
   pointer-events:none;
 }
-.modeLabel{
-  font-weight: 950;
-  letter-spacing:.06em;
-}
+
+/* タグ（右側のカプセル）強化 */
 .modeTag{
   font-size: 12px;
   font-weight: 950;
-  padding: 6px 10px;
+  padding: 7px 12px;
   border-radius: 999px;
-  border:1px solid rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.20);
   background: rgba(0,0,0,.16);
-  color: rgba(255,255,255,.90);
+  color: rgba(255,255,255,.92);
+  letter-spacing: .06em;
 }
 
-/* FLASH mode style */
+/* FLASH専用：冷色＋スキャンライン */
 .modeFlash{
-  border-color: rgba(127,231,255,.30);
-  box-shadow: 0 0 24px rgba(127,231,255,.12);
+  border-color: rgba(127,231,255,.34);
+  box-shadow: 0 0 32px rgba(127,231,255,.14);
 }
 .modeFlash::after{
-  background: radial-gradient(closest-side, rgba(127,231,255,.30), transparent 70%);
+  background:
+    radial-gradient(closest-side, rgba(127,231,255,.30), transparent 70%),
+    repeating-linear-gradient(0deg, rgba(127,231,255,.06) 0 2px, transparent 2px 8px);
+}
+.modeFlash .modeTag{
+  border-color: rgba(127,231,255,.34);
+  background: rgba(127,231,255,.10);
 }
 
-/* BLITZ mode style */
+/* BLITZ専用：暖色＋斜めハッチ */
 .modeBlitz{
-  border-color: rgba(255,204,102,.26);
-  box-shadow: 0 0 24px rgba(255,204,102,.10);
+  border-color: rgba(255,204,102,.30);
+  box-shadow: 0 0 32px rgba(255,85,214,.10);
 }
 .modeBlitz::after{
-  background: radial-gradient(closest-side, rgba(255,85,214,.22), transparent 70%);
+  background:
+    radial-gradient(closest-side, rgba(255,85,214,.22), transparent 70%),
+    repeating-linear-gradient(135deg, rgba(255,204,102,.05) 0 6px, transparent 6px 12px);
+}
+.modeBlitz .modeTag{
+  border-color: rgba(255,204,102,.30);
+  background: rgba(255,204,102,.10);
 }
 
+/* 選択中は “浮く” + 呼吸 */
 .modeBtn.is-on{
-  transform: translateY(-1px);
-  filter: brightness(1.06);
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  animation: modeBreathe 2.8s ease-in-out infinite;
 }
-.modeBtn.is-on .modeTag{
-  border-color: rgba(255,255,255,.28);
-  background: rgba(255,255,255,.10);
+@keyframes modeBreathe{
+  0%,100%{ box-shadow: 0 0 28px rgba(255,255,255,.06); }
+  50%{ box-shadow: 0 0 44px rgba(255,255,255,.10); }
 }
 
+/* ===== panels ===== */
 .panel{
   border:1px solid var(--line);
   background: rgba(255,255,255,.04);
@@ -309,7 +389,7 @@ body{
   margin: 0 0 10px;
 }
 
-/* Buttons: mobile vertical, PC horizontal (but in this trial, we keep vertical always) */
+/* Trial仕様：常に縦並び */
 .cardActions{
   display:flex;
   gap:8px;
@@ -317,9 +397,8 @@ body{
 }
 
 .aBtn{
-  flex:1;
   width:100%;
-  min-height: 48px;
+  min-height: 50px;
   padding: 12px 12px;
   border-radius: 14px;
   border:1px solid rgba(255,255,255,.14);
@@ -340,23 +419,23 @@ body{
   pointer-events:none;
 }
 
-/* NORMAL (old START) */
+/* NORMAL */
 .aBtn.primary{
   border-color: rgba(127,231,255,.30);
   background: rgba(127,231,255,.10);
   box-shadow: 0 0 20px rgba(127,231,255,.12);
 }
 
-/* EXPERT: stronger ritual */
+/* EXPERT */
 .aBtn.danger{
   position: relative;
-  border-color: rgba(255,85,214,.78);
+  border-color: rgba(255,85,214,.82);
   background:
-    radial-gradient(140px 44px at 20% 30%, rgba(255,255,255,.18), transparent 70%),
-    linear-gradient(180deg, rgba(255,85,214,.30), rgba(255,85,214,.10));
+    radial-gradient(160px 50px at 20% 30%, rgba(255,255,255,.18), transparent 70%),
+    linear-gradient(180deg, rgba(255,85,214,.32), rgba(255,85,214,.10));
   box-shadow:
-    0 0 30px rgba(255,85,214,.34),
-    0 0 86px rgba(255,85,214,.20);
+    0 0 34px rgba(255,85,214,.36),
+    0 0 96px rgba(255,85,214,.20);
   animation: expertPulse 2.0s ease-in-out infinite;
 }
 .aBtn.danger::after{
@@ -364,7 +443,7 @@ body{
   position:absolute;
   inset: 5px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,.20);
+  border: 1px solid rgba(255,255,255,.22);
   pointer-events:none;
 }
 .aBtn.danger::before{
@@ -375,7 +454,7 @@ body{
   transform: translateY(-50%);
   opacity:.95;
   color: rgba(255,255,255,.92);
-  text-shadow: 0 0 26px rgba(255,85,214,.78);
+  text-shadow: 0 0 28px rgba(255,85,214,.80);
 }
 .aBtn.danger:hover{ filter: brightness(1.10); }
 @keyframes expertPulse{
