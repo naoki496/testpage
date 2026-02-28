@@ -1005,3 +1005,11 @@ body{
     linear-gradient(0deg, rgba(0,0,0,.22), transparent 45%);
   opacity:.85;
 }
+
+/* HIGACHA button: use same icon system as tabs, but slightly compact */
+.higachaBtn .modeIcon{
+  width:44px; height:44px;
+}
+.higachaBtn .modeIcon img{
+  width:38px; height:38px;
+}
