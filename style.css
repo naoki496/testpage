@@ -610,3 +610,59 @@ body{
 @media (max-width: 340px){
   #panelBlitz .cardActions{ grid-template-columns: 1fr; }
 }
+
+/* =========================
+   Image safety (MUST)
+   ========================= */
+img{
+  max-width:100%;
+  height:auto;
+  display:block;
+}
+
+/* =========================
+   Icon sizing (prevent layout break)
+   ========================= */
+
+/* tab icons */
+.tabIcon{
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  object-fit: contain;
+}
+
+/* big button icons (HIGACHA etc.) */
+.bigBtnIcon{
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+}
+
+/* zukan icon */
+.zukanIcon{
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  object-fit: contain;
+}
+
+/* (if you use any other icon class) */
+.icon, .btnIcon{
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  object-fit: contain;
+}
+
+/* keep buttons from stretching due to images */
+.tab, .bigBtn, .zukanOpen{
+  align-items: center;
+  gap: 10px;
+}
+
+/* If an image still overflows inside buttons */
+.tab img, .bigBtn img, .zukanOpen img{
+  max-width: none;     /* use fixed size above */
+}
