@@ -796,3 +796,66 @@ body{
 .statusDaily .k{ justify-content:space-between; color: rgba(255,255,255,.92); }
 
 .ringCenter{ transform: translateY(1px) !important; }
+
+/* =========================
+   STATUS compact fix (CSS only)
+   ========================= */
+
+/* STATUS 全体を詰める */
+.statusBar{
+  padding: 10px !important;
+}
+
+/* STATUS 内グリッドを安定させる */
+.statusGrid{
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* スマホ時：2×2で固定（HIGACHAが外に出ない） */
+@media (max-width: 420px){
+  .statusGrid{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 各 STATUS カードの縦幅を揃える */
+.statusItem{
+  min-height: 96px;
+  padding: 8px 8px !important;
+}
+
+/* 中の文字を詰める */
+.statusItem .k{
+  font-size: 11px;
+}
+.statusItem .v{
+  font-size: 16px;
+  margin-top: 2px;
+}
+.statusItem .mini{
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+/* HIGACHA ボタンをカード内に収める */
+.statusItem .higachaBtn{
+  margin-top: 4px;
+  min-height: 40px;
+  padding: 8px;
+  font-size: 12px;
+}
+
+/* 黒ずみ対策：STATUS限定で背景を少し明るく */
+.statusItem{
+  background: rgba(255,255,255,.05) !important;
+}
+
+/* STATUS だけカード演出を軽くする */
+.statusBar::before,
+.statusBar::after,
+.statusItem::before,
+.statusItem::after{
+  opacity: .45;
+}
