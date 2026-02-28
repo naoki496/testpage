@@ -492,3 +492,60 @@ body{
   25%{ opacity: 1; }
   100%{ transform: scale(1.10); opacity: 1; }
 }
+
+/* =========================
+   BLITZQUEST cards (fix)
+   ========================= */
+
+.card{
+  border:1px solid rgba(255,255,255,.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.12));
+  padding: 12px;
+  box-shadow: 0 0 24px rgba(0,0,0,.18);
+}
+
+.cardTitle{
+  font-weight: 950;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.94);
+  margin-bottom: 10px;
+  line-height: 1.2;
+}
+
+.cardActions{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+
+/* Disabled expert (lock feeling) */
+.aBtn.is-disabled{
+  opacity: .45;
+  cursor: not-allowed;
+  filter: grayscale(.15) saturate(.6);
+  position: relative;
+  pointer-events: none; /* ✅ クリック不可を保証 */
+}
+
+.aBtn.is-disabled::after{
+  content: "LOCKED";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.86);
+}
+
+/* Keep grid stable on tiny screens */
+@media (max-width: 360px){
+  .cardActions{ grid-template-columns: 1fr; }
+  .aBtn.is-disabled::after{ top: 10px; transform:none; }
+}
