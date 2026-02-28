@@ -1015,9 +1015,49 @@ body{
 }
 
 
+/* =========================
+   Mode buttons: diagonal stripe
+   ========================= */
+.modeBtn{
+  position: relative;
+  overflow: hidden;
+}
+.modeBtn::after{
+  content:"";
+  position:absolute;
+  inset:-40px;
+  pointer-events:none;
+  opacity:.42;
+  transform: rotate(-12deg);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,.00) 0px,
+      rgba(255,255,255,.00) 10px,
+      rgba(255,255,255,.07) 10px,
+      rgba(255,255,255,.07) 16px
+    );
+  mix-blend-mode: screen;
+}
 
-
-
-
-
-
+/* 個別色味（FLASHはミント寄り／BLITZはアンバー寄り） */
+.modeFlash::after{
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(127,231,255,.00) 0px,
+      rgba(127,231,255,.00) 10px,
+      rgba(127,231,255,.10) 10px,
+      rgba(127,231,255,.10) 16px
+    );
+}
+.modeBlitz::after{
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,204,102,.00) 0px,
+      rgba(255,204,102,.00) 10px,
+      rgba(255,204,102,.10) 10px,
+      rgba(255,204,102,.10) 16px
+    );
+}
