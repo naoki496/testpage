@@ -40,11 +40,12 @@
           <div class="v"><span id="hkpValue">0</span></div>
         </div>
 
+        <!-- ✅ HIGACHA: ラベル削除 / ボタンにHIGACHA表記 / アイコン大 -->
         <div class="statusItem">
-          <div class="k">HIGACHA</div>
+          <div class="k"></div>
           <button class="higachaBtn" id="btnHigacha" type="button">
-            <img class="miniIcon" src="./higacha_e.png" alt="" aria-hidden="true">
-            <span>OPEN</span>
+            <img class="higachaIcon" src="./higacha_e.png" alt="" aria-hidden="true">
+            <span>HIGACHA</span>
           </button>
         </div>
       </div>
@@ -71,7 +72,8 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./flashcard_e.png" alt="">
           </span>
-          <span class="modeLabel">FLASHCARD</span>
+          <!-- ✅ 改行ポイントだけ付与（名称はそのまま） -->
+          <span class="modeLabel">FLASH<wbr>CARD</span>
         </span>
         <span class="modeTag">DRILL</span>
       </button>
@@ -81,7 +83,7 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./blitzquest_e.png" alt="">
           </span>
-          <span class="modeLabel">BLITZQUEST</span>
+          <span class="modeLabel">BLITZ<wbr>QUEST</span>
         </span>
         <span class="modeTag">BATTLE</span>
       </button>
@@ -89,7 +91,9 @@
 
     <!-- FLASH -->
     <section class="panel" id="panelFlash">
-      <!-- DAILY 50 gauge -->
+      <div class="grid" id="flashGrid"></div>
+
+      <!-- ✅ ゲージはボタン群の一番下へ移動 -->
       <div class="dailyCard" aria-label="FLASHCARD DAILY 50">
         <div class="dailyTop">
           <div class="dailyTitle">FLASH DAILY 50</div>
@@ -109,20 +113,16 @@
           <span class="dailyReward">×5 → +2HKP</span>
         </div>
 
-        <!-- デバッグ（本番では消せます） -->
         <div class="dailyDbg" id="dailyDbg" hidden>
           <button class="dbgBtn" id="dbgAdd10" type="button">+10</button>
           <button class="dbgBtn" id="dbgAdd50" type="button">+50</button>
           <button class="dbgBtn" id="dbgResetDaily" type="button">RESET</button>
         </div>
       </div>
-
-      <div class="grid" id="flashGrid"></div>
     </section>
 
     <!-- BLITZ -->
     <section class="panel" id="panelBlitz" hidden>
-      <!-- Card Archive link -->
       <div class="archiveCard" aria-label="カード図鑑リンク">
         <div class="archiveLeft">
           <img class="miniIcon" src="./zukan_e.png" alt="" aria-hidden="true">
@@ -138,14 +138,12 @@
       <div class="grid" id="blitzGrid"></div>
     </section>
 
-    <!-- Install -->
     <footer class="footer">
       <button class="installBtn" id="btnInstall" type="button">アプリとしてインストール</button>
       <div class="installHint" id="installHint" hidden></div>
     </footer>
   </main>
 
-  <!-- FX overlay for EXPERT transition -->
   <div class="fxOverlay" id="fxOverlay" aria-hidden="true" style="display:none">
     <div class="fxPulse" aria-hidden="true"></div>
   </div>
