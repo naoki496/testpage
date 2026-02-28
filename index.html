@@ -3,57 +3,235 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#140817" />
   <title>八東国語LOBBY</title>
+  <link rel="manifest" href="./manifest.json" />
   <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
+  <div class="bg"></div>
+
   <header class="top">
-    <section class="statusBar">
+    <div class="logoWrap" aria-label="八東国語LOBBY ロゴ">
+      <img class="logo" id="topLogo" src="./H.K.LOBBY.png" alt="八東国語LOBBY" />
+      <div class="logoFallback" id="logoFallback" hidden>
+        <div class="logoFallbackTitle">八東国語LOBBY</div>
+        <div class="logoFallbackSub">H.K. LOBBY</div>
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <section class="statusBar" aria-label="STATUS">
       <div class="statusTitle">STATUS</div>
+
       <div class="statusGrid">
+        <!-- Rank -->
         <div class="statusItem">
           <div class="k">ランク</div>
           <div class="v" id="rankValue">-</div>
-          <div class="mini">カード総数 <span id="cardTotalValue">-</span></div>
+          <div class="mini">カード総数 <span class="miniNum" id="cardTotalValue">-</span></div>
         </div>
 
+        <!-- HKP -->
         <div class="statusItem">
-          <div class="k">HKP <button class="helpBtn" id="btnHkpHelp">?</button></div>
+          <div class="k">
+            HKP
+            <button class="helpBtn" id="btnHkpHelp" type="button" aria-label="HKPの説明">?</button>
+          </div>
           <div class="v"><span id="hkpValue">0</span></div>
           <div class="mini">Higashi Kokugo Point</div>
         </div>
 
-        <div class="statusItem">
-          <div class="k">FLASH DAILY 50 <button class="helpBtn" id="btnDailyHelp">?</button></div>
-          <svg class="ring" viewBox="0 0 52 52">
-            <circle class="ringTrack" cx="26" cy="26" r="22"/>
-            <circle class="ringProg" id="dailyRingProg" cx="26" cy="26" r="22"/>
-          </svg>
-          <div class="mini"><span id="dailySeen">0</span> / 50</div>
+        <!-- DAILY 50 (circular gauge) -->
+        <div class="statusItem statusDaily">
+  <div class="k">
+    <span>FLASH DAILY 50</span>
+    <button class="helpBtn" id="btnDailyHelp" type="button" aria-label="FLASH DAILY 50の説明">?</button>
+  </div>
+
+  <div class="ringRow">
+    <div class="ringBox" aria-hidden="true">
+      <svg class="ring" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
+        <circle class="ringTrack" cx="26" cy="26" r="22"></circle>
+        <circle class="ringProg" id="dailyRingProg" cx="26" cy="26" r="22"></circle>
+      </svg>
+      <div class="ringCenter">
+        <div class="ringNum" id="dailySeen">0</div>
+      </div>
+    </div>
+
+    <div class="ringText">
+      <div class="ringReward">×5 → +2HKP</div>
+    </div>
+  </div>
+</div>
+            </div>
+
+            <div class="ringText">
+              <div class="ringHint">合計（1日1回カウント）</div>
+              <div class="ringReward">×5 → +2HKP</div>
+            </div>
+          </div>
+
+          <!-- Debug (keep visible in testpage) -->
+          <div class="dailyDbg statusDbg" id="dailyDbg">
+            <button class="dbgBtn dbgMini" id="dbgAdd10" type="button">+10</button>
+            <button class="dbgBtn dbgMini" id="dbgAdd50" type="button">+50</button>
+            <button class="dbgBtn dbgMini" id="dbgResetDaily" type="button">RESET</button>
+          </div>
         </div>
 
-        <div class="statusItem">
-          <button class="higachaBtn" id="btnHigacha">HIGACHA</button>
+        <!-- HIGACHA -->
+        <div class="statusItem statusHigacha">
+          <button class="higachaBtn higachaBig" id="btnHigacha" type="button">
+            <span class="higachaTop">
+              <span class="modeIcon" aria-hidden="true">
+                <img class="higachaIcon" src="./higacha_e.png" alt="">
+              </span>
+            </span>
+            <span class="higachaLabel">HIGACHA</span>
+          </button>
         </div>
       </div>
     </section>
+
+    <!-- MISSIONBRIEF -->
+    <section class="briefChip" aria-label="MISSIONBRIEF">
+      <button class="briefChipBtn" id="btnBriefOpen" type="button" aria-haspopup="dialog">
+        <span class="briefChipLeft">
+          <span class="briefChipTitle">MISSION BRIEF【お知らせ】</span>
+          <span class="briefBadge" id="briefBadge" hidden>UPDATE</span>
+        </span>
+        <span class="briefChipText" id="briefOneLine">（未読）</span>
+        <span class="briefChipIcon" aria-hidden="true">▼</span>
+      </button>
+    </section>
   </header>
 
-  <!-- HKP Modal -->
-  <div class="overlay" id="hkpModal">
-    <div class="modal">
-      <h2>HKPとは</h2>
-      <p>学習で獲得できるポイントです。HIGACHAでも入手できます。</p>
-      <button class="close" data-close>閉じる</button>
+  <main class="wrap" id="app">
+    <!-- Tabs -->
+    <nav class="modeDock" aria-label="mode switch">
+      <button class="modeBtn modeFlash is-on" id="tabFlash" type="button">
+        <span class="modeLeft">
+          <span class="modeIcon" aria-hidden="true">
+            <img src="./flashcard_e.png" alt="">
+          </span>
+          <span class="modeLabel">
+            <span class="modeLine">FLASH</span>
+            <span class="modeLine">CARD</span>
+          </span>
+        </span>
+      </button>
+
+      <button class="modeBtn modeBlitz" id="tabBlitz" type="button">
+        <span class="modeLeft">
+          <span class="modeIcon" aria-hidden="true">
+            <img src="./blitzquest_e.png" alt="">
+          </span>
+          <span class="modeLabel">
+            <span class="modeLine">BLITZ</span>
+            <span class="modeLine">QUEST</span>
+          </span>
+        </span>
+      </button>
+    </nav>
+
+    <!-- FLASH -->
+    <section class="panel" id="panelFlash">
+      <div class="grid" id="flashGrid"></div>
+    </section>
+
+    <!-- BLITZ -->
+    <section class="panel" id="panelBlitz" hidden>
+      <div class="archiveCard" aria-label="カード図鑑リンク">
+        <div class="archiveLeft">
+          <span class="modeIcon" aria-hidden="true">
+            <img class="miniIcon" src="./zukan_e.png" alt="">
+          </span>
+          <div class="archiveText">
+            <div class="archiveTitle">カード図鑑</div>
+            <div class="archiveSub">CARD ARCHIVE</div>
+          </div>
+        </div>
+
+        <a class="archiveOpen" href="https://naoki496.github.io/cards-hub/">OPEN</a>
+      </div>
+
+      <div class="grid" id="blitzGrid"></div>
+    </section>
+
+    <footer class="footer">
+      <button class="installBtn" id="btnInstall" type="button">アプリとしてインストール</button>
+      <div class="installHint" id="installHint" hidden></div>
+    </footer>
+  </main>
+
+  <div class="fxOverlay" id="fxOverlay" aria-hidden="true" style="display:none">
+    <div class="fxPulse" aria-hidden="true"></div>
+  </div>
+
+  <!-- HKP Help Modal -->
+  <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="HKPの説明">
+      <div class="modalHead">
+        <div class="modalTitle">HKP</div>
+        <button class="x" id="hkpHelpClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="modalBody">
+        <div class="leftPad" id="hkpHelpBody"></div>
+      </div>
+    </div>
+
+<!-- Daily50 Help -->
+<div class="overlay" id="dailyHelpOverlay" style="display:none" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="FLASH DAILY 50の説明">
+    <div class="modalHead">
+      <div class="modalTitle">FLASH DAILY 50</div>
+      <button class="x" id="dailyHelpClose" type="button" aria-label="閉じる">×</button>
+    </div>
+    <div class="modalBody">
+      <div class="leftPad" id="dailyHelpBody"></div>
+    </div>
+  </div>
+</div>
+  </div>
+
+  <!-- HIGACHA Modal -->
+  <div class="overlay" id="higachaOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="HIGACHA">
+      <div class="modalHead">
+        <div class="modalTitle">HIGACHA</div>
+        <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="gachaHero">
+          <img class="gachaImg" src="./higacha.png" alt="HIGACHA" />
+        </div>
+
+        <div class="gachaMsg leftPad" id="higachaMsg"></div>
+
+        <div class="modalActions">
+          <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
+          <button class="btnPrimary ghostBtn" id="higachaCancel" type="button">CLOSE</button>
+        </div>
+
+        <div class="note">※HIGACHAは1日1回まで</div>
+      </div>
     </div>
   </div>
 
-  <!-- DAILY Modal -->
-  <div class="overlay" id="dailyModal">
-    <div class="modal">
-      <h2>FLASH DAILY 50</h2>
-      <p>FLASHCARDで本日50枚学習すると進行します。5回で+2HKP。</p>
-      <button class="close" data-close>閉じる</button>
+  <!-- MISSIONBRIEF Modal -->
+  <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
+      <div class="modalHead">
+        <div class="modalTitle">MISSION BRIEF【お知らせ】</div>
+        <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="modalBody">
+        <ul class="briefList" id="briefList"></ul>
+      </div>
     </div>
   </div>
 
