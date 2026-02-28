@@ -1,29 +1,22 @@
 (() => {
   "use strict";
 
-  // =========================================================
   // 図鑑「カード総数」：現段階では表示しない（常に "-"）
-  // - 将来 kokugo-dojo 本番で必要になったら URL を入れて fetchCardTotal() を復帰可能
-  // =========================================================
   const CARD_TOTAL_MANIFEST_URL = null;
 
-  // ===== Keys (kokugo-dojo home.js compatible) =====
   const HKP_KEY = "hklobby.v1.hkp";
   const HIGACHA_LAST_KEY = "hklobby.v1.higacha.lastDate";
 
-  // cache for total cards (kept for future)
+  // 将来用（現段階では未使用だが保持）
   const CARD_TOTAL_CACHE_KEY = "hklobby.v1.cardTotal.cache";
   const CARD_TOTAL_CACHE_TS_KEY = "hklobby.v1.cardTotal.cacheTs";
-  const CARD_TOTAL_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
+  const CARD_TOTAL_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
   const MODE_KEY = "testpage.v1.mode";
 
   const $ = (id) => document.getElementById(id);
   const on = (node, ev, fn, opt) => node && node.addEventListener(ev, fn, opt);
 
-  // -------------------------
-  // helpers
-  // -------------------------
   function todayYMD() {
     const d = new Date();
     const y = d.getFullYear();
@@ -55,7 +48,6 @@
     return { textOnly, urls };
   }
 
-  // "表示||詳細"
   function splitDetail(line) {
     const s = String(line ?? "");
     const parts = s.split("||");
@@ -69,9 +61,7 @@
     return String(s ?? "").trim().toLowerCase();
   }
 
-  // -------------------------
   // HKP / HIGACHA
-  // -------------------------
   function getHKP() {
     const n = Number(localStorage.getItem(HKP_KEY));
     return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
@@ -92,10 +82,7 @@
     localStorage.setItem(HIGACHA_LAST_KEY, todayYMD());
   }
 
-  // -------------------------
-  // Content registry
-  // NOTE: Names MUST remain exactly as-is.
-  // -------------------------
+  // Content registry（名称は変更しない）
   const FLASH_CONTENTS = [
     { name: "古文単語", href: "https://naoki496.github.io/flashcards/", sub: "読解の土台となる基礎語彙。" },
     { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/", sub: "意味・用法・活用形の判断。" },
@@ -126,11 +113,10 @@
     },
   ];
 
-  // -------------------------
-  // Mode (C案 tabs)
-  // -------------------------
+  // Mode tabs
   function setMode(mode) {
     document.body.dataset.mode = mode;
+
     const flash = $("panelFlash");
     const blitz = $("panelBlitz");
     const tabFlash = $("tabFlash");
@@ -145,12 +131,9 @@
 
     localStorage.setItem(MODE_KEY, mode);
     applyFilter();
-    applyCompactLabels();
   }
 
-  // -------------------------
   // Search filter
-  // -------------------------
   function applyFilter() {
     const q = normalize($("q")?.value);
     const isFlash = (document.body.dataset.mode || "flash") === "flash";
@@ -163,9 +146,7 @@
     });
   }
 
-  // -------------------------
   // Render grids
-  // -------------------------
   function renderFlash() {
     const grid = $("flashGrid");
     if (!grid) return;
@@ -216,9 +197,7 @@
     });
   }
 
-  // -------------------------
-  // HUD render
-  // -------------------------
+  // HUD
   function renderHKP() {
     const el = $("hkpValue");
     if (el) el.textContent = String(getHKP());
@@ -239,42 +218,12 @@
     if (el) el.textContent = "-";
   }
 
-  // -------------------------
-  // Card total (now disabled)
-  // -------------------------
   function disableCardTotal() {
     const el = $("cardTotalValue");
     if (el) el.textContent = "-";
   }
 
-  // -------------------------
-  // Compact labels (EXPERT/START -> EX/GO on narrow screens)
-  // - 表示だけ短縮。導線や概念は変えません。
-  // -------------------------
-  function applyCompactLabels() {
-    const isCompact = window.matchMedia("(max-width: 380px)").matches;
-
-    const rewrite = (node) => {
-      const t = node.textContent.trim();
-      if (!node.dataset.long) node.dataset.long = t;
-
-      if (!isCompact) {
-        node.textContent = node.dataset.long;
-        return;
-      }
-      if (t === "EXPERT" || node.dataset.long === "EXPERT") node.textContent = "EX";
-      else if (t === "START" || node.dataset.long === "START") node.textContent = "GO";
-    };
-
-    document.querySelectorAll("#blitzGrid .aBtn").forEach(rewrite);
-    document.querySelectorAll("#flashGrid .aBtn").forEach(rewrite);
-  }
-  window.addEventListener("resize", applyCompactLabels);
-  window.addEventListener("orientationchange", applyCompactLabels);
-
-  // -------------------------
   // HKP help modal
-  // -------------------------
   function initHkpHelp() {
     const helpBtn = $("btnHkpHelp");
     const overlay = $("hkpHelpOverlay");
@@ -320,9 +269,7 @@ HKPを消費することで「EXPERT MODE」への挑戦や、
     });
   }
 
-  // -------------------------
   // HIGACHA modal
-  // -------------------------
   function initHigacha() {
     const btn = $("btnHigacha");
     const overlay = $("higachaOverlay");
@@ -400,9 +347,7 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
-  // -------------------------
-  // DETAIL modal (for MISSIONBRIEF “?”)
-  // -------------------------
+  // DETAIL modal（MISSIONBRIEF “?”）
   function initDetailModal() {
     const overlay = $("detailOverlay");
     const btnClose = $("detailClose");
@@ -467,10 +412,7 @@ TOTAL ${getHKP()} HKP`;
     return { open };
   }
 
-  // -------------------------
-  // MISSIONBRIEF (表示||詳細 + “?” button)
-  // - 上のチップ（btnBriefToggle2）と下の OPEN（btnBriefToggle）を同期
-  // -------------------------
+  // MISSIONBRIEF
   function initBrief(detailApi) {
     const btn = $("btnBriefToggle");
     const btn2 = $("btnBriefToggle2");
@@ -570,7 +512,7 @@ TOTAL ${getHKP()} HKP`;
   function initSearch() {
     const q = $("q");
     const clear = $("btnClear");
-    on(q, "input", applyFilter);
+    on(q, "input", () => applyFilter());
     on(clear, "click", () => {
       if (q) q.value = "";
       applyFilter();
@@ -578,9 +520,6 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
-  // -------------------------
-  // boot
-  // -------------------------
   function boot() {
     renderFlash();
     renderBlitz();
@@ -600,12 +539,9 @@ TOTAL ${getHKP()} HKP`;
     const detailApi = initDetailModal();
     initBrief(detailApi);
 
-    applyCompactLabels();
-
-    // 総数は現段階では出さない
     disableCardTotal();
 
-    // 将来復帰する場合のフック（いまは何もしない）
+    // keep unused constants (future)
     void CARD_TOTAL_MANIFEST_URL;
     void CARD_TOTAL_CACHE_KEY;
     void CARD_TOTAL_CACHE_TS_KEY;
