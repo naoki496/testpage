@@ -323,7 +323,7 @@ HKPを消費することで「EXPERT MODE」への挑戦や、
     const btn = $("btnBriefOpen");
     const one = $("briefOneLine");
     const list = $("briefList");
-    const { open, close } = bindOverlayClose("briefOverlay", "briefClose");
+    const { open } = bindOverlayClose("briefOverlay", "briefClose");
     if (!btn || !one || !list) return;
 
     on(btn, "click", open);
@@ -473,37 +473,86 @@ TOTAL ${getHKP()} HKP`;
     });
   }
 
-  // ===== PWA install button (restore) =====
+  // ===== PWA install button (always visible) =====
   function initInstall() {
     const btn = $("btnInstall");
+    const hint = $("installHint");
     if (!btn) return;
 
-    // SW register (optional but helpful)
+    // try SW register (helps beforeinstallprompt eligibility)
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").catch(() => {});
     }
 
     let deferredPrompt = null;
 
+    function setAvailable(available) {
+      if (!btn) return;
+      btn.classList.toggle("is-disabled", !available);
+      btn.setAttribute("aria-disabled", String(!available));
+      if (hint) hint.hidden = available;
+    }
+
+    // default: not available until we get the event
+    setAvailable(false);
+
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      btn.hidden = false;
+      setAvailable(true);
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      setAvailable(false);
+      if (hint) {
+        hint.hidden = false;
+        hint.textContent = "インストール済みです（ホーム画面から起動できます）。";
+      }
     });
 
     on(btn, "click", async () => {
-      if (!deferredPrompt) return;
-      btn.hidden = true;
+      if (!deferredPrompt) {
+        // show hint instead of doing nothing
+        setAvailable(false);
+        return;
+      }
       deferredPrompt.prompt();
       try { await deferredPrompt.userChoice; } catch {}
       deferredPrompt = null;
+      setAvailable(false);
     });
+  }
 
-    // already installed -> keep hidden
-    window.addEventListener("appinstalled", () => {
-      btn.hidden = true;
-      deferredPrompt = null;
-    });
+  // ===== Top logo fallback (tries multiple filenames) =====
+  function initLogoFallback() {
+    const img = $("topLogo");
+    const fb = $("logoFallback");
+    if (!img || !fb) return;
+
+    const candidates = [
+      "./H.K.LOBBY.png",
+      "./H.K.LOBBY.PNG",
+      "./H.K.LOBBY.jpg",
+      "./H.K.LOBBY.JPG",
+      "./HK.LOBBY.png",
+      "./HKLOBBY.png",
+      "./H.K.LOBBY.jpeg",
+      "./H.K.LOBBY.JPEG",
+    ];
+
+    let i = 0;
+    function tryNext() {
+      i++;
+      if (i >= candidates.length) {
+        img.hidden = true;
+        fb.hidden = false;
+        return;
+      }
+      img.src = candidates[i];
+    }
+
+    img.addEventListener("error", tryNext);
   }
 
   function initTabs() {
@@ -512,6 +561,8 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function boot() {
+    initLogoFallback();
+
     renderFlash();
     renderBlitz();
 
