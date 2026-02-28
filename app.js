@@ -74,12 +74,15 @@
   // =========================
   // Contents
   // =========================
+  // ✅ 指示通り：表記を変更（改行しない前提）
   const FLASH_CONTENTS = [
-    { name: "古文単語", href: "https://naoki496.github.io/flashcards/" },
-    { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/" },
+    { name: "古文単語330", href: "https://naoki496.github.io/flashcards/" },
+    { name: "助動詞確認", href: "https://naoki496.github.io/hatto-kobun-jodoushi/" },
     { name: "文学知識総合", href: "https://naoki496.github.io/bungaku/" },
   ];
 
+  // ✅ ここが壊れていた（{ { が混入）ので完全修正
+  // ✅ 2枠目は「文学知識マスター」+ 指定リンク
   const BLITZ_CONTENTS = [
     {
       name: "古文単語330マスター",
@@ -87,13 +90,13 @@
       expertHref: "https://naoki496.github.io/kobun-quiz/expert.html",
       expertEnabled: true,
     },
-{
-  {
-  name: "文学知識マスター",
-  normalHref: "https://naoki496.github.io/bungakusi-quiz/",
-  expertHref: "",
-  expertEnabled: false,
-},
+    {
+      name: "文学知識マスター",
+      normalHref: "https://naoki496.github.io/bungakusi-quiz/",
+      expertHref: "",
+      expertEnabled: false,
+    },
+    {
       name: "漢字読解マスター",
       normalHref: "https://naoki496.github.io/kanji-y-quiz/",
       expertHref: "",
@@ -221,7 +224,7 @@
     setTimeout(() => { location.href = url; }, 380);
   }
 
-  // ✅ BFCache復帰対策：戻った時にFXが残っていたら必ず消す
+  // ✅ 戻った時にFXが残っていたら必ず消す
   function clearFxOverlay() {
     const fx = $("fxOverlay");
     if (!fx) return;
@@ -661,7 +664,7 @@ TOTAL ${getHKP()} HKP`;
   // Sync on return (重要)
   // =========================
   function syncStatus() {
-    clearFxOverlay(); // ✅ 戻る/復帰でFX残留を確実に消す
+    clearFxOverlay();
     renderHKP();
     updateHigachaButtonState();
     const st = ensureDailyState();
@@ -694,7 +697,7 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function boot() {
-    clearFxOverlay(); // 初期も安全側
+    clearFxOverlay();
 
     renderFlash();
     renderBlitz();
