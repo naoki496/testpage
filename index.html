@@ -18,34 +18,35 @@
     <section class="statusBar">
       <div class="statusTitle">STATUS</div>
       <div class="statusGrid">
-        <div class="statusItem">
+        <div class="statusItem statusRank">
           <div class="k">ランク</div>
           <div class="v" id="rankValue">-</div>
           <div class="mini">カード総数 <span class="miniNum" id="cardTotalValue">-</span></div>
         </div>
 
-        <div class="statusItem">
+        <div class="statusItem statusHKP">
           <div class="k">
             HKP
-            <button class="helpBtn corner" id="btnHkpHelp" type="button">?</button>
+            <button class="helpBtn helpBtn--corner" id="btnHkpHelp" type="button" aria-label="HKPの説明">?</button>
           </div>
           <div class="v"><span id="hkpValue">0</span></div>
+          <div class="mini">Higashi Kokugo Point</div>
         </div>
 
         <div class="statusItem statusDaily">
           <div class="k">
-            DAILY 50
-            <button class="helpBtn corner" id="btnDailyHelp" type="button" aria-label="FLASH DAILY 50 の説明">?</button>
+            FLASH DAILY 50
+            <button class="helpBtn helpBtn--corner" id="btnDailyHelp" type="button" aria-label="FLASH DAILY 50の説明">?</button>
           </div>
 
-          <div class="ringRow">
-            <div class="ringBox" aria-hidden="true">
-              <svg class="ring" viewBox="0 0 64 64">
-                <circle class="ringTrack" cx="32" cy="32" r="22"></circle>
-                <circle class="ringProg" id="dailyRingProg" cx="32" cy="32" r="22"></circle>
+          <div class="ringWrap" aria-hidden="true">
+            <div class="ringBox">
+              <svg class="ring" viewBox="0 0 60 60" role="img" aria-label="進捗リング">
+                <circle class="ringTrack" cx="30" cy="30" r="22"></circle>
+                <circle class="ringProg" id="dailyRingProg" cx="30" cy="30" r="22"></circle>
               </svg>
               <div class="ringCenter">
-                <div class="ringNum"><span id="dailySeen">0</span></div>
+                <div class="ringNum" id="dailySeen">0</div>
                 <div class="ringDen">/50</div>
               </div>
             </div>
@@ -54,11 +55,13 @@
 
         <div class="statusItem statusHigacha">
           <button class="higachaBtn" id="btnHigacha" type="button">
-            <img class="higachaIcon" src="./higacha_e.png" alt="" />
-            <span>HIGACHA</span>
+            <span class="modeIcon modeIcon--mini" aria-hidden="true">
+              <img src="./higacha_e.png" alt="" />
+            </span>
+            <span class="higachaLabel">HIGACHA</span>
           </button>
         </div>
-      </div>
+</div>
     </section>
 
     <section class="briefChip">
@@ -96,7 +99,7 @@
     <section class="panel" id="panelBlitz" hidden>
       <div class="archiveCard">
         <div class="archiveLeft">
-          <img class="miniIcon" src="./zukan_e.png" alt="">
+          <span class="modeIcon modeIcon--mini" aria-hidden="true"><img src="./zukan_e.png" alt="" /></span>
           <div class="archiveText">
             <div class="archiveTitle">カード図鑑</div>
             <div class="archiveSub">CARD ARCHIVE</div>
@@ -114,76 +117,5 @@
   </main>
 
   <script src="./app.js"></script>
-  <!-- =========================
-       Overlays / Modals
-       ========================= -->
-
-  <!-- HKP Help -->
-  <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="hkpHelpTitle">
-      <div class="modalHead">
-        <div class="modalTitle" id="hkpHelpTitle">HKP</div>
-        <button class="x" id="hkpHelpClose" type="button" aria-label="閉じる">×</button>
-      </div>
-      <div class="modalBody">
-        <div class="leftPad" id="hkpHelpBody"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Daily 50 Help -->
-  <div class="overlay" id="dailyHelpOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dailyHelpTitle">
-      <div class="modalHead">
-        <div class="modalTitle" id="dailyHelpTitle">FLASH DAILY 50</div>
-        <button class="x" id="dailyHelpClose" type="button" aria-label="閉じる">×</button>
-      </div>
-      <div class="modalBody">
-        <div class="leftPad" id="dailyHelpBody"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- HIGACHA -->
-  <div class="overlay" id="higachaOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="higachaTitle">
-      <div class="modalHead">
-        <div class="modalTitle" id="higachaTitle">HIGACHA</div>
-        <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
-      </div>
-
-      <div class="modalBody">
-        <div class="gachaHero">
-          <img class="gachaImg" src="./assets/higacha.png" alt="HIGACHA" />
-        </div>
-        <div class="gachaMsg" id="higachaMsg"></div>
-
-        <div class="modalActions">
-          <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
-          <button class="btnPrimary" id="higachaCancel" type="button">CLOSE</button>
-        </div>
-        <div class="note">※1日1回まで</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mission Brief -->
-  <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="briefTitle">
-      <div class="modalHead">
-        <div class="modalTitle" id="briefTitle">MISSION BRIEF</div>
-        <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>
-      </div>
-      <div class="modalBody">
-        <ul class="briefList" id="briefList"></ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- EXPERT transition FX -->
-  <div class="fxOverlay" id="fxOverlay" style="display:none" aria-hidden="true">
-    <div class="fxPulse" aria-hidden="true"></div>
-  </div>
-
 </body>
 </html>

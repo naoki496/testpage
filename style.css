@@ -120,7 +120,7 @@ body{
   gap:10px;
 }
 .statusItem{
-  padding:8px 10px;
+  padding:10px 10px;
   border:1px solid rgba(255,255,255,.10);
   border-radius: 14px;
   background: rgba(0,0,0,.14);
@@ -128,7 +128,7 @@ body{
   overflow:hidden;
 
   /* 高さ固定（4枚同じ縦幅） */
-  height: 92px;
+  height: 132px;
   display:flex;
   flex-direction:column;
   justify-content: space-between;
@@ -161,7 +161,7 @@ body{
   position:relative;
   z-index:1;
 }
-.mini{ margin-top: 4px; font-size: 11px; color: rgba(255,255,255,.74); position:relative; z-index:1; }
+.mini{ margin-top: 6px; font-size: 12px; color: rgba(255,255,255,.74); position:relative; z-index:1; }
 .miniNum{ font-weight: 950; color: rgba(255,255,255,.92); }
 
 .helpBtn{
@@ -187,7 +187,7 @@ body{
   font-weight: 950;
   letter-spacing: .06em;
   display:flex;
-  flex-direction: row;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:8px;
@@ -929,13 +929,47 @@ body{
 }
 
 
-/* STATUS help buttons in corner */
-.helpBtn.corner{
+/* ===== STATUS fine tuning ===== */
+.helpBtn--corner{
   position:absolute;
-  top:10px;
   right:10px;
+  top:10px;
 }
 
+.statusHKP .k,
+.statusDaily .k{
+  position:relative;
+  padding-right: 28px;
+}
 
-/* STATUS value sizing */
-#rankValue, #hkpValue{ font-size: 22px; }
+.statusRank .v,
+.statusHKP .v{
+  font-size: 22px;
+  line-height: 1.05;
+}
+
+.ringWrap{
+  margin-top: 10px;
+  display:flex;
+  justify-content:center;
+}
+
+.modeIcon--mini{
+  width:48px;
+  height:48px;
+}
+.modeIcon--mini img{
+  width:42px;
+  height:42px;
+}
+
+.statusHigacha .higachaBtn{
+  min-height: 0;
+  padding: 10px;
+  gap: 10px;
+  justify-content:flex-start;
+}
+.higachaLabel{
+  font-weight:950;
+  letter-spacing:.06em;
+}
