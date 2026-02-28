@@ -160,7 +160,7 @@ body{
   .statusItem:nth-child(3){ grid-column: 1 / -1; }
 }
 
-/* ===== MISSIONBRIEF : "見に行かせる" 告知パネル化 ===== */
+/* ===== MISSIONBRIEF : notice panel + badge ===== */
 .briefChip{ margin: 12px 0 0; }
 .briefChipBtn{
   width:100%;
@@ -168,28 +168,20 @@ body{
   align-items:center;
   justify-content:space-between;
   gap:10px;
-
-  /* 厚みUP */
   padding: 14px 14px;
   min-height: 60px;
-
   border-radius: 18px;
   border:1px solid rgba(255,255,255,.18);
-
-  /* 目立つ背景 */
   background:
     radial-gradient(220px 80px at 18% 40%, rgba(127,231,255,.14), transparent 70%),
     radial-gradient(240px 90px at 78% 30%, rgba(255,204,102,.12), transparent 70%),
     linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.14));
-
   color: rgba(255,255,255,.94);
   cursor:pointer;
   position: relative;
   overflow:hidden;
   box-shadow: 0 0 26px rgba(127,231,255,.08);
 }
-
-/* 左のアクセントバー */
 .briefChipBtn::before{
   content:"";
   position:absolute;
@@ -198,8 +190,6 @@ body{
   background: linear-gradient(180deg, rgba(127,231,255,.95), rgba(255,85,214,.55));
   opacity:.65;
 }
-
-/* うっすら流れる光（チカチカしない） */
 .briefChipBtn::after{
   content:"";
   position:absolute;
@@ -214,12 +204,31 @@ body{
   0%,100%{ transform: translateX(-18%) rotate(12deg); }
   50%{ transform: translateX(18%) rotate(12deg); }
 }
-
+.briefChipLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  white-space: nowrap;
+}
 .briefChipTitle{
   font-weight: 950;
   letter-spacing:.08em;
   color: rgba(127,231,255,.98);
-  white-space: nowrap;
+}
+.briefBadge{
+  font-size: 11px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.22);
+  background: rgba(255,85,214,.16);
+  color: rgba(255,255,255,.92);
+  box-shadow: 0 0 22px rgba(255,85,214,.16);
+}
+.briefBadge.is-new{
+  background: rgba(127,231,255,.16);
+  box-shadow: 0 0 22px rgba(127,231,255,.16);
 }
 .briefChipText{
   flex:1;
@@ -246,7 +255,7 @@ body{
   padding: 10px 14px 18px;
 }
 
-/* ===== MODE DOCK : “押す場所”を強制的に可視化 ===== */
+/* ===== MODE DOCK : big obvious buttons ===== */
 .modeDock{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -256,10 +265,8 @@ body{
 @media (max-width: 380px){
   .modeDock{ grid-template-columns: 1fr; }
 }
-
-/* ベース（縦に厚い） */
 .modeBtn{
-  min-height: 72px;          /* ← 縦の厚みUP */
+  min-height: 72px;
   padding: 14px 14px;
   border-radius: 20px;
   border:1px solid rgba(255,255,255,.18);
@@ -273,11 +280,8 @@ body{
   overflow:hidden;
   background: rgba(255,255,255,.05);
 }
-
-/* 中の装飾（回路っぽい線） */
-.modeBtn .modeLabel{ position:relative; z-index:2; }
+.modeBtn .modeLabel{ position:relative; z-index:2; font-weight: 950; letter-spacing:.06em; }
 .modeBtn .modeTag{ position:relative; z-index:2; }
-
 .modeBtn::before{
   content:"";
   position:absolute;
@@ -294,8 +298,6 @@ body{
   opacity:.50;
   pointer-events:none;
 }
-
-/* タグ（右側のカプセル）強化 */
 .modeTag{
   font-size: 12px;
   font-weight: 950;
@@ -306,8 +308,6 @@ body{
   color: rgba(255,255,255,.92);
   letter-spacing: .06em;
 }
-
-/* FLASH専用：冷色＋スキャンライン */
 .modeFlash{
   border-color: rgba(127,231,255,.34);
   box-shadow: 0 0 32px rgba(127,231,255,.14);
@@ -321,8 +321,6 @@ body{
   border-color: rgba(127,231,255,.34);
   background: rgba(127,231,255,.10);
 }
-
-/* BLITZ専用：暖色＋斜めハッチ */
 .modeBlitz{
   border-color: rgba(255,204,102,.30);
   box-shadow: 0 0 32px rgba(255,85,214,.10);
@@ -336,8 +334,6 @@ body{
   border-color: rgba(255,204,102,.30);
   background: rgba(255,204,102,.10);
 }
-
-/* 選択中は “浮く” + 呼吸 */
 .modeBtn.is-on{
   transform: translateY(-2px);
   filter: brightness(1.08);
@@ -357,13 +353,6 @@ body{
   backdrop-filter: blur(10px);
 }
 .panel + .panel{ margin-top:12px; }
-
-.panelHead{ margin-bottom: 10px; }
-.panelTitle{
-  font-size: 14px;
-  font-weight: 950;
-  letter-spacing:.06em;
-}
 
 .grid{
   display:grid;
@@ -389,13 +378,14 @@ body{
   margin: 0 0 10px;
 }
 
-/* Trial仕様：常に縦並び */
+/* actions always vertical */
 .cardActions{
   display:flex;
   gap:8px;
   flex-direction: column;
 }
 
+/* ===== Buttons + progress gauge ===== */
 .aBtn{
   width:100%;
   min-height: 50px;
@@ -412,11 +402,36 @@ body{
   align-items:center;
   justify-content:center;
   white-space: nowrap;
+  position: relative;
+  overflow:hidden;
 }
 .aBtn[aria-disabled="true"], .aBtn.is-disabled{
   opacity:.45;
   cursor:not-allowed;
   pointer-events:none;
+}
+
+/* FLASH buttons get a thin gauge */
+.aBtn.hasGauge{
+  padding-bottom: 16px; /* room for gauge */
+}
+.aBtn .gauge{
+  position:absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 7px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.10);
+  overflow:hidden;
+}
+.aBtn .gauge > i{
+  display:block;
+  height:100%;
+  width:0%;
+  border-radius: 999px;
+  background: rgba(127,231,255,.35);
+  box-shadow: 0 0 16px rgba(127,231,255,.16);
 }
 
 /* NORMAL */
@@ -514,21 +529,12 @@ body{
   background: rgba(0,0,0,.12);
   margin: 8px 0;
 }
-.briefText{ flex:1; color: rgba(255,255,255,.90); line-height: 1.5; word-break: break-word; }
-.briefActions{ display:flex; gap:8px; align-items:center; }
-.briefQ{
-  width:44px;height:44px;
-  border-radius: 14px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
-  font-weight: 950;
-  cursor:pointer;
-}
-.briefLinks a{
-  color: rgba(255,255,255,.92);
-  text-decoration:none;
-  border-bottom:1px solid rgba(255,255,255,.24);
+.briefText{
+  flex:1;
+  color: rgba(255,255,255,.90);
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 /* Modal */
@@ -594,18 +600,29 @@ body{
 }
 .note{ margin-top:10px; font-size: 12px; color: rgba(255,255,255,.62); }
 
-.detailLinksWrap{ margin-top: 12px; }
-.detailLinksTitle{
-  font-size: 12px;
-  color: rgba(255,255,255,.72);
-  font-weight: 950;
-  letter-spacing: .06em;
-  margin: 0 0 6px 2px;
+/* ===== EXPERT transition FX ===== */
+.fxOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(0,0,0,.62);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter: blur(2px);
 }
-.detailLinks a{
-  display:inline-block;
-  margin-right: 10px;
-  color: rgba(255,255,255,.92);
-  text-decoration:none;
-  border-bottom:1px solid rgba(255,255,255,.24);
+.fxPulse{
+  width: 240px;
+  height: 240px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,85,214,.40), rgba(0,0,0,0) 60%);
+  box-shadow:
+    0 0 80px rgba(255,85,214,.25),
+    0 0 140px rgba(255,85,214,.18);
+  animation: fxPop .36s ease-out forwards;
+}
+@keyframes fxPop{
+  0%{ transform: scale(.82); opacity:.0; }
+  25%{ opacity: 1; }
+  100%{ transform: scale(1.10); opacity: 1; }
 }
