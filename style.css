@@ -817,3 +817,22 @@ body{
 @media (max-width: 360px){
   #panelFlash .aBtn{ font-size: 13px; }
 }
+
+/* STATUSを“カード”寄りに（内容/エフェクトは維持） */
+.statusBar{
+  border: 1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(420px 120px at 18% 10%, rgba(127,231,255,.08), transparent 70%),
+    radial-gradient(420px 120px at 82% 0%, rgba(255,85,214,.06), transparent 72%),
+    linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.18));
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.22) inset,
+    0 12px 30px rgba(0,0,0,.28);
+}
+.statusItem{
+  background:
+    radial-gradient(240px 90px at 20% 20%, rgba(255,255,255,.05), transparent 70%),
+    rgba(0,0,0,.14);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06) inset;
+}
