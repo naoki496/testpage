@@ -40,7 +40,44 @@
           <div class="v"><span id="hkpValue">0</span></div>
         </div>
 
-        <!-- ✅ HIGACHA: アイコン表示形式をFLASH/BLITZと同じ(modeIcon)へ戻す -->
+        <!-- ✅ DAILY 50: HIGACHAの左隣へ移設（円形ゲージ） -->
+        <div class="statusItem statusDaily" aria-label="FLASH DAILY 50">
+          <div class="k">FLASH DAILY 50</div>
+
+          <div class="ringRow">
+            <div class="ringBox" aria-hidden="true">
+              <svg class="ring" viewBox="0 0 64 64">
+                <circle class="ringTrack" cx="32" cy="32" r="22"></circle>
+                <circle class="ringProg" id="dailyRingProg" cx="32" cy="32" r="22"></circle>
+              </svg>
+              <div class="ringCenter">
+                <div class="ringNum"><span id="dailySeen">0</span></div>
+                <div class="ringDen">/50</div>
+              </div>
+            </div>
+
+            <div class="ringText">
+              <div class="ringHint">合計（1日1回カウント）</div>
+              <div class="ringReward">×5 → +2HKP</div>
+
+              <div class="dailySteps statusSteps" aria-label="ゲージ（5回で+2HKP）">
+                <span class="step" id="step1"></span>
+                <span class="step" id="step2"></span>
+                <span class="step" id="step3"></span>
+                <span class="step" id="step4"></span>
+                <span class="step" id="step5"></span>
+              </div>
+
+              <div class="dailyDbg" id="dailyDbg" hidden>
+                <button class="dbgBtn" id="dbgAdd10" type="button">+10</button>
+                <button class="dbgBtn" id="dbgAdd50" type="button">+50</button>
+                <button class="dbgBtn" id="dbgResetDaily" type="button">RESET</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ HIGACHA（アイコン形式はmodeIconのまま） -->
         <div class="statusItem">
           <div class="k"></div>
           <button class="higachaBtn" id="btnHigacha" type="button">
@@ -74,10 +111,9 @@
           <span class="modeIcon" aria-hidden="true">
             <img src="./flashcard_e.png" alt="">
           </span>
-          <!-- ✅ 改行ポイントだけ付与（名称はそのまま） -->
           <span class="modeLabel">FLASH<wbr>CARD</span>
         </span>
-        <span class="modeTag">DRILL</span>
+        <!-- ✅ DRILL削除 -->
       </button>
 
       <button class="modeBtn modeBlitz" id="tabBlitz" type="button">
@@ -87,47 +123,20 @@
           </span>
           <span class="modeLabel">BLITZ<wbr>QUEST</span>
         </span>
-        <span class="modeTag">BATTLE</span>
+        <!-- ✅ BATTLE削除 -->
       </button>
     </nav>
 
     <!-- FLASH -->
     <section class="panel" id="panelFlash">
       <div class="grid" id="flashGrid"></div>
-
-      <!-- ✅ ゲージはボタン群の一番下へ移動 -->
-      <div class="dailyCard" aria-label="FLASHCARD DAILY 50">
-        <div class="dailyTop">
-          <div class="dailyTitle">FLASH DAILY 50</div>
-          <div class="dailySub"><span id="dailySeen">0</span> / 50（合計）</div>
-        </div>
-
-        <div class="dailyBar" aria-hidden="true">
-          <i id="dailyBarFill" style="width:0%"></i>
-        </div>
-
-        <div class="dailySteps" aria-label="ゲージ（5回で+2HKP）">
-          <span class="step" id="step1"></span>
-          <span class="step" id="step2"></span>
-          <span class="step" id="step3"></span>
-          <span class="step" id="step4"></span>
-          <span class="step" id="step5"></span>
-          <span class="dailyReward">×5 → +2HKP</span>
-        </div>
-
-        <div class="dailyDbg" id="dailyDbg" hidden>
-          <button class="dbgBtn" id="dbgAdd10" type="button">+10</button>
-          <button class="dbgBtn" id="dbgAdd50" type="button">+50</button>
-          <button class="dbgBtn" id="dbgResetDaily" type="button">RESET</button>
-        </div>
-      </div>
+      <!-- ✅ dailyCard はSTATUSへ移したため削除 -->
     </section>
 
     <!-- BLITZ -->
     <section class="panel" id="panelBlitz" hidden>
       <div class="archiveCard" aria-label="カード図鑑リンク">
         <div class="archiveLeft">
-          <!-- ✅ カード図鑑: アイコン表示形式をFLASH/BLITZと同じ(modeIcon)へ戻す -->
           <span class="modeIcon" aria-hidden="true">
             <img src="./zukan_e.png" alt="">
           </span>
