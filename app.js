@@ -2,15 +2,14 @@
   "use strict";
 
   // =========================================================
-  // CONFIG
-  // - カード総数（図鑑枚数）は、将来ここに “正しいソースURL” を入れるだけで運用できます。
-  // - テストページでは空のままでOK（"-"表示）。
+  // 図鑑「カード総数」(＝全cards.csvの総行数) の正規運用スイッチ
+  // - テスト: null のままでOK（"-"表示）
+  // - kokugo-dojo本番: 下のURLを有効化するだけで動きます
   // =========================================================
-  const CARD_TOTAL_SOURCES = [
-    // 例：cards-hub の manifest が用意できたら、下のどれかに差し替え
-    // "https://naoki496.github.io/cards-hub/cards-manifest.json",
-    // "https://raw.githubusercontent.com/naoki496/cards-hub/refs/heads/main/cards-manifest.json",
-  ];
+  const CARD_TOTAL_MANIFEST_URL = null;
+  // kokugo-dojo本番で有効化するならこれ：
+  // const CARD_TOTAL_MANIFEST_URL =
+  //   "https://raw.githubusercontent.com/naoki496/cards-hub/refs/heads/main/cards-manifest.json";
 
   // ===== Keys (kokugo-dojo home.js compatible) =====
   const HKP_KEY = "hklobby.v1.hkp";
@@ -130,7 +129,7 @@
       name: "文学史知識マスター",
       expertHref: "",
       startHref:  "https://naoki496.github.io/bungakusi-quiz/",
-      expertEnabled: false, // URL確定後に true + expertHref を入れる
+      expertEnabled: false,
       sub: "作者・作品・時代の基礎を即断で固める。",
     },
     {
@@ -256,9 +255,8 @@
   }
 
   // -------------------------
-  // Card total (図鑑枚数) hook
-  // - テスト段階: "-" のままでもOK
-  // - 正規運用: CARD_TOTAL_SOURCES に “真のデータソースURL” を追加すれば反映されます。
+  // Card total (図鑑枚数)
+  // - cards-hub/cards-manifest.json を読み、sources[].cardsCsv を合算
   // -------------------------
   function setCardTotalText(s) {
     const el = $("cardTotalValue");
@@ -281,78 +279,71 @@
     localStorage.setItem(CARD_TOTAL_CACHE_TS_KEY, String(Date.now()));
   }
 
-  function inferCardTotalFromManifestJson(obj) {
-    // できるだけ汎用に：よくあるパターンを吸収
-    // - { cards: [...] }
-    // - { items: [...] }
-    // - [ ... ]
-    // - { total: 123 }
-    if (!obj) return null;
+  function countCardsFromCsvText(text) {
+    const lines = String(text ?? "")
+      .replace(/\r\n/g, "\n")
+      .replace(/\r/g, "\n")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
 
-    if (Array.isArray(obj)) return obj.length;
+    if (!lines.length) return 0;
 
-    if (Number.isFinite(obj.total)) return obj.total;
+    const header = lines[0];
+    const headerLike =
+      header.includes(",") && /(^|,)\s*id\s*(,|$)/i.test(header);
 
-    if (Array.isArray(obj.cards)) return obj.cards.length;
-    if (Array.isArray(obj.items)) return obj.items.length;
+    return headerLike ? Math.max(0, lines.length - 1) : lines.length;
+  }
 
-    // cardsManifest の形が { byRepo: {kobun:[...], ...} } みたいな場合も合算
-    if (obj.byRepo && typeof obj.byRepo === "object") {
-      let sum = 0;
-      for (const k of Object.keys(obj.byRepo)) {
-        const a = obj.byRepo[k];
-        if (Array.isArray(a)) sum += a.length;
+  async function fetchCardTotalFromCardsHubManifest(manifestUrl) {
+    const res = await fetchWithTimeout(manifestUrl, 6000);
+    if (!res.ok) throw new Error(`manifest load failed: ${res.status}`);
+
+    const man = await res.json();
+    const sources = Array.isArray(man?.sources) ? man.sources : [];
+
+    let total = 0;
+
+    // 順にCSVを読む（失敗はスキップせず、例外にせずに継続）
+    for (const s of sources) {
+      const csvUrl = String(s?.cardsCsv ?? "").trim();
+      if (!csvUrl) continue;
+
+      try {
+        const r = await fetchWithTimeout(csvUrl, 6000);
+        if (!r.ok) continue;
+        const txt = await r.text();
+        total += countCardsFromCsvText(txt);
+      } catch {
+        // ignore and continue
       }
-      return sum || null;
     }
 
-    return null;
+    return total;
   }
 
   async function fetchCardTotal() {
-    // まずキャッシュがあれば即表示（体感を軽く）
     const cached = getCachedCardTotal();
     if (cached !== null) setCardTotalText(cached);
 
-    if (!CARD_TOTAL_SOURCES.length) {
-      // テスト段階：ソース未指定ならここで終了
+    if (!CARD_TOTAL_MANIFEST_URL) {
       if (cached === null) setCardTotalText("-");
       return;
     }
 
-    for (const url of CARD_TOTAL_SOURCES) {
-      try {
-        const r = await fetchWithTimeout(url, 6000);
-        if (!r.ok) continue;
-
-        const ct = (r.headers.get("content-type") || "").toLowerCase();
-        let total = null;
-
-        if (ct.includes("application/json") || url.endsWith(".json")) {
-          const obj = await r.json();
-          total = inferCardTotalFromManifestJson(obj);
-        } else {
-          // CSV等：行数カウント（ヘッダ1行がある場合は自動で除外）
-          const txt = await r.text();
-          const lines = txt.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-          if (lines.length) {
-            const headerLike = lines[0].includes(",") && /id|rarity|name|img/i.test(lines[0]);
-            total = headerLike ? Math.max(0, lines.length - 1) : lines.length;
-          }
-        }
-
-        if (Number.isFinite(total)) {
-          const n = Math.max(0, Math.trunc(total));
-          setCardTotalText(n);
-          setCachedCardTotal(n);
-          return;
-        }
-      } catch {
-        // 次のソースへ
+    try {
+      const total = await fetchCardTotalFromCardsHubManifest(CARD_TOTAL_MANIFEST_URL);
+      if (Number.isFinite(total)) {
+        const n = Math.max(0, Math.trunc(total));
+        setCardTotalText(n);
+        setCachedCardTotal(n);
+        return;
       }
+    } catch {
+      // fallthrough
     }
 
-    // 全失敗
     if (cached === null) setCardTotalText("-");
   }
 
@@ -581,9 +572,9 @@ TOTAL ${getHKP()} HKP`;
   // - 上のチップ（btnBriefToggle2）と下の OPEN（btnBriefToggle）を同期
   // -------------------------
   function initBrief(detailApi) {
-    const btn = $("btnBriefToggle");      // 下段
-    const btn2 = $("btnBriefToggle2");    // 上段チップ
-    const one = $("briefOneLine");        // 上段1行要約
+    const btn = $("btnBriefToggle");
+    const btn2 = $("btnBriefToggle2");
+    const one = $("briefOneLine");
     const body = $("briefBody");
     const list = $("briefList");
     if (!body || !list) return;
@@ -709,10 +700,9 @@ TOTAL ${getHKP()} HKP`;
     const detailApi = initDetailModal();
     initBrief(detailApi);
 
-    // 表示短縮（狭い画面用）
     applyCompactLabels();
 
-    // 図鑑枚数（ソース未設定なら "-" のまま）
+    // 図鑑枚数（CARD_TOTAL_MANIFEST_URL が null なら "-" のまま）
     fetchCardTotal();
   }
 
