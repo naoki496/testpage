@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#07060a" />
+  <title>八東国語LOBBY | testpage</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body data-mode="flash">
+  <div class="bg"></div>
+
+  <header class="top">
+    <img
+      class="logo"
+      src="https://raw.githubusercontent.com/naoki496/kokugo-dojo/refs/heads/main/H.K.LOBBY.png"
+      alt="八東国語LOBBY"
+      loading="eager"
+    />
+
+    <!-- ===== STATUS / HKP / HIGACHA ===== -->
+    <section class="statusBar" aria-label="STATUS">
+      <div class="statusTitle">STATUS</div>
+
+      <div class="statusGrid">
+        <div class="statusItem">
+          <div class="k">ランク</div>
+          <div class="v" id="rankValue">-</div>
+        </div>
+
+        <div class="statusItem">
+          <div class="k">
+            HKP
+            <button class="helpBtn" id="btnHkpHelp" type="button" aria-label="HKPの説明">?</button>
+          </div>
+          <div class="v"><span id="hkpValue">0</span></div>
+        </div>
+
+        <div class="statusItem">
+          <div class="k">HIGACHA</div>
+          <button class="higachaBtn" id="btnHigacha" type="button">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="t">OPEN</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main class="wrap" id="app">
+    <!-- ===== Segmented control ===== -->
+    <nav class="seg" aria-label="mode switch">
+      <button class="segBtn is-on" id="tabFlash" type="button">FLASHCARD</button>
+      <button class="segBtn" id="tabBlitz" type="button">BLITZQUEST</button>
+    </nav>
+
+    <!-- ===== Search (filter) ===== -->
+    <section class="toolbar">
+      <input id="q" class="search" type="search" inputmode="search" placeholder="検索" />
+      <button id="btnClear" class="btnGhost" type="button">クリア</button>
+    </section>
+
+    <!-- ===== Lists ===== -->
+    <section class="panel" id="panelFlash" aria-label="FLASHCARD">
+      <div class="panelHead">
+        <div class="panelTitle">FLASHCARD</div>
+        <div class="panelHint">同格コンテンツ（増えてもここに追加）</div>
+      </div>
+      <div class="grid" id="flashGrid"></div>
+    </section>
+
+    <section class="panel" id="panelBlitz" aria-label="BLITZQUEST" hidden>
+      <div class="panelHead">
+        <div class="panelTitle">BLITZQUEST</div>
+        <div class="panelHint">各コンテンツ：EXPERT / START を分離（導線は維持）</div>
+      </div>
+      <div class="grid" id="blitzGrid"></div>
+    </section>
+
+    <!-- ===== MISSIONBRIEF ===== -->
+    <section class="brief" aria-label="MISSIONBRIEF">
+      <div class="briefHead">
+        <div class="briefTitle">MISSIONBRIEF</div>
+        <button class="btnGhost" id="btnBriefToggle" type="button" aria-expanded="false">OPEN</button>
+      </div>
+      <div class="briefBody" id="briefBody" hidden>
+        <ul class="briefList" id="briefList"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== HKP Help Modal ===== -->
+  <div class="overlay" id="hkpHelpOverlay" aria-hidden="true" style="display:none;">
+    <div class="modal">
+      <div class="modalHead">
+        <div class="modalTitle">HKP</div>
+        <button class="x" id="hkpHelpClose" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div class="modalBody leftPad" id="hkpHelpBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== HIGACHA Modal ===== -->
+  <div class="overlay" id="higachaOverlay" aria-hidden="true" style="display:none;">
+    <div class="modal">
+      <div class="modalHead">
+        <div class="modalTitle">HIGACHA</div>
+        <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="gachaHero">
+          <img
+            class="gachaImg"
+            src="https://raw.githubusercontent.com/naoki496/kokugo-dojo/refs/heads/main/higacha.png"
+            alt="HIGACHA"
+            loading="lazy"
+          />
+        </div>
+
+        <div class="gachaMsg leftPad" id="higachaMsg"></div>
+
+        <div class="modalActions">
+          <button class="btnGhost" id="higachaCancel" type="button">CLOSE</button>
+          <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
+        </div>
+
+        <div class="note">※ 1日1回まで。結果はHKPに加算されます。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DETAIL Modal (MISSIONBRIEF “?”) ===== -->
+  <div class="overlay" id="detailOverlay" aria-hidden="true" style="display:none;">
+    <div class="modal">
+      <div class="modalHead">
+        <div class="modalTitle" id="detailTitle">DETAIL</div>
+        <button class="x" id="detailClose" type="button" aria-label="閉じる">×</button>
+      </div>
+
+      <div class="modalBody">
+        <div class="detailBody leftPad" id="detailBody"></div>
+
+        <div class="detailLinksWrap" id="detailLinksWrap" style="display:none;">
+          <div class="detailLinksTitle">LINK</div>
+          <div class="detailLinks leftPad" id="detailLinks"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
