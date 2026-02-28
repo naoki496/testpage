@@ -1,17 +1,11 @@
 (() => {
   "use strict";
 
-  // 図鑑「カード総数」：現段階では表示しない（常に "-"）
+  // いまは総数は出さない（将来復帰可能）
   const CARD_TOTAL_MANIFEST_URL = null;
 
   const HKP_KEY = "hklobby.v1.hkp";
   const HIGACHA_LAST_KEY = "hklobby.v1.higacha.lastDate";
-
-  // 将来用（現段階では未使用だが保持）
-  const CARD_TOTAL_CACHE_KEY = "hklobby.v1.cardTotal.cache";
-  const CARD_TOTAL_CACHE_TS_KEY = "hklobby.v1.cardTotal.cacheTs";
-  const CARD_TOTAL_CACHE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
-
   const MODE_KEY = "testpage.v1.mode";
 
   const $ = (id) => document.getElementById(id);
@@ -57,10 +51,6 @@
     return { main, detail: detail.length ? detail : null };
   }
 
-  function normalize(s) {
-    return String(s ?? "").trim().toLowerCase();
-  }
-
   // HKP / HIGACHA
   function getHKP() {
     const n = Number(localStorage.getItem(HKP_KEY));
@@ -82,7 +72,7 @@
     localStorage.setItem(HIGACHA_LAST_KEY, todayYMD());
   }
 
-  // Content registry（名称は変更しない）
+  // ===== Contents（名称は変更しない）=====
   const FLASH_CONTENTS = [
     { name: "古文単語", href: "https://naoki496.github.io/flashcards/", sub: "読解の土台となる基礎語彙。" },
     { name: "助動詞", href: "https://naoki496.github.io/hatto-kobun-jodoushi/", sub: "意味・用法・活用形の判断。" },
@@ -113,7 +103,7 @@
     },
   ];
 
-  // Mode tabs
+  // ===== Mode tabs =====
   function setMode(mode) {
     document.body.dataset.mode = mode;
 
@@ -130,23 +120,9 @@
     tabBlitz?.classList.toggle("is-on", !isFlash);
 
     localStorage.setItem(MODE_KEY, mode);
-    applyFilter();
   }
 
-  // Search filter
-  function applyFilter() {
-    const q = normalize($("q")?.value);
-    const isFlash = (document.body.dataset.mode || "flash") === "flash";
-    const grid = isFlash ? $("flashGrid") : $("blitzGrid");
-    if (!grid) return;
-
-    grid.querySelectorAll("[data-name]").forEach((node) => {
-      const name = normalize(node.getAttribute("data-name"));
-      node.hidden = q ? !name.includes(q) : false;
-    });
-  }
-
-  // Render grids
+  // ===== Render grids =====
   function renderFlash() {
     const grid = $("flashGrid");
     if (!grid) return;
@@ -155,7 +131,6 @@
     FLASH_CONTENTS.forEach((c) => {
       const card = document.createElement("div");
       card.className = "card";
-      card.setAttribute("data-name", c.name);
 
       card.innerHTML = `
         <div class="cardTitle">${escapeHtml(c.name)}</div>
@@ -176,7 +151,6 @@
     BLITZ_CONTENTS.forEach((c) => {
       const card = document.createElement("div");
       card.className = "card";
-      card.setAttribute("data-name", c.name);
 
       const expertDisabled = !c.expertEnabled || !c.expertHref;
       const expertAttrs = expertDisabled
@@ -197,7 +171,7 @@
     });
   }
 
-  // HUD
+  // ===== HUD =====
   function renderHKP() {
     const el = $("hkpValue");
     if (el) el.textContent = String(getHKP());
@@ -208,7 +182,6 @@
     if (!btn) return;
     const ok = canHigachaToday();
     btn.disabled = !ok;
-    btn.classList.toggle("is-ready", ok);
     btn.classList.toggle("is-disabled", !ok);
     btn.setAttribute("aria-disabled", String(!ok));
   }
@@ -217,19 +190,48 @@
     const el = $("rankValue");
     if (el) el.textContent = "-";
   }
-
   function disableCardTotal() {
     const el = $("cardTotalValue");
     if (el) el.textContent = "-";
+    void CARD_TOTAL_MANIFEST_URL;
   }
 
-  // HKP help modal
+  // ===== Modal helpers =====
+  function bindOverlayClose(overlayId, closeId) {
+    const overlay = $(overlayId);
+    const closeBtn = $(closeId);
+    if (!overlay || !closeBtn) return { open: () => {}, close: () => {} };
+
+    let lastFocus = null;
+    function open() {
+      lastFocus = document.activeElement;
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      closeBtn.focus();
+    }
+    function close() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      try { lastFocus?.focus?.(); } catch {}
+    }
+
+    on(closeBtn, "click", close);
+    on(overlay, "click", (e) => { if (e.target === overlay) close(); });
+    on(document, "keydown", (e) => {
+      if (e.key === "Escape" && overlay.style.display === "flex") close();
+    });
+
+    return { open, close };
+  }
+
+  // ===== HKP Help =====
   function initHkpHelp() {
+    const { open } = bindOverlayClose("hkpHelpOverlay", "hkpHelpClose");
     const helpBtn = $("btnHkpHelp");
-    const overlay = $("hkpHelpOverlay");
-    const closeBtn = $("hkpHelpClose");
     const body = $("hkpHelpBody");
-    if (!helpBtn || !overlay || !closeBtn || !body) return;
+    if (!helpBtn || !body) return;
 
     const text =
 `★HKPとは？
@@ -245,109 +247,13 @@ BLITZ QUESTの通常10問モードを学習時、
 HKPを消費することで「EXPERT MODE」への挑戦や、
 その他の機能を使用できるようになるかも。`;
 
-    let lastFocus = null;
-    function open() {
-      lastFocus = document.activeElement;
+    on(helpBtn, "click", () => {
       body.textContent = text;
-      overlay.style.display = "flex";
-      overlay.setAttribute("aria-hidden", "false");
-      closeBtn.focus();
-      document.body.style.overflow = "hidden";
-    }
-    function close() {
-      try { (lastFocus && typeof lastFocus.focus === "function") ? lastFocus.focus() : helpBtn.focus(); } catch {}
-      overlay.style.display = "none";
-      overlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-
-    on(helpBtn, "click", open);
-    on(closeBtn, "click", close);
-    on(overlay, "click", (e) => { if (e.target === overlay) close(); });
-    on(document, "keydown", (e) => {
-      if (e.key === "Escape" && overlay.style.display === "flex") close();
+      open();
     });
   }
 
-  // HIGACHA modal
-  function initHigacha() {
-    const btn = $("btnHigacha");
-    const overlay = $("higachaOverlay");
-    const closeBtn = $("higachaClose");
-    const cancelBtn = $("higachaCancel");
-    const drawBtn = $("higachaDraw");
-    const msgEl = $("higachaMsg");
-    if (!btn || !overlay || !closeBtn || !cancelBtn || !drawBtn || !msgEl) return;
-
-    let lastFocus = null;
-
-    function open() {
-      lastFocus = document.activeElement;
-      const ok = canHigachaToday();
-
-      if (ok) {
-        msgEl.textContent =
-`本日のHIGACHAを実行します。
-
-結果により +1 または +2 HKP を獲得します。`;
-        drawBtn.disabled = false;
-        drawBtn.style.opacity = "";
-      } else {
-        msgEl.textContent =
-`本日のHIGACHAは使用済みです。
-
-また明日、試せます。`;
-        drawBtn.disabled = true;
-        drawBtn.style.opacity = "0.45";
-      }
-
-      overlay.style.display = "flex";
-      overlay.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
-      closeBtn.focus();
-    }
-
-    function close() {
-      try { (lastFocus && typeof lastFocus.focus === "function") ? lastFocus.focus() : btn.focus(); } catch {}
-      overlay.style.display = "none";
-      overlay.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-      renderHKP();
-      updateHigachaButtonState();
-    }
-
-    on(btn, "click", open);
-    on(closeBtn, "click", close);
-    on(cancelBtn, "click", close);
-    on(overlay, "click", (e) => { if (e.target === overlay) close(); });
-    on(document, "keydown", (e) => {
-      if (e.key === "Escape" && overlay.style.display === "flex") close();
-    });
-
-    on(drawBtn, "click", () => {
-      if (!canHigachaToday()) {
-        updateHigachaButtonState();
-        return;
-      }
-      const gain = (Math.random() < 0.70) ? 1 : 2;
-      addHKP(gain);
-      markHigachaDoneToday();
-
-      msgEl.textContent =
-`RESULT
-
-+${gain}HKP
-
-TOTAL ${getHKP()} HKP`;
-
-      drawBtn.disabled = true;
-      drawBtn.style.opacity = "0.45";
-      renderHKP();
-      updateHigachaButtonState();
-    });
-  }
-
-  // DETAIL modal（MISSIONBRIEF “?”）
+  // ===== Detail modal for “?” =====
   function initDetailModal() {
     const overlay = $("detailOverlay");
     const btnClose = $("detailClose");
@@ -355,6 +261,7 @@ TOTAL ${getHKP()} HKP`;
     const bodyEl = $("detailBody");
     const linksWrap = $("detailLinksWrap");
     const linksEl = $("detailLinks");
+
     if (!overlay || !btnClose || !titleEl || !bodyEl || !linksWrap || !linksEl) {
       return { open: () => {} };
     }
@@ -365,7 +272,6 @@ TOTAL ${getHKP()} HKP`;
       lastFocus = document.activeElement;
 
       titleEl.textContent = titleText || "DETAIL";
-
       const raw = String(detailText ?? "").replaceAll("\\n", "\n");
 
       const urlRe = /(https?:\/\/[^\s]+)/g;
@@ -397,10 +303,10 @@ TOTAL ${getHKP()} HKP`;
     }
 
     function close() {
-      try { (lastFocus && typeof lastFocus.focus === "function") ? lastFocus.focus() : null; } catch {}
       overlay.style.display = "none";
       overlay.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+      try { lastFocus?.focus?.(); } catch {}
     }
 
     on(btnClose, "click", close);
@@ -412,29 +318,15 @@ TOTAL ${getHKP()} HKP`;
     return { open };
   }
 
-  // MISSIONBRIEF
+  // ===== MISSIONBRIEF (top only -> modal) =====
   function initBrief(detailApi) {
-    const btn = $("btnBriefToggle");
-    const btn2 = $("btnBriefToggle2");
+    const btn = $("btnBriefOpen");
     const one = $("briefOneLine");
-    const body = $("briefBody");
     const list = $("briefList");
-    if (!body || !list) return;
+    const { open, close } = bindOverlayClose("briefOverlay", "briefClose");
+    if (!btn || !one || !list) return;
 
-    function setOpen(open) {
-      body.hidden = !open;
-      btn?.setAttribute("aria-expanded", String(open));
-      btn2?.setAttribute("aria-expanded", String(open));
-      if (btn) btn.textContent = open ? "CLOSE" : "OPEN";
-      if (btn2) {
-        const icon = btn2.querySelector(".briefChipIcon");
-        if (icon) icon.textContent = open ? "▴" : "▾";
-      }
-    }
-
-    let open = false;
-    on(btn, "click", () => { open = !open; setOpen(open); });
-    on(btn2, "click", () => { open = !open; setOpen(open); });
+    on(btn, "click", open);
 
     function renderLines(lines) {
       list.innerHTML = "";
@@ -492,16 +384,126 @@ TOTAL ${getHKP()} HKP`;
           .map((s) => s.trim())
           .filter(Boolean);
 
-        if (one) {
-          const first = lines[0] ? splitDetail(lines[0]).main : "";
-          one.textContent = first || "（未読）";
-        }
+        const first = lines[0] ? splitDetail(lines[0]).main : "";
+        one.textContent = first || "（未読）";
 
-        renderLines(lines.slice(0, 60));
+        renderLines(lines.slice(0, 80));
       })
       .catch(() => {
-        if (one) one.textContent = "（読み込み失敗）";
+        one.textContent = "（読み込み失敗）";
+        list.innerHTML = "";
       });
+  }
+
+  // ===== HIGACHA =====
+  function initHigacha() {
+    const btn = $("btnHigacha");
+    const overlay = $("higachaOverlay");
+    const closeBtn = $("higachaClose");
+    const cancelBtn = $("higachaCancel");
+    const drawBtn = $("higachaDraw");
+    const msgEl = $("higachaMsg");
+    if (!btn || !overlay || !closeBtn || !cancelBtn || !drawBtn || !msgEl) return;
+
+    let lastFocus = null;
+
+    function open() {
+      lastFocus = document.activeElement;
+      const ok = canHigachaToday();
+
+      if (ok) {
+        msgEl.textContent =
+`本日のHIGACHAを実行します。
+
+結果により +1 または +2 HKP を獲得します。`;
+        drawBtn.disabled = false;
+        drawBtn.style.opacity = "";
+      } else {
+        msgEl.textContent =
+`本日のHIGACHAは使用済みです。
+
+また明日、試せます。`;
+        drawBtn.disabled = true;
+        drawBtn.style.opacity = "0.45";
+      }
+
+      overlay.style.display = "flex";
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      closeBtn.focus();
+    }
+
+    function close() {
+      overlay.style.display = "none";
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      try { lastFocus?.focus?.(); } catch {}
+      renderHKP();
+      updateHigachaButtonState();
+    }
+
+    on(btn, "click", open);
+    on(closeBtn, "click", close);
+    on(cancelBtn, "click", close);
+    on(overlay, "click", (e) => { if (e.target === overlay) close(); });
+    on(document, "keydown", (e) => {
+      if (e.key === "Escape" && overlay.style.display === "flex") close();
+    });
+
+    on(drawBtn, "click", () => {
+      if (!canHigachaToday()) {
+        updateHigachaButtonState();
+        return;
+      }
+      const gain = (Math.random() < 0.70) ? 1 : 2;
+      addHKP(gain);
+      markHigachaDoneToday();
+
+      msgEl.textContent =
+`RESULT
+
++${gain}HKP
+
+TOTAL ${getHKP()} HKP`;
+
+      drawBtn.disabled = true;
+      drawBtn.style.opacity = "0.45";
+      renderHKP();
+      updateHigachaButtonState();
+    });
+  }
+
+  // ===== PWA install button (restore) =====
+  function initInstall() {
+    const btn = $("btnInstall");
+    if (!btn) return;
+
+    // SW register (optional but helpful)
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    }
+
+    let deferredPrompt = null;
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      btn.hidden = false;
+    });
+
+    on(btn, "click", async () => {
+      if (!deferredPrompt) return;
+      btn.hidden = true;
+      deferredPrompt.prompt();
+      try { await deferredPrompt.userChoice; } catch {}
+      deferredPrompt = null;
+    });
+
+    // already installed -> keep hidden
+    window.addEventListener("appinstalled", () => {
+      btn.hidden = true;
+      deferredPrompt = null;
+    });
   }
 
   function initTabs() {
@@ -509,43 +511,25 @@ TOTAL ${getHKP()} HKP`;
     on($("tabBlitz"), "click", () => setMode("blitz"));
   }
 
-  function initSearch() {
-    const q = $("q");
-    const clear = $("btnClear");
-    on(q, "input", () => applyFilter());
-    on(clear, "click", () => {
-      if (q) q.value = "";
-      applyFilter();
-      q?.focus();
-    });
-  }
-
   function boot() {
     renderFlash();
     renderBlitz();
 
     initTabs();
-    initSearch();
 
     const saved = localStorage.getItem(MODE_KEY);
     setMode(saved === "blitz" ? "blitz" : "flash");
 
     renderHKP();
     updateHigachaButtonState();
-    initHkpHelp();
-    initHigacha();
     renderRankPlaceholder();
-
-    const detailApi = initDetailModal();
-    initBrief(detailApi);
-
     disableCardTotal();
 
-    // keep unused constants (future)
-    void CARD_TOTAL_MANIFEST_URL;
-    void CARD_TOTAL_CACHE_KEY;
-    void CARD_TOTAL_CACHE_TS_KEY;
-    void CARD_TOTAL_CACHE_MAX_AGE_MS;
+    initHkpHelp();
+    const detailApi = initDetailModal();
+    initBrief(detailApi);
+    initHigacha();
+    initInstall();
   }
 
   document.addEventListener("DOMContentLoaded", boot);
