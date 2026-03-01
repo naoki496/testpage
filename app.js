@@ -626,18 +626,15 @@ TOTAL ${getHKP()} HKP`;
   }
 
   function renderDailyUI(seen) {
-    const safeSeen = Number(seen) || 0;
-    const pct = Math.max(0, Math.min(100, (safeSeen / 50) * 100));
-
     const seenEl = $("dailySeen");
-    if (seenEl) seenEl.textContent = String(safeSeen);
+    if (seenEl) seenEl.textContent = String(seen);
 
-    // ✅ mini horizontal bar (current UI)
+    const ring = $("dailyRingProg");
+    const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
+
     const barFill = $("dailyBarFill");
     if (barFill) barFill.style.width = pct.toFixed(1) + "%";
 
-    // legacy ring support (if still present)
-    const ring = $("dailyRingProg");
     if (ring) {
       const r = 22;
       const circ = 2 * Math.PI * r;
