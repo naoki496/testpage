@@ -567,82 +567,155 @@ TOTAL ${getHKP()} HKP`;
   }
 
   // =========================
-    // =========================
-  // Daily 50 logic (STATUS)
-  // - UI is "0/50" + horizontal progress bar
-  // - Do NOT rewrite statusDaily innerHTML (prevents layout regressions)
+  // Daily 50 logic
   // =========================
-  const DAILY_TOTAL = 50;
-  const DAILY_KEY_PREFIX = "hklobby.v1.daily50.";
-  const DAILY_SEEN_KEY = DAILY_KEY_PREFIX + "seen";
-  const DAILY_DATE_KEY = DAILY_KEY_PREFIX + "date";
-
-  // ✅ デバッグは常にOFF（UI汚染・崩壊の原因になりやすい）
-  const DAILY_DEBUG = false;
-
-  function todayKey() {
-    // local date key (YYYY-MM-DD)
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
+  function readNum(key) {
+    const n = Number(localStorage.getItem(key));
+    return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
   }
 
-  function readDailyState() {
-    const dkey = todayKey();
-    const savedDate = localStorage.getItem(DAILY_DATE_KEY);
-    let seen = parseInt(localStorage.getItem(DAILY_SEEN_KEY) || "0", 10);
-    if (!Number.isFinite(seen) || seen < 0) seen = 0;
-
-    // 日付が変わったらリセット
-    if (savedDate !== dkey) {
-      localStorage.setItem(DAILY_DATE_KEY, dkey);
-      localStorage.setItem(DAILY_SEEN_KEY, "0");
-      seen = 0;
+  function loadDailyState() {
+    try {
+      const raw = localStorage.getItem(DAILY_STATE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
     }
-    if (seen > DAILY_TOTAL) seen = DAILY_TOTAL;
-    return { dateKey: dkey, seen };
   }
 
-  function writeDailySeen(seen) {
-    const v = Math.max(0, Math.min(DAILY_TOTAL, Number(seen) || 0));
-    localStorage.setItem(DAILY_DATE_KEY, todayKey());
-    localStorage.setItem(DAILY_SEEN_KEY, String(v));
-    return v;
+  function saveDailyState(st) {
+    try { localStorage.setItem(DAILY_STATE_KEY, JSON.stringify(st)); } catch {}
   }
 
-  function renderDailyUI() {
-    const state = readDailyState();
+  function getTodaySeenTotal() {
+    return FLASH_TODAY_KEYS.reduce((sum, k) => sum + readNum(k), 0);
+  }
+
+  function ensureDailyState() {
+    const t = todayYMD();
+    let st = loadDailyState();
+
+    if (!st || typeof st !== "object") {
+      st = { date: t, progressed: false, streak: 0, touched: false };
+      saveDailyState(st);
+      return st;
+    }
+
+    st.date = String(st.date || t);
+    st.progressed = !!st.progressed;
+    st.streak = Math.max(0, Math.trunc(Number(st.streak) || 0));
+    st.touched = !!st.touched;
+
+    if (st.date !== t) {
+      const gap = diffDays(st.date, t);
+      if (gap >= 1) {
+        let dec = 0;
+        if (!st.touched) dec += 1;
+        if (gap > 1) dec += (gap - 1);
+        st.streak = Math.max(0, st.streak - dec);
+      }
+
+      st.date = t;
+      st.progressed = false;
+      st.touched = false;
+      saveDailyState(st);
+    }
+
+    st.streak = Math.max(0, Math.min(4, st.streak));
+    return st;
+  }
+
+  function renderDailyUI(seen) {
     const seenEl = $("dailySeen");
-    const fillEl = $("dailyBarFill");
+    if (seenEl) seenEl.textContent = String(seen);
 
-    if (seenEl) seenEl.textContent = String(state.seen);
+    const ring = $("dailyRingProg");
+    const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
 
-    if (fillEl) {
-      const pct = (state.seen / DAILY_TOTAL) * 100;
-      fillEl.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+    const barFill = $("dailyBarFill");
+    if (barFill) barFill.style.width = pct.toFixed(1) + "%";
+
+    if (ring) {
+      const r = 22;
+      const circ = 2 * Math.PI * r;
+      ring.style.strokeDasharray = String(circ);
+      ring.style.strokeDashoffset = String(circ * (1 - pct / 100));
     }
+
+    const dbg = $("dailyDbg");
+    if (dbg) dbg.hidden = !DAILY_DEBUG;
   }
 
-  // 外部（FLASHCARD側）からカウントしたい場合の入口
-  // - app.js 内の該当箇所で addDailySeen(1) を呼べばOK
-  function addDailySeen(delta) {
-    const cur = readDailyState().seen;
-    const next = writeDailySeen(cur + (Number(delta) || 0));
-    renderDailyUI();
-    return next;
+  function tryProgressDaily(st) {
+    const seen = getTodaySeenTotal();
+
+    if (seen > 0 && !st.touched) {
+      st.touched = true;
+      saveDailyState(st);
+    }
+
+    renderDailyUI(seen);
+
+    if (st.progressed) return;
+    if (seen < 50) return;
+
+    st.progressed = true;
+    st.touched = true;
+
+    let next = (Number(st.streak) || 0) + 1;
+    if (next >= 5) {
+      addHKP(2);
+      next = 0;
+    }
+    st.streak = Math.max(0, Math.min(4, next));
+    saveDailyState(st);
+
+    renderDailyUI(seen);
   }
 
-  // 初回描画
-  function initDaily50Status() {
-    renderDailyUI();
-
-    // debug is OFF
+  function initDailyDebugControls() {
     if (!DAILY_DEBUG) return;
+
+    const add10 = $("dbgAdd10");
+    const add50 = $("dbgAdd50");
+    const reset = $("dbgResetDaily");
+    if (!add10 || !add50 || !reset) return;
+
+    function bumpAny(n) {
+      const k = FLASH_TODAY_KEYS[0];
+      localStorage.setItem(k, String(readNum(k) + n));
+    }
+
+    on(add10, "click", () => {
+      bumpAny(10);
+      const st = ensureDailyState();
+      tryProgressDaily(st);
+    });
+
+    on(add50, "click", () => {
+      bumpAny(50);
+      const st = ensureDailyState();
+      tryProgressDaily(st);
+    });
+
+    on(reset, "click", () => {
+      FLASH_TODAY_KEYS.forEach((k) => localStorage.setItem(k, "0"));
+      const t = todayYMD();
+      const prev = loadDailyState();
+      const st = {
+        date: t,
+        progressed: false,
+        streak: Math.max(0, Math.trunc(Number(prev?.streak) || 0)),
+        touched: false
+      };
+      saveDailyState(st);
+      const now = ensureDailyState();
+      tryProgressDaily(now);
+      renderHKP();
+    });
   }
 
-// =========================
+  // =========================
   // Sync on return (重要)
   // =========================
   function syncStatus() {
