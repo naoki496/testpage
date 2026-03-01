@@ -119,24 +119,6 @@ body{
   grid-template-columns: repeat(4, minmax(0,1fr));
   gap:10px;
 }
-
-/* STATUS: 上段（ランク / HKP）は高さ固定で以後動かさない */
-.statusRank{ --status-h: 132px; }
-.statusHkp { --status-h: 132px; }
-
-/* STATUS: 下段（Daily / Higacha）は縦幅を圧縮 */
-.statusDaily{ --status-h: 104px; }
-.statusHigacha{ --status-h: 104px; }
-
-/* visually-hidden helper (STATUS内の数値保持用) */
-.srOnly{
-  position:absolute !important;
-  width:1px; height:1px;
-  padding:0; margin:-1px;
-  overflow:hidden; clip:rect(0,0,0,0);
-  white-space:nowrap; border:0;
-}
-
 .statusItem{
   padding:10px 10px;
   border:1px solid rgba(255,255,255,.10);
@@ -145,10 +127,8 @@ body{
   position: relative;
   overflow:hidden;
 
-  /* ✅ 基本の縦幅（ブロックごとに上書き可） */
-  --status-h: 132px;
-  height: var(--status-h);
-
+  /* 高さ固定（4枚同じ縦幅） */
+  height: 132px;
   display:flex;
   flex-direction:column;
   justify-content: space-between;
@@ -819,120 +799,57 @@ body{
 
 
 /* =========================
-   STATUS compact patch (20260301)
-   - Only affects STATUS area
-========================= */
-.statusBar .statusGrid{
-  gap: 10px;
+   Mode selected dot restore
+   ========================= */
+.modeBtn{
+  position: relative; /* 念のため */
 }
 
-.statusBar .statusItem{
-  height: 88px;            /* was 132px */
-  padding: 12px 14px;      /* tighter */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+.modeBtn.is-on::before{
+  content:"";
+  position:absolute;
+  left:10px;
+  top:10px;
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 0 16px rgba(255,255,255,.22);
+  opacity:.75;
+  z-index: 3;
+  pointer-events:none;
 }
 
-.statusBar .statusItem .k{
-  font-size: 14px;
-  letter-spacing: .08em;
-}
-
-.statusBar .statusItem .v{
-  font-size: 24px;         /* readable but compact */
-  line-height: 1.05;
-  margin-top: 2px;
-}
-
-.statusBar .statusItem .mini{
-  font-size: 12px;
-  opacity: .7;
-}
-
-.statusBar .statusItem .miniNum{
-  font-weight: 700;
-  opacity: 1;
-}
-
-/* HKP / Daily help buttons keep position (inside .k flex row) */
-.statusBar .statusItem .k{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.statusBar .helpBtn{
-  margin-left:auto;
-}
-
-/* Daily: compact number + horizontal bar */
-.statusBar .dailyCompact{
-  margin-top: 6px;
+/* ===== STATUS: Daily mini bar (scoped) ===== */
+.statusBar .statusDaily .dailyCompact{
   display:flex;
   flex-direction:column;
-  gap: 10px;
-  width:100%;
-}
-
-.statusBar .dailyNum{
-  display:flex;
-  align-items:baseline;
   gap:10px;
+  margin-top:14px;
 }
-
-.statusBar .dailySeen{
-  font-size: 28px;
-  font-weight: 800;
-  line-height: 1;
+.statusBar .statusDaily .dailyNum{
+  font-weight:800;
+  letter-spacing:0.02em;
+  font-size:34px;
+  line-height:1;
 }
-
-.statusBar .dailyDen{
-  font-size: 18px;
-  opacity:.75;
+.statusBar .statusDaily .dailyDen{
+  font-size:22px;
   font-weight:700;
+  opacity:0.85;
+  margin-left:6px;
 }
-
-.statusBar .dailyBarMini{
-  position: relative;
-  width: 100%;
-  height: 10px;
-  margin-top: 8px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.10);
+.statusBar .statusDaily .dailyBarMini{
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,0.10);
+  border:1px solid rgba(255,255,255,0.10);
   overflow:hidden;
 }
-
-.statusBar .dailyBarMini > i{
-  position:absolute;
-  inset:0 auto 0 0;
-  width: 0%;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.45);
-}
-
-/* Gacha tile: icon only, centered */
-.statusBar .statusGacha{
-  padding: 0;
-}
-
-.statusBar .higachaTile{
-  width:100%;
+.statusBar .statusDaily .dailyBarMini > i{
+  display:block;
   height:100%;
-  border:0;
-  background: transparent;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius: 20px;
-}
-
-.statusBar .statusGacha .modeIcon{
-  width: 56px;
-  height: 56px;
-}
-
-.statusBar .statusGacha .modeIcon img{
-  width: 34px;
-  height: 34px;
+  width:0%;
+  border-radius:999px;
+  background:rgba(255,255,255,0.36);
 }
