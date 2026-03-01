@@ -1,196 +1,160 @@
-/* style.css（全文） */
+/* ===== Base ===== */
 :root{
-  --bg0:#07040a;
-  --text:#ffffff;
-  --sub: rgba(255,255,255,0.74);
-  --line: rgba(255,255,255,0.14);
+  --bg0:#050307;
+  --bg1:#0b0610;
 
-  --mint:#7fe7ff;
-  --pink:#ff55d6;
-  --lav:#a79bff;
-  --amber:#ffcc66;
+  --accent1:#ff3dcf;
+  --accent2:#cbff5c;
+
+  --text:#ffffff;
+  --sub: rgba(255,255,255,.68);
+
+  --panel: rgba(255,255,255,.06);
+  --panel2: rgba(0,0,0,.18);
+  --border: rgba(255,255,255,.12);
+
+  --shadow: 0 18px 40px rgba(0,0,0,.35);
+
+  /* status fixed sizes */
+  --status-h: 132px;
+  --status-gap: 10px;
 
   --radius: 18px;
+  --radius2: 22px;
 }
 
+/* ===== Reset / global ===== */
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
-
 body{
   margin:0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
-  color:var(--text);
-  background:
-    radial-gradient(900px 700px at 25% 10%, rgba(167,155,255,.18), transparent 60%),
-    radial-gradient(900px 700px at 80% 15%, rgba(255,85,214,.14), transparent 62%),
-    radial-gradient(900px 700px at 55% 85%, rgba(255,204,102,.12), transparent 60%),
-    radial-gradient(900px 700px at 10% 85%, rgba(127,231,255,.10), transparent 60%),
-    linear-gradient(180deg, var(--bg0), #050207);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+  color: var(--text);
+  background: radial-gradient(1000px 800px at 50% -20%, rgba(255,61,207,.25), transparent 60%),
+              radial-gradient(700px 400px at 80% 15%, rgba(203,255,92,.12), transparent 55%),
+              radial-gradient(700px 400px at 20% 15%, rgba(255,61,207,.10), transparent 55%),
+              linear-gradient(180deg, var(--bg0), #06030b 55%, #030207);
   overflow-x:hidden;
 }
 
+/* global image safety */
+img{ max-width:100%; height:auto; display:block; }
+
+/* background helpers */
 .bg{
-  position:fixed; inset:0;
-  background:
-    radial-gradient(620px 440px at 50% 0%, rgba(127,231,255,.08), transparent 62%),
-    radial-gradient(680px 520px at 0% 60%, rgba(167,155,255,.10), transparent 60%),
-    radial-gradient(680px 520px at 100% 60%, rgba(255,85,214,.08), transparent 60%);
+  position:fixed;
+  inset:0;
   pointer-events:none;
+  background:
+    radial-gradient(900px 650px at 50% 0%, rgba(255,61,207,.12), transparent 62%),
+    radial-gradient(700px 450px at 10% 20%, rgba(203,255,92,.08), transparent 60%),
+    radial-gradient(700px 450px at 90% 20%, rgba(255,61,207,.06), transparent 60%);
+  opacity:.9;
 }
 
-/* Top */
-.top{
-  padding:14px 14px 0;
-  max-width: 980px;
-  margin: 0 auto;
+.wrap{
+  width:min(960px, 92vw);
+  margin: 18px auto 22px;
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
 }
 
-.logoWrap{
-  width: min(920px, 100%);
-  margin: 10px auto 10px;
-  border-radius: 14px;
+/* ===== HERO ===== */
+.hero{
+  padding: 10px 10px 2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-.logo{
-  width: 100%;
-  height:auto;
-  display:block;
-  border-radius: 14px;
-  opacity: .96;
-}
+.logo{ width:min(520px, 92vw); filter: drop-shadow(0 14px 30px rgba(0,0,0,.55)); }
+
 .logoFallback{
-  border-radius: 14px;
-  padding: 18px 14px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(0,0,0,.16));
+  width:100%;
+  border-radius: 22px;
+  padding: 18px 16px;
   text-align:center;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: 0 16px 30px rgba(0,0,0,.30);
 }
-.logoFallbackTitle{ font-weight: 950; letter-spacing: .08em; font-size: 18px; }
-.logoFallbackSub{ margin-top: 4px; font-size: 12px; color: rgba(255,255,255,.72); letter-spacing: .12em; }
+.logoFallbackTitle{ font-weight: 900; letter-spacing:.06em; font-size: 22px; }
+.logoFallbackSub{ margin-top: 6px; opacity:.72; font-weight: 700; }
 
-/* STATUS */
+/* ===== STATUS ===== */
 .statusBar{
-  margin: 10px 0 10px;
+  border-radius: 22px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
   padding: 12px 12px;
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  backdrop-filter: blur(10px);
-
-  background:
-    radial-gradient(260px 120px at 18% 0%, rgba(127,231,255,.12), transparent 60%),
-    radial-gradient(260px 120px at 82% 0%, rgba(255,85,214,.10), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.16));
-  box-shadow:
-    0 14px 42px rgba(0,0,0,.28),
-    0 0 36px rgba(127,231,255,.06);
-  position: relative;
-  overflow:hidden;
-}
-
-/* キラッと光る（STATUS全体） */
-.statusBar::after{
-  content:"";
-  position:absolute;
-  top:-30%;
-  left:-60%;
-  width:60%;
-  height:180%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.16), transparent);
-  transform: skewX(-18deg);
-  animation: statusShine 6.8s ease-in-out infinite;
-  pointer-events:none;
-  opacity:.55;
-}
-@keyframes statusShine{
-  0%{ left:-70%; opacity:0; }
-  12%{ opacity:.55; }
-  30%{ left:120%; opacity:0; }
-  100%{ left:120%; opacity:0; }
 }
 
 .statusTitle{
-  font-weight: 950;
-  letter-spacing: .08em;
-  font-size: 12px;
-  color: rgba(255,255,255,.90);
-  margin-bottom: 8px;
+  font-weight: 900;
+  letter-spacing:.14em;
+  font-size: 14px;
+  opacity: .85;
+  margin-bottom: 10px;
 }
+
 .statusGrid{
   display:grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
-  gap:10px;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: var(--status-gap);
 }
 
-/* STATUS: 上段（ランク / HKP）は高さ固定で以後動かさない */
-.statusRank{ --status-h: 132px; }
-.statusHkp { --status-h: 132px; }
-
-/* STATUS: 下段（Daily / Higacha）は縦幅を圧縮 */
-.statusDaily{ --status-h: 104px; }
-.statusHigacha{ --status-h: 104px; }
-
-/* visually-hidden helper (STATUS内の数値保持用) */
-.srOnly{
-  position:absolute !important;
-  width:1px; height:1px;
-  padding:0; margin:-1px;
-  overflow:hidden; clip:rect(0,0,0,0);
-  white-space:nowrap; border:0;
-}
-
-.statusItem{
-  padding:10px 10px;
-  border:1px solid rgba(255,255,255,.10);
-  border-radius: 14px;
-  background: rgba(0,0,0,.14);
-  position: relative;
-  overflow:hidden;
-
-  /* ✅ 基本の縦幅（ブロックごとに上書き可） */
-  --status-h: 132px;
+/* each tile fixed height */
+.statusBar .statusItem{
   height: var(--status-h);
-
+  border-radius: 20px;
+  background: rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.10);
+  padding: 12px 12px;
   display:flex;
   flex-direction:column;
-  justify-content: space-between;
-}
-.statusItem::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: radial-gradient(220px 80px at 30% 0%, rgba(255,255,255,.08), transparent 60%);
-  pointer-events:none;
-  opacity:.7;
-  z-index:0;
+  justify-content:center;
+  gap: 6px;
+  position:relative;
+  overflow:hidden;
 }
 
-
-.k{
-  display:flex;
-  align-items:center;
-  gap:8px;
+/* label + value */
+.statusBar .statusItem .k{
   font-size: 12px;
-  color: var(--sub);
-  position:relative;
-  z-index:1;
+  opacity:.75;
+  letter-spacing: .08em;
+  font-weight: 800;
 }
-.v{
-  margin-top:4px;
-  font-size: 18px;
+.statusBar .statusItem .v{
+  font-size: 34px;
   font-weight: 950;
-  color: rgba(255,255,255,.94);
-  position:relative;
-  z-index:1;
+  line-height:1;
 }
-.mini{ margin-top: 6px; font-size: 12px; color: rgba(255,255,255,.74); position:relative; z-index:1; }
-.miniNum{ font-weight: 950; color: rgba(255,255,255,.92); }
+.statusBar .statusItem .mini{
+  font-size: 12px;
+  opacity:.72;
+  font-weight: 750;
+}
+.statusBar .statusItem .miniNum{
+  font-weight: 950;
+}
 
+/* ===== help button ===== */
 .helpBtn{
-  border:none;
-  width:18px; height:18px;
-  border-radius: 10px;
-  background: rgba(127,231,255,.18);
-  color: rgba(255,255,255,.95);
-  font-weight:950;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.22);
+  background: rgba(0,0,0,.22);
+  color: rgba(255,255,255,.85);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  font-size: 14px;
+  line-height:1;
+  box-shadow: 0 0 16px rgba(255,255,255,.12);
   cursor:pointer;
 }
 
@@ -234,628 +198,254 @@ body{
 }
 .modeIcon img{
   width:48px; height:48px;
-  image-rendering: pixelated;
-  display:block;
+  object-fit:contain;
 }
 
-.higachaIcon{
-  width:48px;
-  height:48px;
-  display:block;
-  image-rendering: pixelated;
-  filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+/* ===== MISSION ===== */
+.mission{
+  border-radius: 22px;
+  background: rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  overflow:hidden;
 }
-
-@media (max-width: 520px){
-  .statusGrid{ grid-template-columns: 1fr 1fr; }
-}
-
-/* MISSIONBRIEF */
-.briefChip{ margin: 12px 0 0; }
-.briefChipBtn{
+.missionBtn{
   width:100%;
+  border:0;
+  background: transparent;
+  color: var(--text);
+  cursor:pointer;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:10px;
-  padding: 14px 14px;
-  min-height: 60px;
-  border-radius: 18px;
-  border:1px solid rgba(255,255,255,.18);
-  background:
-    radial-gradient(220px 80px at 18% 40%, rgba(127,231,255,.14), transparent 70%),
-    radial-gradient(240px 90px at 78% 30%, rgba(255,204,102,.12), transparent 70%),
-    linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.14));
-  color: rgba(255,255,255,.94);
-  cursor:pointer;
-  position: relative;
-  overflow:hidden;
-  box-shadow: 0 0 26px rgba(127,231,255,.08);
+  padding: 12px 14px;
+  gap: 10px;
 }
-.briefChipBtn::before{
-  content:"";
-  position:absolute;
-  left:0; top:0; bottom:0;
-  width: 6px;
-  background: linear-gradient(180deg, rgba(127,231,255,.95), rgba(255,85,214,.55));
-  opacity:.65;
-}
-.briefChipLeft{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  white-space: nowrap;
-}
-.briefChipTitle{
+.missionLeft{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
+.missionTitle{ font-weight: 900; letter-spacing:.06em; }
+.missionBadge{
   font-weight: 950;
-  letter-spacing:.06em;
-  color: rgba(127,231,255,.98);
-}
-.briefBadge{
-  font-size: 11px;
-  font-weight: 950;
-  letter-spacing: .08em;
-  padding: 6px 10px;
+  letter-spacing:.08em;
   border-radius: 999px;
-  border:1px solid rgba(255,255,255,.22);
-  background: rgba(255,85,214,.16);
-  color: rgba(255,255,255,.92);
-  box-shadow: 0 0 22px rgba(255,85,214,.16);
+  padding: 2px 10px;
+  background: rgba(203,255,92,.16);
+  border: 1px solid rgba(203,255,92,.28);
 }
-.briefBadge.is-new{
-  background: rgba(127,231,255,.16);
-  box-shadow: 0 0 22px rgba(127,231,255,.16);
+.missionUnread{
+  opacity:.78;
+  font-weight: 800;
 }
-.briefChipText{
-  flex:1;
-  text-align:left;
-  color: rgba(255,255,255,.90);
-  overflow:hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.briefChipIcon{
-  opacity:.95;
-  font-weight:950;
-  padding: 8px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.16);
-  background: rgba(0,0,0,.14);
-  transition: transform .22s ease, filter .22s ease;
-}
-.briefChipBtn.is-open .briefChipIcon{
-  transform: rotate(180deg);
-  filter: brightness(1.15);
-}
-.briefChipBtn.is-seen{
-  box-shadow: 0 0 22px rgba(255,255,255,.05);
-}
-.briefChipBtn.is-seen .briefChipTitle{
-  color: rgba(255,255,255,.90);
+.missionRight{ opacity:.75; font-weight: 900; }
+.missionBody{
+  padding: 10px 14px 14px;
+  border-top:1px solid rgba(255,255,255,.08);
+  color: rgba(255,255,255,.86);
+  line-height:1.65;
+  white-space:pre-wrap;
 }
 
-/* main */
-.wrap{
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 10px 14px 18px;
-}
-
-/* MODE DOCK */
-.modeDock{
+/* ===== MODES ===== */
+.modes{
   display:grid;
   grid-template-columns: 1fr 1fr;
-  gap:12px;
-  margin: 14px 0 14px;
-}
-@media (max-width: 380px){
-  .modeDock{ grid-template-columns: 1fr; }
+  gap: 12px;
 }
 
 .modeBtn{
-  min-height: 86px;
-  padding: 14px 14px;
   border-radius: 22px;
-  border:1px solid rgba(255,255,255,.18);
-  color: rgba(255,255,255,.96);
-  cursor:pointer;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  padding: 16px 14px;
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  color: var(--text);
+  text-decoration:none;
+}
+
+.modeBtn .modeName{
+  font-weight: 950;
+  letter-spacing:.06em;
+}
+
+/* ===== HUB ===== */
+.hub{
+  border-radius: 22px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+}
+.hubBtn{
+  width:100%;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:12px;
-  position:relative;
-  overflow:hidden;
-  background: rgba(255,255,255,.05);
-}
-
-/* Diagonal stripe overlay */
-.modeBtn::after{
-  content:"";
-  position:absolute;
-  inset:-40px;
-  pointer-events:none;
-  opacity:.42;
-  transform: rotate(-12deg);
-  background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,255,255,.00) 0px,
-      rgba(255,255,255,.00) 10px,
-      rgba(255,255,255,.07) 10px,
-      rgba(255,255,255,.07) 16px
-    );
-  mix-blend-mode: screen;
-}
-.modeFlash::after{
-  background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(127,231,255,.00) 0px,
-      rgba(127,231,255,.00) 10px,
-      rgba(127,231,255,.10) 10px,
-      rgba(127,231,255,.10) 16px
-    );
-}
-.modeBlitz::after{
-  background:
-    repeating-linear-gradient(
-      135deg,
-      rgba(255,204,102,.00) 0px,
-      rgba(255,204,102,.00) 10px,
-      rgba(255,204,102,.10) 10px,
-      rgba(255,204,102,.10) 16px
-    );
-}
-
-.modeLeft{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-  position:relative;
-  z-index:1;
-}
-
-.modeLabel{
-  display:flex;
-  flex-direction: column;
-  line-height: 1.02;
-  font-weight: 950;
-  letter-spacing:.10em;
-}
-.modeLine{ display:block; white-space: nowrap; }
-
-.modeFlash{
-  border-color: rgba(127,231,255,.38);
-  background:
-    radial-gradient(260px 90px at 20% 0%, rgba(127,231,255,.16), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16));
-  box-shadow: 0 0 34px rgba(127,231,255,.16);
-}
-.modeBlitz{
-  border-color: rgba(255,204,102,.34);
-  background:
-    radial-gradient(260px 90px at 20% 0%, rgba(255,204,102,.12), transparent 60%),
-    linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.16));
-  box-shadow: 0 0 34px rgba(255,85,214,.10);
-}
-
-.modeBtn.is-on{
-  transform: translateY(-2px);
-  filter: brightness(1.08);
-}
-
-/* Panels */
-.panel{
-  border:1px solid var(--line);
-  background: rgba(255,255,255,.04);
-  border-radius: var(--radius);
-  padding: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.grid{
-  display:grid;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-  gap:10px;
-}
-@media (min-width: 760px){
-  .grid{ grid-template-columns: repeat(3, minmax(0,1fr)); }
-}
-@media (max-width: 340px){
-  .grid{ grid-template-columns: 1fr; }
-}
-
-/* Cards */
-.card{
-  border-radius: 16px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(0,0,0,.14);
-  padding: 12px;
-}
-.cardTitle{
-  font-weight: 950;
-  font-size: 14px;
-  margin: 0 0 10px;
-}
-.cardActions{
-  display:flex;
-  gap:8px;
-  flex-direction: column;
-}
-
-/* Buttons */
-.aBtn{
-  width:100%;
-  min-height: 50px;
-  padding: 12px 12px;
-  border-radius: 14px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
-  font-weight: 950;
-  cursor:pointer;
-  text-align:center;
+  padding: 14px 14px;
+  gap: 12px;
   text-decoration:none;
-  display:inline-flex;
+  color: var(--text);
+}
+.hubIcon{
+  width:56px; height:56px;
+  border-radius: 999px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.18);
+  display:flex;
   align-items:center;
   justify-content:center;
-  white-space: nowrap;
-  position: relative;
   overflow:hidden;
 }
-.aBtn[aria-disabled="true"], .aBtn.is-disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  pointer-events:none;
-}
+.hubIcon img{ width:36px; height:36px; object-fit:contain; }
 
-.aBtn.primary{
-  border-color: rgba(127,231,255,.30);
-  background: rgba(127,231,255,.10);
-  box-shadow: 0 0 20px rgba(127,231,255,.12);
-}
+.hubText{ display:flex; flex-direction:column; }
+.hubTitle{ font-weight: 950; letter-spacing:.06em; }
+.hubSub{ opacity:.72; font-weight: 800; font-size: 12px; }
 
-/* EXPERT */
-.aBtn.danger{
-  border-color: rgba(255,85,214,.82);
-  background:
-    radial-gradient(160px 50px at 20% 30%, rgba(255,255,255,.18), transparent 70%),
-    linear-gradient(180deg, rgba(255,85,214,.32), rgba(255,85,214,.10));
-  box-shadow:
-    0 0 34px rgba(255,85,214,.36),
-    0 0 96px rgba(255,85,214,.20);
-  animation: expertPulse 2.0s ease-in-out infinite;
-}
-@keyframes expertPulse{
-  0%,100%{ transform: translateY(0); filter: brightness(1); }
-  50%{ transform: translateY(-1px); filter: brightness(1.14); }
-}
-
-/* Card archive row */
-.archiveCard{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding: 12px;
-  border-radius: 16px;
-  border:1px solid rgba(255,255,255,.14);
-  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(0,0,0,.10));
-  margin-bottom: 10px;
-}
-.archiveLeft{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:0;
-}
-.archiveText{
-  min-width:0;
-}
-.archiveTitle{
+.hubOpen{
   font-weight: 950;
-  letter-spacing: .06em;
-  white-space: nowrap;
+  letter-spacing:.10em;
+  opacity:.85;
 }
-.archiveSub{
-  margin-top: 2px;
-  font-size: 12px;
-  color: rgba(255,255,255,.72);
-  white-space: nowrap;
-}
-.archiveOpen{
-  flex:0 0 auto;
-  text-decoration:none;
-  font-weight: 950;
+
+/* ===== INSTALL ===== */
+.install{ display:flex; justify-content:center; }
+.installBtn{
+  border-radius: 999px;
+  padding: 10px 16px;
+  border:1px solid rgba(255,255,255,.18);
+  background: rgba(0,0,0,.20);
+  color: rgba(255,255,255,.92);
+  cursor:pointer;
+  box-shadow: 0 0 22px rgba(255,255,255,.10);
+  font-weight: 900;
   letter-spacing: .06em;
-  padding: 10px 14px;
+}
+
+/* ===== bottom bar ===== */
+.bottomBar{
+  position: sticky;
+  bottom: 10px;
+  z-index: 10;
+  display:flex;
+  flex-wrap:wrap;
+  gap: 8px;
+  align-items:center;
+  justify-content:center;
+  padding: 8px 8px 10px;
+  border-radius: 22px;
+  background: rgba(0,0,0,.25);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow: 0 14px 28px rgba(0,0,0,.35);
+}
+.bottomBtn{
   border-radius: 999px;
   border:1px solid rgba(255,255,255,.16);
-  background: rgba(0,0,0,.14);
+  background: rgba(255,255,255,.06);
   color: rgba(255,255,255,.92);
-}
-
-/* Icons */
-.miniIcon{
-  width:34px; height:34px;
-  image-rendering: pixelated;
-  display:block;
-  flex:0 0 auto;
-}
-
-/* Footer */
-.footer{ margin-top: 14px; padding-bottom: 10px; }
-.installBtn{
-  width:100%;
-  min-height: 48px;
-  padding: 12px 12px;
-  border-radius: 16px;
-  border:1px solid rgba(255,204,102,.30);
-  background: rgba(255,204,102,.12);
-  color: rgba(255,255,255,.94);
-  font-weight: 950;
-  letter-spacing: .04em;
+  font-weight: 900;
+  letter-spacing: .06em;
+  padding: 8px 12px;
+  display:flex;
+  align-items:center;
+  gap: 8px;
   cursor:pointer;
-  box-shadow: 0 0 28px rgba(255,204,102,.10);
 }
-.installBtn.is-disabled{ opacity: .55; cursor: default; }
-.installHint{ margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.68); }
+.bottomBtn:active{ transform: translateY(1px); }
+.bottomLabel{ font-size: 12px; }
+.bottomX{ opacity:.75; font-weight: 950; }
+.bottomIconOnly{ padding: 8px; }
+.bottomIcon{ width: 26px; height: 26px; object-fit:contain; }
 
-/* Modal */
+.bottomNote{
+  width:100%;
+  text-align:center;
+  opacity:.74;
+  font-weight: 800;
+  font-size: 12px;
+  padding-top: 2px;
+}
+
+/* ===== Overlay / modal ===== */
 .overlay{
-  position:fixed; inset:0;
-  background: rgba(0,0,0,.62);
+  position:fixed;
+  inset:0;
+  background: rgba(0,0,0,.58);
   display:flex;
   align-items:center;
   justify-content:center;
   padding: 16px;
-  z-index: 50;
+  z-index: 100;
 }
 .modal{
-  width: min(560px, 100%);
-  max-height: min(86vh, 720px);
-  display:flex;
-  flex-direction: column;
-  border-radius: 18px;
-  border:1px solid rgba(255,255,255,.16);
-  background: rgba(12,9,18,.90);
-  backdrop-filter: blur(12px);
+  width:min(560px, 92vw);
+  border-radius: 22px;
+  background: rgba(10,6,16,.92);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: 0 20px 50px rgba(0,0,0,.55);
   overflow:hidden;
 }
 .modalHead{
-  flex: 0 0 auto;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding: 12px 14px;
   border-bottom:1px solid rgba(255,255,255,.10);
 }
-.modalTitle{ font-weight: 950; letter-spacing:.06em; }
-.x{
-  width:44px;height:44px;
-  border-radius: 14px;
+.modalTitle{
+  font-weight: 950;
+  letter-spacing:.08em;
+}
+.modalHead .x{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
   border:1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.9);
-  font-size: 18px;
+  color: rgba(255,255,255,.92);
   cursor:pointer;
 }
 .modalBody{
-  flex: 1 1 auto;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
   padding: 14px;
-  color: rgba(255,255,255,.92);
+  color: rgba(255,255,255,.90);
+  line-height:1.7;
 }
-.leftPad{
-  text-align:left;
-  padding: 10px 12px;
-  border:1px solid rgba(255,255,255,.12);
+.leftPad{ padding-left: 4px; }
+.cta{
+  margin-top: 10px;
+  width: 100%;
   border-radius: 14px;
-  background: rgba(0,0,0,.16);
-  white-space: pre-line;
-}
-.gachaHero{ display:flex; justify-content:center; padding: 6px 0 10px; }
-.gachaImg{ width: 180px; height:auto; display:block; filter: drop-shadow(0 14px 26px rgba(0,0,0,.42)); }
-.gachaMsg{ white-space: pre-line; }
-.modalActions{ margin-top: 12px; display:flex; gap:10px; }
-.btnPrimary{
-  flex:1;
-  min-height: 44px;
-  padding: 12px 12px;
-  border-radius: 14px;
-  border:1px solid rgba(127,231,255,.24);
-  background: rgba(127,231,255,.10);
+  border:1px solid rgba(255,61,207,.35);
+  background:
+    radial-gradient(280px 90px at 50% 0%, rgba(255,61,207,.22), transparent 70%),
+    linear-gradient(180deg, rgba(255,61,207,.14), rgba(0,0,0,.18));
   color: rgba(255,255,255,.92);
   font-weight: 950;
+  letter-spacing:.10em;
+  padding: 12px 12px;
   cursor:pointer;
 }
-.note{ margin-top:10px; font-size: 12px; color: rgba(255,255,255,.62); }
 
-/* Brief list */
-.briefList{ margin:0; padding-left:0; list-style:none; }
-.briefItem{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:10px 10px;
-  border:1px solid rgba(255,255,255,.10);
-  border-radius: 14px;
-  background: rgba(0,0,0,.12);
-  margin: 8px 0;
-}
-.briefText{
-  flex:1;
-  color: rgba(255,255,255,.90);
-  line-height: 1.5;
-  word-break: break-word;
-  white-space: pre-wrap;
+/* ===== a11y helpers ===== */
+.srOnly{
+  position:absolute !important;
+  width:1px; height:1px;
+  padding:0; margin:-1px;
+  overflow:hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space:nowrap;
+  border:0;
 }
 
-/* EXPERT transition FX */
-.fxOverlay{
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background: rgba(0,0,0,.62);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  backdrop-filter: blur(2px);
-}
-.fxPulse{
-  width: 240px;
-  height: 240px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 50% 50%, rgba(255,85,214,.40), rgba(0,0,0,0) 60%);
-  box-shadow:
-    0 0 80px rgba(255,85,214,.25),
-    0 0 140px rgba(255,85,214,.18);
-  animation: fxPop .36s ease-out forwards;
-}
-@keyframes fxPop{
-  0%{ transform: scale(.82); opacity:.0; }
-  25%{ opacity: 1; }
-  100%{ transform: scale(1.10); opacity: 1; }
+/* ===== responsive ===== */
+@media (max-width: 680px){
+  .statusGrid{ grid-template-columns: 1fr 1fr; }
 }
 
-/* =========================
-   Daily ring UI (STATUS内)
-   ========================= */
-.ringRow{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-top:4px;
-  position:relative;
-  z-index:1;
-}
-.ringBox{
-  width:64px;
-  height:64px;
-  position:relative;
-  flex:0 0 auto;
-}
-.ring{
-  width:64px;
-  height:64px;
-  display:block;
-  transform: rotate(-90deg);
-}
-.ringTrack{
-  fill:none;
-  stroke: rgba(255,255,255,.12);
-  stroke-width: 7;
-}
-.ringProg{
-  fill:none;
-  stroke: rgba(127,231,255,.55);
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-dasharray: 138.23;
-  stroke-dashoffset: 138.23;
-  filter: drop-shadow(0 0 10px rgba(127,231,255,.18));
-}
-.ringCenter{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  transform: translateY(1px);
-}
-.ringNum{
-  font-weight: 950;
-  font-size: 16px;
-  line-height: 1;
-}
-.ringDen{
-  margin-top:2px;
-  font-size: 11px;
-  color: rgba(255,255,255,.70);
-  letter-spacing:.04em;
-}
-.ringHint{
-  font-size: 11px;
-  color: rgba(255,255,255,.72);
-}
-.ringReward{
-  margin-top:2px;
-  font-size: 12px;
-  font-weight: 950;
-  color: rgba(255,255,255,.88);
-}
-
-/* Debug buttons inside STATUS item */
-.statusDbg{
-  margin-top: 6px;
-  display:flex;
-  gap:6px;
-  position:relative;
-  z-index:1;
-}
-.dbgBtn{
-  flex:1;
-  min-height: 38px;
-  border-radius: 12px;
-  border:1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.92);
-  font-weight: 900;
-}
-.dbgMini{
-  min-height: 30px;
-  font-size: 12px;
-  padding: 8px 8px;
-}
-.statusItem > *{ position:relative; z-index:1; }
-
-
-.statusDaily .k{ justify-content:space-between; color: rgba(255,255,255,.92); }
-
-.ringCenter{ transform: translateY(1px) !important; }
-
-
-/* =========================
-   STATUS compact patch (20260301)
-   - Only affects STATUS area
-========================= */
-.statusBar .statusGrid{
-  gap: 10px;
-}
-
-.statusBar .statusItem{
-  height: 88px;            /* was 132px */
-  padding: 12px 14px;      /* tighter */
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.statusBar .statusItem .k{
-  font-size: 14px;
-  letter-spacing: .08em;
-}
-
-.statusBar .statusItem .v{
-  font-size: 24px;         /* readable but compact */
-  line-height: 1.05;
-  margin-top: 2px;
-}
-
-.statusBar .statusItem .mini{
-  font-size: 12px;
-  opacity: .7;
-}
-
-.statusBar .statusItem .miniNum{
-  font-weight: 700;
-  opacity: 1;
-}
-
-/* HKP / Daily help buttons keep position (inside .k flex row) */
+/* ------------------------------------------------------
+   STATUS内の微調整（既存運用のまま）
+------------------------------------------------------ */
 .statusBar .statusItem .k{
   display:flex;
   align-items:center;
@@ -935,4 +525,24 @@ body{
 .statusBar .statusGacha .modeIcon img{
   width: 34px;
   height: 34px;
+}
+
+/* ------------------------------------------------------
+   STATUS compact patch (20260301) - 現状運用のまま
+------------------------------------------------------ */
+.statusBar{
+  padding: 10px 10px;
+}
+.statusTitle{
+  margin-bottom: 8px;
+}
+.statusBar .statusItem{
+  height: var(--status-h);
+  padding: 10px 10px;
+}
+.statusBar .statusItem .v{
+  font-size: 32px;
+}
+.statusBar .statusItem .mini{
+  font-size: 12px;
 }
