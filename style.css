@@ -797,179 +797,105 @@ body{
 
 .ringCenter{ transform: translateY(1px) !important; }
 
+
 /* =========================
-   STATUS compact fix (CSS only)
+   STATUS compact (only)
    ========================= */
-
-/* STATUS 全体を詰める */
 .statusBar{
-  padding: 10px !important;
+  padding: 10px 10px;
 }
-
-/* STATUS 内グリッドを安定させる */
 .statusGrid{
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
-/* スマホ時：2×2で固定（HIGACHAが外に出ない） */
-@media (max-width: 420px){
-  .statusGrid{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+/* target only status tiles */
+.statusBar .statusItem{
+  padding: 8px 10px;
+  min-height: 86px; /* ~65% of previous 132px */
 }
 
-/* 各 STATUS カードの縦幅を揃える */
-.statusItem{
-  min-height: 96px;
-  padding: 8px 8px !important;
-}
-
-/* 中の文字を詰める */
-.statusItem .k{
-  font-size: 11px;
-}
-.statusItem .v{
-  font-size: 16px;
-  margin-top: 2px;
-}
-.statusItem .mini{
-  margin-top: 4px;
-  font-size: 11px;
-}
-
-/* HIGACHA ボタンをカード内に収める */
-.statusItem .higachaBtn{
-  margin-top: 4px;
-  min-height: 40px;
-  padding: 8px;
+/* top rows */
+.statusBar .k{
   font-size: 12px;
 }
-
-/* 黒ずみ対策：STATUS限定で背景を少し明るく */
-.statusItem{
-  background: rgba(255,255,255,.05) !important;
+.statusBar .kTop{
+  justify-content: space-between;
 }
 
-/* STATUS だけカード演出を軽くする */
-.statusBar::before,
-.statusBar::after,
-.statusItem::before,
-.statusItem::after{
-  opacity: .45;
-}
-
-/* =========================
-   STATUS compact (65% target)
-   ========================= */
-.statusBar{
-  padding: 8px !important;
-}
-
-.statusGrid{
-  gap: 7px !important;
-}
-
-.statusItem{
-  min-height: 62px !important;     /* 96px → 約65% */
-  padding: 6px 7px !important;     /* 10→6 */
-}
-
-.statusItem .k{
-  font-size: 10.5px !important;
-  gap: 6px !important;
-}
-
-.statusItem .v{
-  font-size: 15px !important;
-  margin-top: 1px !important;
-  line-height: 1.05 !important;
-}
-
-.statusItem .mini{
-  margin-top: 2px !important;
-  font-size: 10.5px !important;
-  line-height: 1.1 !important;
-}
-
-/* HIGACHAボタンが収まるようにさらに詰める */
-.statusItem .higachaBtn{
-  margin-top: 3px !important;
-  min-height: 34px !important;
-  padding: 6px 8px !important;
-  font-size: 11px !important;
-}
-
-/* まだ黒く沈むなら少しだけ持ち上げる（STATUS内だけ） */
-.statusItem{
-  background: rgba(255,255,255,.055) !important;
-}
-
-/* =========================
-   Mode selected dot restore
-   ========================= */
-.modeBtn{
-  position: relative; /* 念のため */
-}
-
-.modeBtn.is-on::before{
-  content:"";
-  position:absolute;
-  left:10px;
-  top:10px;
-  width:10px;
-  height:10px;
-  border-radius:999px;
-  background: rgba(255,255,255,.88);
-  box-shadow: 0 0 16px rgba(255,255,255,.22);
-  opacity:.75;
-  z-index: 3;
-  pointer-events:none;
-}
-
-
-/* ===== STATUS fine tuning ===== */
-.helpBtn--corner{
-  position:absolute;
-  right:10px;
-  top:10px;
-}
-
-.statusHKP .k,
-.statusDaily .k{
-  position:relative;
-  padding-right: 28px;
-}
-
-.statusRank .v,
-.statusHKP .v{
+/* values: tighter */
+.statusBar .v{
+  margin-top: 6px;
   font-size: 22px;
   line-height: 1.05;
 }
+.statusBar .mini{
+  margin-top: 6px;
+  font-size: 11px;
+}
 
-.ringWrap{
-  margin-top: 10px;
+/* help button keeps position (inline at top-right) and stays clickable */
+.statusBar .helpBtn{
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* DAILY center ring */
+.statusDaily .dailyCenter{
+  margin-top: 4px;
   display:flex;
+  justify-content: center;
+  align-items: center;
+}
+.statusDaily .ringBox{
+  width: 66px;
+  height: 66px;
+}
+.statusDaily .ring{
+  width: 66px;
+  height: 66px;
+}
+.statusDaily .ringNum{ font-size: 18px; }
+.statusDaily .ringDen{ font-size: 11px; }
+
+/* HIGACHA tile as button */
+.statusHigacha{
+  cursor: pointer;
+  text-align: center;
+}
+.statusHigacha:disabled,
+.statusHigacha.is-disabled{
+  opacity: .55;
+  cursor: not-allowed;
+}
+.higachaInner{
+  height: 100%;
+  display:flex;
+  flex-direction: column;
+  align-items:center;
   justify-content:center;
+  gap: 8px;
 }
-
-.modeIcon--mini{
-  width:48px;
-  height:48px;
+.higachaIconWrap{
+  width: 54px;
+  height: 54px;
 }
-.modeIcon--mini img{
-  width:42px;
-  height:42px;
-}
-
-.statusHigacha .higachaBtn{
-  min-height: 0;
-  padding: 10px;
-  gap: 10px;
-  justify-content:flex-start;
+.higachaIconWrap img{
+  width: 46px;
+  height: 46px;
 }
 .higachaLabel{
-  font-weight:950;
-  letter-spacing:.06em;
+  font-weight: 950;
+  letter-spacing: .08em;
+}
+
+/* Mobile: keep 2x2 */
+@media (max-width: 420px){
+  .statusGrid{ grid-template-columns: 1fr 1fr; }
 }
