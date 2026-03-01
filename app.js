@@ -158,12 +158,12 @@
     const btn = $("btnHigacha");
     if (!btn) return;
     const ok = canHigachaToday();
-    btn.disabled = !ok;
+    // ✅ disabled にするとモーダルが開けなくなるため、見た目だけ落とす
+    btn.disabled = false;
     btn.classList.toggle("is-disabled", !ok);
     btn.setAttribute("aria-disabled", String(!ok));
   }
-
-  function renderRankPlaceholder() {
+function renderRankPlaceholder() {
     const el = $("rankValue");
     if (el) el.textContent = "-";
   }
@@ -302,11 +302,15 @@ HKPを入手できます。
 
 ※HIGACHAは1日1回まで`;
 
-    on(helpBtn, "click", () => {
+        on(helpBtn, "click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const other = $("dailyHelpOverlay");
+      if (other) { other.style.display = "none"; other.setAttribute("aria-hidden", "true"); }
       body.textContent = text;
       open();
     });
-  }
+}
 
   
   // =========================
