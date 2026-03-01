@@ -45,52 +45,25 @@
 
         <!-- DAILY 50 (circular gauge) -->
         <div class="statusItem statusDaily">
-  <div class="k">
-    <span>FLASH DAILY 50</span>
-    <button class="helpBtn" id="btnDailyHelp" type="button" aria-label="FLASH DAILY 50の説明">?</button>
-  </div>
-
-  <div class="ringRow">
-    <div class="ringBox" aria-hidden="true">
-      <svg class="ring" viewBox="0 0 52 52" aria-hidden="true" focusable="false">
-        <circle class="ringTrack" cx="26" cy="26" r="22"></circle>
-        <circle class="ringProg" id="dailyRingProg" cx="26" cy="26" r="22"></circle>
-      </svg>
-      <div class="ringCenter">
-        <div class="ringNum" id="dailySeen">0</div>
-      </div>
-    </div>
-
-    <div class="ringText">
-      <div class="ringReward">×5 → +2HKP</div>
-    </div>
-  </div>
-</div>
-            </div>
-
-            <div class="ringText">
-              <div class="ringHint">合計（1日1回カウント）</div>
-              <div class="ringReward">×5 → +2HKP</div>
-            </div>
+          <div class="k">
+            <span>FLASH DAILY</span>
+            <button class="helpBtn" id="btnDailyHelp" type="button" aria-label="FLASH DAILYの説明">?</button>
           </div>
 
-          <!-- Debug (keep visible in testpage) -->
-          <div class="dailyDbg statusDbg" id="dailyDbg">
-            <button class="dbgBtn dbgMini" id="dbgAdd10" type="button">+10</button>
-            <button class="dbgBtn dbgMini" id="dbgAdd50" type="button">+50</button>
-            <button class="dbgBtn dbgMini" id="dbgResetDaily" type="button">RESET</button>
+          <!-- 進捗値（表示はしない：JSが更新する） -->
+          <span class="srOnly" id="dailySeen">0</span>
+
+          <div class="dailyBarMini" aria-hidden="true">
+            <i id="dailyBarFill"></i>
           </div>
         </div>
 
         <!-- HIGACHA -->
         <div class="statusItem statusHigacha">
-          <button class="higachaBtn higachaBig" id="btnHigacha" type="button">
-            <span class="higachaTop">
-              <span class="modeIcon" aria-hidden="true">
-                <img class="higachaIcon" src="./higacha_e.png" alt="">
-              </span>
+          <button class="higachaBtn" id="btnHigacha" type="button" aria-label="HIGACHA">
+            <span class="modeIcon" aria-hidden="true">
+              <img class="higachaIcon" src="./higacha.png" alt="" />
             </span>
-            <span class="higachaLabel">HIGACHA</span>
           </button>
         </div>
       </div>
@@ -184,11 +157,11 @@
     </div>
   </div>
 
-  <!-- Daily Help Modal -->
+  <!-- Daily50 Help -->
   <div class="overlay" id="dailyHelpOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="FLASH DAILYの説明">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="FLASH DAILY 50の説明">
       <div class="modalHead">
-        <div class="modalTitle">FLASH DAILY</div>
+        <div class="modalTitle">FLASH DAILY 50</div>
         <button class="x" id="dailyHelpClose" type="button" aria-label="閉じる">×</button>
       </div>
       <div class="modalBody">
@@ -207,7 +180,7 @@
 
       <div class="modalBody">
         <div class="gachaHero">
-          <img class="gachaImg" src="./higacha.png" alt="HIGACHA" />
+          <img class="gachaImg" src="./assets/higacha.png" alt="HIGACHA" />
         </div>
 
         <div class="gachaMsg leftPad" id="higachaMsg"></div>
