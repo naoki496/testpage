@@ -296,7 +296,7 @@ Higashi Kokugo Point の略称。
 
 BLITZQUESTの学習時、
 一定条件でHKPを入手できます。
-また、TOPページの「HIGACHA」を回すことでも
+TOPページの「HIGACHA」を回すことでも
 HKPを入手できます。
 時々+2になることも…？
 
