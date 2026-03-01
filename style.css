@@ -119,6 +119,24 @@ body{
   grid-template-columns: repeat(4, minmax(0,1fr));
   gap:10px;
 }
+
+/* STATUS: 上段（ランク / HKP）は高さ固定で以後動かさない */
+.statusRank{ --status-h: 132px; }
+.statusHkp { --status-h: 132px; }
+
+/* STATUS: 下段（Daily / Higacha）は縦幅を圧縮 */
+.statusDaily{ --status-h: 104px; }
+.statusHigacha{ --status-h: 104px; }
+
+/* visually-hidden helper (STATUS内の数値保持用) */
+.srOnly{
+  position:absolute !important;
+  width:1px; height:1px;
+  padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0);
+  white-space:nowrap; border:0;
+}
+
 .statusItem{
   padding:10px 10px;
   border:1px solid rgba(255,255,255,.10);
@@ -127,8 +145,10 @@ body{
   position: relative;
   overflow:hidden;
 
-  /* 高さ固定（4枚同じ縦幅） */
-  height: 132px;
+  /* ✅ 基本の縦幅（ブロックごとに上書き可） */
+  --status-h: 132px;
+  height: var(--status-h);
+
   display:flex;
   flex-direction:column;
   justify-content: space-between;
@@ -877,6 +897,7 @@ body{
   position: relative;
   width: 100%;
   height: 10px;
+  margin-top: 8px;
   border-radius: 999px;
   background: rgba(255,255,255,0.10);
   overflow:hidden;
