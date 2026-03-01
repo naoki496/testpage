@@ -158,12 +158,12 @@
     const btn = $("btnHigacha");
     if (!btn) return;
     const ok = canHigachaToday();
-    // ✅ disabled にするとモーダルが開けなくなるため、見た目だけ落とす
-    btn.disabled = false;
+    // NOTE: do NOT set btn.disabled here; we still want the modal to open and show the message.
     btn.classList.toggle("is-disabled", !ok);
     btn.setAttribute("aria-disabled", String(!ok));
   }
-function renderRankPlaceholder() {
+
+  function renderRankPlaceholder() {
     const el = $("rankValue");
     if (el) el.textContent = "-";
   }
@@ -302,15 +302,11 @@ HKPを入手できます。
 
 ※HIGACHAは1日1回まで`;
 
-        on(helpBtn, "click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const other = $("dailyHelpOverlay");
-      if (other) { other.style.display = "none"; other.setAttribute("aria-hidden", "true"); }
+    on(helpBtn, "click", () => {
       body.textContent = text;
       open();
     });
-}
+  }
 
   
   // =========================
@@ -633,17 +629,11 @@ TOTAL ${getHKP()} HKP`;
     const seenEl = $("dailySeen");
     if (seenEl) seenEl.textContent = String(seen);
 
-    const ring = $("dailyRingProg");
-    const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
-    if (ring) {
-      const r = 22;
-      const circ = 2 * Math.PI * r;
-      ring.style.strokeDasharray = String(circ);
-      ring.style.strokeDashoffset = String(circ * (1 - pct / 100));
+    const fillEl = $("dailyBarFill");
+    if (fillEl) {
+      const pct = Math.max(0, Math.min(100, (seen / 50) * 100));
+      fillEl.style.width = `${pct.toFixed(1)}%`;
     }
-
-    const dbg = $("dailyDbg");
-    if (dbg) dbg.hidden = !DAILY_DEBUG;
   }
 
   function tryProgressDaily(st) {
