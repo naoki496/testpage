@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#140817" />
   <title>八東国語LOBBY</title>
-  <link rel="manifest" href="./manifest.json" />
   <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
   <div class="bg"></div>
 
-  <header class="top">
-    <div class="logoWrap" aria-label="八東国語LOBBY ロゴ">
-      <img class="logo" id="topLogo" src="./H.K.LOBBY.png" alt="八東国語LOBBY" />
+  <main class="wrap" id="app" aria-label="八東国語LOBBY">
+
+    <header class="hero" aria-label="ヘッダー">
+      <img class="logo" src="./H.K.LOBBY.png" alt="八東国語LOBBY" onerror="this.style.display='none';document.getElementById('logoFallback').hidden=false;" />
       <div class="logoFallback" id="logoFallback" hidden>
         <div class="logoFallbackTitle">八東国語LOBBY</div>
         <div class="logoFallbackSub">H.K. LOBBY</div>
       </div>
-    </div>
+    </header>
 
     <!-- STATUS -->
     <section class="statusBar" aria-label="STATUS">
@@ -47,7 +47,6 @@
         <div class="statusItem statusDaily">
           <div class="k">
             <span>FLASH DAILY</span>
-            <button class="helpBtn" id="btnDailyHelp" type="button" aria-label="FLASH DAILYの説明">?</button>
           </div>
 
           <!-- 進捗値（表示はしない：JSが更新する） -->
@@ -70,81 +69,89 @@
     </section>
 
     <!-- MISSIONBRIEF -->
-    <section class="briefChip" aria-label="MISSIONBRIEF">
-      <button class="briefChipBtn" id="btnBriefOpen" type="button" aria-haspopup="dialog">
-        <span class="briefChipLeft">
-          <span class="briefChipTitle">MISSION BRIEF【お知らせ】</span>
-          <span class="briefBadge" id="briefBadge" hidden>UPDATE</span>
+    <section 
+      class="mission"
+      aria-label="MISSION BRIEF"
+    >
+      <button class="missionBtn" id="btnMission" type="button">
+        <span class="missionLeft">
+          <span class="missionTitle">MISSION BRIEF〖お知らせ〗</span>
+          <span class="missionBadge" id="missionBadge" aria-live="polite">UPDATE</span>
+          <span class="missionUnread" id="missionUnread" aria-live="polite">（未読）</span>
         </span>
-        <span class="briefChipText" id="briefOneLine">（未読）</span>
-        <span class="briefChipIcon" aria-hidden="true">▼</span>
+        <span class="missionRight" aria-hidden="true">▼</span>
       </button>
+      <div class="missionBody" id="missionBody" hidden></div>
     </section>
-  </header>
 
-  <main class="wrap" id="app">
-    <!-- Tabs -->
-    <nav class="modeDock" aria-label="mode switch">
-      <button class="modeBtn modeFlash is-on" id="tabFlash" type="button">
-        <span class="modeLeft">
-          <span class="modeIcon" aria-hidden="true">
-            <img src="./flashcard_e.png" alt="">
-          </span>
-          <span class="modeLabel">
-            <span class="modeLine">FLASH</span>
-            <span class="modeLine">CARD</span>
-          </span>
+    <!-- modes -->
+    <section class="modes" aria-label="モード選択">
+      <a class="modeBtn modeFlash" href="https://naoki496.github.io/kobun-quiz/" aria-label="FLASH CARD">
+        <span class="modeIcon" aria-hidden="true">
+          <img src="./flash.png" alt="" />
         </span>
+        <span class="modeName">FLASH CARD</span>
+      </a>
+
+      <a class="modeBtn modeBlitz" href="https://naoki496.github.io/blitz-quest/" aria-label="BLITZ QUEST">
+        <span class="modeIcon" aria-hidden="true">
+          <img src="./blitz.png" alt="" />
+        </span>
+        <span class="modeName">BLITZ QUEST</span>
+      </a>
+    </section>
+
+    <!-- card hub -->
+    <section class="hub" aria-label="カード図鑑">
+      <a class="hubBtn" href="https://naoki496.github.io/cards-hub/" aria-label="カード図鑑">
+        <span class="hubIcon" aria-hidden="true">
+          <img src="./archive.png" alt="" />
+        </span>
+        <span class="hubText">
+          <span class="hubTitle">カード図鑑</span>
+          <span class="hubSub">CARD ARCHIVE</span>
+        </span>
+        <span class="hubOpen" aria-hidden="true">OPEN</span>
+      </a>
+    </section>
+
+    <!-- install -->
+    <section class="install" aria-label="インストール">
+      <button class="installBtn" id="btnInstall" type="button" hidden>アプリとしてインストール</button>
+    </section>
+
+    <!-- bottom quick -->
+    <nav class="bottomBar" aria-label="クイック">
+      <button class="bottomBtn" id="btnHkp" type="button" aria-label="HKP">
+        <span class="bottomLabel">HKP</span>
+        <span class="bottomX" aria-hidden="true">×</span>
       </button>
 
-      <button class="modeBtn modeBlitz" id="tabBlitz" type="button">
-        <span class="modeLeft">
-          <span class="modeIcon" aria-hidden="true">
-            <img src="./blitzquest_e.png" alt="">
-          </span>
-          <span class="modeLabel">
-            <span class="modeLine">BLITZ</span>
-            <span class="modeLine">QUEST</span>
-          </span>
-        </span>
+      <button class="bottomBtn" id="btnDaily" type="button" aria-label="FLASH DAILY 50">
+        <span class="bottomLabel">FLASH DAILY 50</span>
+        <span class="bottomX" aria-hidden="true">×</span>
       </button>
+
+      <button class="bottomBtn" id="btnHigachaOpen" type="button" aria-label="HIGACHA">
+        <span class="bottomLabel">HIGACHA</span>
+        <span class="bottomX" aria-hidden="true">×</span>
+      </button>
+
+      <button class="bottomBtn bottomIconOnly" id="btnHigacha" type="button" aria-label="HIGACHA">
+        <img class="bottomIcon" src="./higacha.png" alt="" />
+      </button>
+
+      <button class="bottomBtn" id="btnHigachaClose" type="button" aria-label="DRAW CLOSE">
+        <span class="bottomLabel">DRAW CLOSE</span>
+        <span class="bottomX" aria-hidden="true">×</span>
+      </button>
+
+      <div class="bottomNote" id="bottomNote">※HIGACHAは1日1回まで</div>
     </nav>
 
-    <!-- FLASH -->
-    <section class="panel" id="panelFlash">
-      <div class="grid" id="flashGrid"></div>
-    </section>
-
-    <!-- BLITZ -->
-    <section class="panel" id="panelBlitz" hidden>
-      <div class="archiveCard" aria-label="カード図鑑リンク">
-        <div class="archiveLeft">
-          <span class="modeIcon" aria-hidden="true">
-            <img class="miniIcon" src="./zukan_e.png" alt="">
-          </span>
-          <div class="archiveText">
-            <div class="archiveTitle">カード図鑑</div>
-            <div class="archiveSub">CARD ARCHIVE</div>
-          </div>
-        </div>
-
-        <a class="archiveOpen" href="https://naoki496.github.io/cards-hub/">OPEN</a>
-      </div>
-
-      <div class="grid" id="blitzGrid"></div>
-    </section>
-
-    <footer class="footer">
-      <button class="installBtn" id="btnInstall" type="button">アプリとしてインストール</button>
-      <div class="installHint" id="installHint" hidden></div>
-    </footer>
   </main>
 
-  <div class="fxOverlay" id="fxOverlay" aria-hidden="true" style="display:none">
-    <div class="fxPulse" aria-hidden="true"></div>
-  </div>
-
-  <!-- HKP Help Modal -->
+  <!-- HKP Help -->
   <div class="overlay" id="hkpHelpOverlay" style="display:none" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-label="HKPの説明">
       <div class="modalHead">
@@ -177,33 +184,11 @@
         <div class="modalTitle">HIGACHA</div>
         <button class="x" id="higachaClose" type="button" aria-label="閉じる">×</button>
       </div>
-
       <div class="modalBody">
-        <div class="gachaHero">
-          <img class="gachaImg" src="./assets/higacha.png" alt="HIGACHA" />
+        <div class="leftPad">
+          <p>DRAWを押すと、本日のガチャが実行されます。</p>
+          <button class="cta" id="btnDraw" type="button">DRAW</button>
         </div>
-
-        <div class="gachaMsg leftPad" id="higachaMsg"></div>
-
-        <div class="modalActions">
-          <button class="btnPrimary" id="higachaDraw" type="button">DRAW</button>
-          <button class="btnPrimary ghostBtn" id="higachaCancel" type="button">CLOSE</button>
-        </div>
-
-        <div class="note">※HIGACHAは1日1回まで</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MISSIONBRIEF Modal -->
-  <div class="overlay" id="briefOverlay" style="display:none" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="MISSIONBRIEF">
-      <div class="modalHead">
-        <div class="modalTitle">MISSION BRIEF【お知らせ】</div>
-        <button class="x" id="briefClose" type="button" aria-label="閉じる">×</button>
-      </div>
-      <div class="modalBody">
-        <ul class="briefList" id="briefList"></ul>
       </div>
     </div>
   </div>
