@@ -13,9 +13,9 @@
   const BRIEF_SEEN_KEY = "hklobby.v1.missionBrief.seenSignature";
 
   // Daily 50
-  // st = {date, progressed, streak, touched}
+  // st = {date, rewarded, touched}
   const DAILY_STATE_KEY = "hklobby.v1.flashDaily50";
-  const DAILY_DEBUG = false; // testpage: true / 本番: false 推奨 // testpage: true / 本番: false 推奨
+  const DAILY_DEBUG = false; // testpage: true / 本番: false 推奨
 
   // FLASH apps should store today's seen count here (numbers)
   const FLASH_TODAY_KEYS = [
@@ -308,9 +308,8 @@ HKPを入手できます。
     });
   }
 
-  
   // =========================
-  // Daily50 Help
+  // Daily50 Help  ※仕様変更反映
   // =========================
   function initDailyHelp() {
     const btn = $("btnDailyHelp");
@@ -322,12 +321,11 @@ HKPを入手できます。
 `FLASH DAILY 50 とは？
 
 FLASHCARD（古文単語330 / 助動詞確認 / 文学知識総合）で
-「本日見たカード枚数（合計）」が 50 に到達すると 1回進行します。
+「本日見たカード枚数（合計）」が 50 に到達すると、
+その日に限り +1HKP を付与します（1日1回まで）。
 
-進行が 5 回分たまると、自動で +2HKP を付与し、カウントは 0 に戻ります。
-
-※カウントは端末の保存データ（localStorage）に記録されます。
-※実装テスト用のデバッグ機能は、必要なときだけ表示を戻します。`;
+※100枚見ても +2 にはなりません。
+※カウントは端末の保存データ（localStorage）に記録されます。`;
 
     on(btn, "click", () => {
       body.textContent = text;
@@ -335,7 +333,7 @@ FLASHCARD（古文単語330 / 助動詞確認 / 文学知識総合）で
     });
   }
 
-// =========================
+  // =========================
   // HIGACHA modal
   // =========================
   function initHigacha() {
@@ -567,7 +565,7 @@ TOTAL ${getHKP()} HKP`;
   }
 
   // =========================
-  // Daily 50 logic
+  // Daily 50 logic  ※仕様変更反映
   // =========================
   function readNum(key) {
     const n = Number(localStorage.getItem(key));
@@ -591,37 +589,44 @@ TOTAL ${getHKP()} HKP`;
     return FLASH_TODAY_KEYS.reduce((sum, k) => sum + readNum(k), 0);
   }
 
+  // ✅ st の互換移行（旧: {date, progressed, streak, touched} でも壊さない）
+  function normalizeDailyStateObject(st, today) {
+    const o = (st && typeof st === "object") ? st : {};
+    const date = String(o.date || today);
+
+    // 旧仕様フィールドから推定
+    const legacyProgressed = !!o.progressed;
+    const legacyStreak = Math.max(0, Math.trunc(Number(o.streak) || 0));
+
+    // 新仕様：rewarded（その日に+HKP付与済みか）
+    const rewarded = !!o.rewarded || legacyProgressed || false;
+
+    const touched = !!o.touched;
+
+    return { date, rewarded, touched, __legacyStreak: legacyStreak };
+  }
+
   function ensureDailyState() {
     const t = todayYMD();
-    let st = loadDailyState();
+    let stRaw = loadDailyState();
+    let st = normalizeDailyStateObject(stRaw, t);
 
-    if (!st || typeof st !== "object") {
-      st = { date: t, progressed: false, streak: 0, touched: false };
+    // 日付が違うなら当日状態へリセット（1日1回ルール用）
+    if (st.date !== t) {
+      // 旧ロジックの減衰などは不要（仕様変更）
+      // ただし touched は日次管理に必要なので reset
+      st = { date: t, rewarded: false, touched: false };
       saveDailyState(st);
       return st;
     }
 
-    st.date = String(st.date || t);
-    st.progressed = !!st.progressed;
-    st.streak = Math.max(0, Math.trunc(Number(st.streak) || 0));
+    // 当日でも、必要フィールドを補完
+    st.date = t;
+    st.rewarded = !!st.rewarded;
     st.touched = !!st.touched;
 
-    if (st.date !== t) {
-      const gap = diffDays(st.date, t);
-      if (gap >= 1) {
-        let dec = 0;
-        if (!st.touched) dec += 1;
-        if (gap > 1) dec += (gap - 1);
-        st.streak = Math.max(0, st.streak - dec);
-      }
-
-      st.date = t;
-      st.progressed = false;
-      st.touched = false;
-      saveDailyState(st);
-    }
-
-    st.streak = Math.max(0, Math.min(4, st.streak));
+    // 旧streakが残っていても使わない（保存から落とす）
+    saveDailyState({ date: st.date, rewarded: st.rewarded, touched: st.touched });
     return st;
   }
 
@@ -646,29 +651,28 @@ TOTAL ${getHKP()} HKP`;
     if (dbg) dbg.hidden = !DAILY_DEBUG;
   }
 
+  // ✅ 50到達で +1HKP（1日1回まで）
   function tryProgressDaily(st) {
     const seen = getTodaySeenTotal();
 
     if (seen > 0 && !st.touched) {
       st.touched = true;
-      saveDailyState(st);
+      saveDailyState({ date: st.date, rewarded: st.rewarded, touched: st.touched });
     }
 
     renderDailyUI(seen);
 
-    if (st.progressed) return;
+    // すでに当日付与済みなら何もしない（100枚でも2回目は不可）
+    if (st.rewarded) return;
+
+    // 50未満なら付与しない
     if (seen < 50) return;
 
-    st.progressed = true;
+    // ✅ ここで1回だけ +1
+    addHKP(1);
+    st.rewarded = true;
     st.touched = true;
-
-    let next = (Number(st.streak) || 0) + 1;
-    if (next >= 5) {
-      addHKP(2);
-      next = 0;
-    }
-    st.streak = Math.max(0, Math.min(4, next));
-    saveDailyState(st);
+    saveDailyState({ date: st.date, rewarded: st.rewarded, touched: st.touched });
 
     renderDailyUI(seen);
   }
@@ -701,13 +705,7 @@ TOTAL ${getHKP()} HKP`;
     on(reset, "click", () => {
       FLASH_TODAY_KEYS.forEach((k) => localStorage.setItem(k, "0"));
       const t = todayYMD();
-      const prev = loadDailyState();
-      const st = {
-        date: t,
-        progressed: false,
-        streak: Math.max(0, Math.trunc(Number(prev?.streak) || 0)),
-        touched: false
-      };
+      const st = { date: t, rewarded: false, touched: false };
       saveDailyState(st);
       const now = ensureDailyState();
       tryProgressDaily(now);
