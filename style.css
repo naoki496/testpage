@@ -936,3 +936,41 @@ body{
   width: 34px;
   height: 34px;
 }
+
+/* ===== Mode selected mark (top-left) ===== */
+/* レイアウト不変：absoluteの擬似要素で“印”だけ重ねる */
+
+@keyframes modeMarkPulse{
+  0%   { transform: scale(1);   opacity: .90; }
+  50%  { transform: scale(1.12); opacity: 1.00; }
+  100% { transform: scale(1);   opacity: .90; }
+}
+
+.modeBtn.is-on::before{
+  content:"";
+  position:absolute;
+  top:10px;
+  left:10px;
+  width:10px;
+  height:10px;
+  border-radius:3px;
+  pointer-events:none;
+  z-index:2;
+  animation: modeMarkPulse 1.8s ease-in-out infinite;
+}
+
+/* FLASH選択中＝ミント */
+.modeFlash.is-on::before{
+  background: var(--mint);
+  box-shadow:
+    0 0 10px rgba(127,231,255,.65),
+    0 0 22px rgba(127,231,255,.35);
+}
+
+/* BLITZ選択中＝アンバー */
+.modeBlitz.is-on::before{
+  background: var(--amber);
+  box-shadow:
+    0 0 10px rgba(255,204,102,.60),
+    0 0 22px rgba(255,204,102,.30);
+}
